@@ -1,4 +1,4 @@
-import express from "express"
+import express from 'express'
 
 const web = express()
 web.use(express.json())

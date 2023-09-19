@@ -1,5 +1,5 @@
-import {PrismaClient} from "@prisma/client";
-import {log} from './logging.js';
+import { PrismaClient } from '@prisma/client'
+import { log } from './logging.js'
 
 export const prismaClient = new PrismaClient({
     log: [
@@ -20,20 +20,20 @@ export const prismaClient = new PrismaClient({
             level: 'warn',
         },
     ],
-});
+})
 
 prismaClient.$on('error', (e) => {
-    log.error(e);
+    log.error(e)
 })
 
 prismaClient.$on('warn', (e) => {
-    log.warn(e);
+    log.warn(e)
 })
 
 prismaClient.$on('info', (e) => {
-    log.info(e);
+    log.info(e)
 })
 
 prismaClient.$on('query', (e) => {
-    log.info(e);
+    log.info(e)
 })

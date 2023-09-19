@@ -5,7 +5,12 @@
   "main": "src/main.js",
   "type": "module",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "lint": "npx eslint src test",
+    "lint:fix": "npm run lint -- --fix",
+    "prettier": "npx prettier src --check",
+    "prettier:fix": "npm run prettier -- --write",
+    "format": "npm run prettier:fix && npm run lint:fix"
   },
   "jest": {
     "transform": {
@@ -38,8 +43,12 @@
     "@types/jest": "^29.5.5",
     "@types/supertest": "^2.0.12",
     "babel-jest": "^29.7.0",
+    "eslint": "^8.49.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
     "jest": "^29.7.0",
     "nodemon": "^3.0.1",
+    "prettier": "^3.0.3",
     "prisma": "^5.3.1",
     "supertest": "^6.3.3"
   }
