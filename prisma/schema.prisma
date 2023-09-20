@@ -7,92 +7,105 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model users {
+model User {
   id        Int      @id @default(autoincrement())
   roleId    Int
-  firstName String   @db.VarChar(255)
-  lastName  String?  @db.VarChar(255)
-  username  String   @unique @db.VarChar(255)
-  email     String   @unique @db.VarChar(255)
+  firstName String   @db.VarChar(100)
+  lastName  String?  @db.VarChar(100)
+  username  String   @unique @db.VarChar(100)
+  email     String   @unique @db.VarChar(100)
   password  String   @db.VarChar(100)
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  role roles  @relation(fields: [roleId], references: [id])
-  blog blog[]
+  role Roles  @relation(fields: [roleId], references: [id])
+  blog Blog[]
 
   @@index([username])
+  @@map("users")
 }
 
-model roles {
+model Roles {
   id        Int      @id @default(autoincrement())
   name      String   @unique
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  users     users[]
+
+  user User[]
+
+  @@map("roles")
 }
 
-model categories {
+model Category {
   id        Int      @id @default(autoincrement())
   name      String   @unique
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  blog      blog[]
+  blog      Blog[]
+
+  @@map("categories")
 }
 
-model blog {
+model Blog {
   id          Int      @id @default(autoincrement())
   userId      Int
   categoryId  Int
   title       String   @db.VarChar(255)
-  slug        String   @unique @db.VarChar(255)
+  slug        String   @unique @db.VarChar(100)
   description String?  @db.VarChar(255)
   content     String   @db.Text
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  user     users      @relation(fields: [userId], references: [id])
-  category categories @relation(fields: [categoryId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
 
   @@index([slug])
+  @@map("blogs")
 }
 
-model areas {
-  id        Int         @id @default(autoincrement())
-  name      String      @db.VarChar(255)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  countries countries[]
+model Area {
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(255)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  countries Country[]
+
+  @@map("areas")
 }
 
-model countries {
+model Country {
   id        Int      @id @default(autoincrement())
   name      String   @db.VarChar(255)
   areaId    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  area           areas            @relation(fields: [areaId], references: [id])
-  cities         cities[]
-  countries_tour countries_tour[]
+  area           Area            @relation(fields: [areaId], references: [id])
+  cities         City[]
+  countries_tour CountriesTour[]
+
+  @@map("countries")
 }
 
-model cities {
+model City {
   id        Int      @id @default(autoincrement())
   name      String   @db.VarChar(255)
   countryId Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  country        countries        @relation(fields: [countryId], references: [id])
-  indonesia_tour indonesia_tour[]
+  country        Country         @relation(fields: [countryId], references: [id])
+  indonesia_tour IndonesiaTour[]
+
+  @@map("cities")
 }
 
-model indonesia_tour {
+model IndonesiaTour {
   id          Int      @id @default(autoincrement())
   name        String   @db.VarChar(255)
   cityId      Int
@@ -104,12 +117,13 @@ model indonesia_tour {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  city cities @relation(fields: [cityId], references: [id])
+  city City @relation(fields: [cityId], references: [id])
 
   @@index([name])
+  @@map("indonesia_tour")
 }
 
-model countries_tour {
+model CountriesTour {
   id          Int      @id @default(autoincrement())
   name        String   @db.VarChar(255)
   countryId   Int
@@ -121,5 +135,7 @@ model countries_tour {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  country countries @relation(fields: [countryId], references: [id])
+  country Country @relation(fields: [countryId], references: [id])
+
+  @@map("countries_tour")
 }
