@@ -1,5 +1,5 @@
 import userService from '../service/userService.js'
-import responses from '../utils/response.js'
+import responses from '../utils/response-api.js'
 import { logger } from '../application/logging.js'
 
 const add = async (req, res, next) => {
