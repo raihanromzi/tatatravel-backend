@@ -10,7 +10,7 @@ const error = async (err, req, res, next) => {
 
     if (err instanceof ResponseError) {
         res.status(err.code)
-            .send(response.responseError(err.code, '', err.message))
+            .send(response.responseError(err.code, err.status, err.message))
             .end()
     } else {
         logger.info(err.message)
