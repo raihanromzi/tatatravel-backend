@@ -29,4 +29,20 @@ describe('POST /api/v1/users', () => {
         expect(result.body.data.email).toBe('johndoe@email.com')
         expect(result.body.data.password).toBeUndefined()
     })
+
+    it('should not add new user', async () => {
+        const result = await supertest(web).post('/api/v1/users').send({
+            firstName: '',
+            lastName: 'Doe',
+            username: 'johndoe',
+            email: 'johndoe@email.com',
+            password: '123456',
+            role: 1,
+        })
+
+        logger.info(result.body)
+
+        expect(result.status).toBe(400)
+        expect(result.body.errors).toBeDefined()
+    })
 })

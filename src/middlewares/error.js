@@ -2,7 +2,7 @@ import { ResponseError } from '../utils/response-error.js'
 import response from '../utils/response.js'
 import { logger } from '../application/logging.js'
 
-const errorMiddleware = async (err, req, res, next) => {
+const error = async (err, req, res, next) => {
     if (!err) {
         next()
         return
@@ -20,4 +20,4 @@ const errorMiddleware = async (err, req, res, next) => {
     }
 }
 
-export { errorMiddleware }
+export { error }
