@@ -1,11 +1,11 @@
 import { validate } from '../validation/validation.js'
-import { addUserValidation } from '../validation/user-validation.js'
+import { addUserValidationSchema } from '../validation/user-validation.js'
 import { prismaClient } from '../application/database.js'
 import { ResponseError } from '../utils/response-error.js'
 import * as bcrypt from 'bcrypt'
 
 const add = async (request) => {
-    const user = validate(addUserValidation, request)
+    const user = validate(addUserValidationSchema, request)
 
     const countUser = await prismaClient.user.count({
         where: {
