@@ -1,4 +1,4 @@
-const cleanObj = require('./clean-obj.js')
+import { cleanObj } from './clean-obj.js'
 
 const responseSuccess = (code, status, data) =>
     cleanObj({
@@ -14,7 +14,4 @@ const responseError = (code, status, error) =>
         errors: error,
     })
 
-module.exports = {
-    responseSuccess,
-    responseError,
-}
+export default { responseSuccess, responseError }

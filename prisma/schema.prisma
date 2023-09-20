@@ -10,12 +10,13 @@ datasource db {
 model User {
   id        Int      @id @default(autoincrement())
   roleId    Int
-  firstName String   @db.VarChar(100)
-  lastName  String?  @db.VarChar(100)
-  username  String   @unique @db.VarChar(100)
-  email     String   @unique @db.VarChar(100)
-  password  String   @db.VarChar(100)
+  firstName String   @db.VarChar(50)
+  lastName  String?  @db.VarChar(50)
+  username  String   @unique @db.VarChar(30)
+  email     String   @unique @db.VarChar(255)
+  password  String   @db.VarChar(255)
   isActive  Boolean  @default(true)
+  Token     String?  @db.VarChar(255)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -70,7 +71,7 @@ model Blog {
 
 model Area {
   id        Int       @id @default(autoincrement())
-  name      String    @db.VarChar(255)
+  name      String    @db.VarChar(100)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   countries Country[]
@@ -80,7 +81,7 @@ model Area {
 
 model Country {
   id        Int      @id @default(autoincrement())
-  name      String   @db.VarChar(255)
+  name      String   @db.VarChar(100)
   areaId    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -94,7 +95,7 @@ model Country {
 
 model City {
   id        Int      @id @default(autoincrement())
-  name      String   @db.VarChar(255)
+  name      String   @db.VarChar(100)
   countryId Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -107,7 +108,7 @@ model City {
 
 model IndonesiaTour {
   id          Int      @id @default(autoincrement())
-  name        String   @db.VarChar(255)
+  name        String   @db.VarChar(100)
   cityId      Int
   price       String   @db.VarChar(255)
   dateStart   DateTime
@@ -125,7 +126,7 @@ model IndonesiaTour {
 
 model CountriesTour {
   id          Int      @id @default(autoincrement())
-  name        String   @db.VarChar(255)
+  name        String   @db.VarChar(100)
   countryId   Int
   price       String   @db.VarChar(255)
   dateStart   DateTime

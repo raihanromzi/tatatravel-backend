@@ -15,4 +15,4 @@ const cleanObj = (obj) => {
     return newObj
 }
 
-module.exports = cleanObj
+export { cleanObj }
