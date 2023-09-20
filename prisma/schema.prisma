@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,4 +5,121 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model users {
+  id        Int      @id @default(autoincrement())
+  roleId    Int
+  firstName String   @db.VarChar(255)
+  lastName  String?  @db.VarChar(255)
+  username  String   @unique @db.VarChar(255)
+  email     String   @unique @db.VarChar(255)
+  password  String   @db.VarChar(100)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  role roles  @relation(fields: [roleId], references: [id])
+  blog blog[]
+
+  @@index([username])
+}
+
+model roles {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  users     users[]
+}
+
+model categories {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  blog      blog[]
+}
+
+model blog {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  categoryId  Int
+  title       String   @db.VarChar(255)
+  slug        String   @unique @db.VarChar(255)
+  description String?  @db.VarChar(255)
+  content     String   @db.Text
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user     users      @relation(fields: [userId], references: [id])
+  category categories @relation(fields: [categoryId], references: [id])
+
+  @@index([slug])
+}
+
+model areas {
+  id        Int         @id @default(autoincrement())
+  name      String      @db.VarChar(255)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  countries countries[]
+}
+
+model countries {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  areaId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  area           areas            @relation(fields: [areaId], references: [id])
+  cities         cities[]
+  countries_tour countries_tour[]
+}
+
+model cities {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  countryId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  country        countries        @relation(fields: [countryId], references: [id])
+  indonesia_tour indonesia_tour[]
+}
+
+model indonesia_tour {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(255)
+  cityId      Int
+  price       String   @db.VarChar(255)
+  dateStart   DateTime
+  dateEnd     DateTime
+  description String?  @db.VarChar(255)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  city cities @relation(fields: [cityId], references: [id])
+
+  @@index([name])
+}
+
+model countries_tour {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(255)
+  countryId   Int
+  price       String   @db.VarChar(255)
+  dateStart   DateTime
+  dateEnd     DateTime
+  description String?  @db.VarChar(255)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  country countries @relation(fields: [countryId], references: [id])
 }

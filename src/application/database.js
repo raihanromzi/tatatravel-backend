@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client'
 import { log } from './logging.js'
 
 export const prismaClient = new PrismaClient({
+    errorFormat: 'pretty',
     log: [
         {
             emit: 'event',
