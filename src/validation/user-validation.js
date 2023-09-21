@@ -36,7 +36,7 @@ const addUserValidationSchema = Joi.object({
         'any.only': 'Password is required!',
     }),
     role: Joi.number().required(),
-})
+}).unknown(true)
 
 const loginValidationSchema = Joi.object({
     email: Joi.string().email().required().messages({
@@ -52,6 +52,6 @@ const loginValidationSchema = Joi.object({
         'string.max': 'max 255 characters',
         'any.only': 'Password is required!',
     }),
-})
+}).unknown(true)
 
 export { addUserValidationSchema, loginValidationSchema }
