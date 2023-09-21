@@ -1,7 +1,7 @@
 import supertest from 'supertest'
 import { web } from '../../src/application/web.js'
 import { logger } from '../../src/application/logging.js'
-import { createRoleAdmin, createUserJohn, deleteUserJohn } from '../utils/test-util.js'
+import { createUserJohn, deleteUserJohn } from '../utils/test-util.js'
 
 describe('POST /api/v1/users', () => {
     afterEach(async () => {
