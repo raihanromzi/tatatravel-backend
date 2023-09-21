@@ -38,4 +38,20 @@ const addUserValidationSchema = Joi.object({
     role: Joi.number().required(),
 })
 
-export { addUserValidationSchema }
+const loginValidationSchema = Joi.object({
+    email: Joi.string().email().required().messages({
+        'string.base': 'email must be a string',
+        'string.empty': 'email cannot be empty',
+        'string.email': 'email must be a valid email',
+        'any.required': 'email is required!',
+    }),
+    password: Joi.string().min(6).max(255).required().messages({
+        'string.base': 'password must be a string',
+        'string.empty': 'password cannot be empty',
+        'string.min': 'min 6 characters',
+        'string.max': 'max 255 characters',
+        'any.only': 'Password is required!',
+    }),
+})
+
+export { addUserValidationSchema, loginValidationSchema }

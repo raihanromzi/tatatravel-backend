@@ -19,21 +19,21 @@ model User {
   token     String?   @db.VarChar(255)
   expiredAt DateTime? @db.DateTime
   createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  updatedAt DateTime  @default(now()) @updatedAt
 
-  role Roles  @relation(fields: [roleId], references: [id])
+  role Role   @relation(fields: [roleId], references: [id])
   blog Blog[]
 
   @@index([username])
   @@map("users")
 }
 
-model Roles {
+model Role {
   id        Int      @id @default(autoincrement())
   name      String   @unique
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now()) @updatedAt
 
   user User[]
 
@@ -45,7 +45,7 @@ model Category {
   name      String   @unique
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now()) @updatedAt
   blog      Blog[]
 
   @@map("categories")
@@ -61,7 +61,7 @@ model Blog {
   content     String   @db.Text
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime @default(now()) @updatedAt
 
   user     User     @relation(fields: [userId], references: [id])
   category Category @relation(fields: [categoryId], references: [id])
@@ -74,7 +74,7 @@ model Area {
   id        Int       @id @default(autoincrement())
   name      String    @db.VarChar(100)
   createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  updatedAt DateTime  @default(now()) @updatedAt
   countries Country[]
 
   @@map("areas")
@@ -85,7 +85,7 @@ model Country {
   name      String   @db.VarChar(100)
   areaId    Int
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now()) @updatedAt
 
   area           Area            @relation(fields: [areaId], references: [id])
   cities         City[]
@@ -99,7 +99,7 @@ model City {
   name      String   @db.VarChar(100)
   countryId Int
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now()) @updatedAt
 
   country        Country         @relation(fields: [countryId], references: [id])
   indonesia_tour IndonesiaTour[]
@@ -117,7 +117,7 @@ model IndonesiaTour {
   description String?  @db.VarChar(255)
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime @default(now()) @updatedAt
 
   city City @relation(fields: [cityId], references: [id])
 
@@ -135,7 +135,7 @@ model CountriesTour {
   description String?  @db.VarChar(255)
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime @default(now()) @updatedAt
 
   country Country @relation(fields: [countryId], references: [id])
 
