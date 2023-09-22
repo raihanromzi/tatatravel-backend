@@ -9,6 +9,14 @@ const deleteUserJohn = async () => {
     })
 }
 
+const deleteUserJohnNew = async () => {
+    await prismaClient.user.deleteMany({
+        where: {
+            username: 'johndoenew',
+        },
+    })
+}
+
 const createUserJohn = async () => {
     await prismaClient.user.create({
         data: {
@@ -53,4 +61,4 @@ const createRoleAdmin = async () => {
     })
 }
 
-export { deleteUserJohn, createUserJohn, deleteRoleAdmin, createRoleAdmin }
+export { deleteUserJohn, deleteUserJohnNew, createUserJohn, deleteRoleAdmin, createRoleAdmin }

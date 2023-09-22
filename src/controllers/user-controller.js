@@ -34,4 +34,18 @@ const getUser = async (req, res, next) => {
     }
 }
 
-export default { add, login, getUser }
+const updateUser = async (req, res, next) => {
+    try {
+        const username = req.user.username
+        const request = req.body
+        request.username = username
+
+        const result = await userService.updateUser(request)
+        res.status(200).send(responses.responseSuccess(200, 'OK', result))
+    } catch (e) {
+        logger.error(e)
+        next(e)
+    }
+}
+
+export default { add, login, getUser, updateUser }
