@@ -87,57 +87,37 @@ model Country {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  area           Area            @relation(fields: [areaId], references: [id])
-  cities         City[]
-  countries_tour CountriesTour[]
+  area        Area          @relation(fields: [areaId], references: [id])
+  TourCountry TourCountry[]
 
   @@map("countries")
 }
 
-model City {
+model Tour {
+  id          Int           @id @default(autoincrement())
+  name        String        @db.VarChar(100)
+  price       String        @db.VarChar(255)
+  dateStart   DateTime
+  dateEnd     DateTime
+  description String?       @db.VarChar(255)
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @default(now()) @updatedAt
+  TourCountry TourCountry[]
+
+  @@index([name])
+  @@map("tours")
+}
+
+model TourCountry {
   id        Int      @id @default(autoincrement())
-  name      String   @db.VarChar(100)
+  tourId    Int
   countryId Int
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  country        Country         @relation(fields: [countryId], references: [id])
-  indonesia_tour IndonesiaTour[]
-
-  @@map("cities")
-}
-
-model IndonesiaTour {
-  id          Int      @id @default(autoincrement())
-  name        String   @db.VarChar(100)
-  cityId      Int
-  price       String   @db.VarChar(255)
-  dateStart   DateTime
-  dateEnd     DateTime
-  description String?  @db.VarChar(255)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now()) @updatedAt
-
-  city City @relation(fields: [cityId], references: [id])
-
-  @@index([name])
-  @@map("indonesia_tour")
-}
-
-model CountriesTour {
-  id          Int      @id @default(autoincrement())
-  name        String   @db.VarChar(100)
-  countryId   Int
-  price       String   @db.VarChar(255)
-  dateStart   DateTime
-  dateEnd     DateTime
-  description String?  @db.VarChar(255)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now()) @updatedAt
-
+  tour    Tour    @relation(fields: [tourId], references: [id])
   country Country @relation(fields: [countryId], references: [id])
 
-  @@map("countries_tour")
+  @@map("tour_countries")
 }

@@ -25,7 +25,6 @@ Response Body Success :
     "email": "string",
     "phone": "string"
   },
-
   // Atau bisa juga seperti ini kalau data lebih dari 1
 
   "data": [
@@ -35,14 +34,17 @@ Response Body Success :
       "phone": "string"
     }
   ],
-
   // Atau bisa juga seperti ini kalau ada pagination
 
   "page": {
-    "size": 10, // perpage berapa
-    "total": 100, // total data di db
-    "totalPage": 10, // 100/10 = 10
-    "current": 1 // lagi buka page berapa
+    "size": 10,
+    // perpage berapa
+    "total": 100,
+    // total data di db
+    "totalPage": 10,
+    // 100/10 = 10
+    "current": 1
+    // lagi buka page berapa
   }
 }
 ```
@@ -73,3 +75,15 @@ Response Body Error :
   }
 }
 ```
+
+```json
+{
+  "country": [
+    "indonesia",
+    "singapore",
+    "malaysia"
+  ]
+}
+```
+
+
