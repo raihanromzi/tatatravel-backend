@@ -6,6 +6,7 @@ import { publicRouter } from './public-route.js'
 const userRouter = express.Router()
 
 userRouter.use(authMiddleware)
+
 publicRouter.post('/api/v1/users', userController.add)
 userRouter.get('/api/v1/users/current', userController.getUser)
 userRouter.patch('/api/v1/users/current', userController.updateUser)
