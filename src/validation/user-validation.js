@@ -62,4 +62,37 @@ const getUserValidationSchema = Joi.string().min(3).max(30).required().messages(
     'any.required': 'username is required!',
 })
 
-export { addUserValidationSchema, loginValidationSchema, getUserValidationSchema }
+const updateUserValidationSchema = Joi.object({
+    username: Joi.string().min(3).max(30).required().messages({
+        'string.base': 'username must be a string',
+        'string.min': 'min 3 characters',
+        'string.max': 'max 30 characters',
+    }),
+    newUsername: Joi.string().min(3).max(30).required().messages({
+        'string.base': 'username must be a string',
+        'string.min': 'min 3 characters',
+        'string.max': 'max 30 characters',
+    }),
+    password: Joi.string().min(6).max(255).optional().messages({
+        'string.base': 'password must be a string',
+        'string.min': 'min 6 characters',
+        'string.max': 'max 255 characters',
+    }),
+    firstName: Joi.string().min(3).max(50).optional().messages({
+        'string.base': 'first name must be a string',
+        'string.min': 'min 3 characters',
+        'string.max': 'max 50 characters',
+    }),
+    lastName: Joi.string().min(3).max(50).optional().messages({
+        'string.base': 'last name must be a string',
+        'string.min': 'min 3 characters',
+        'string.max': 'max 50 characters',
+    }),
+})
+
+export {
+    addUserValidationSchema,
+    loginValidationSchema,
+    getUserValidationSchema,
+    updateUserValidationSchema,
+}

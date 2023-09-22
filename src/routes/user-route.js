@@ -6,5 +6,6 @@ const userRouter = express.Router()
 
 userRouter.use(authMiddleware)
 userRouter.get('/api/v1/users/current', userController.getUser)
+userRouter.patch('/api/v1/users/current', userController.updateUser)
 
 export { userRouter }
