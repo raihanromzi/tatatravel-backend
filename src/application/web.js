@@ -1,12 +1,14 @@
 import express from 'express'
-import { userRouter } from '../routes/userRoute.js'
-import { error } from '../middlewares/error.js'
+import { publicRouter } from '../routes/public-route.js'
+import { errorMiddleware } from '../middlewares/error-middleware.js'
+import { userRouter } from '../routes/user-route.js'
 
 const web = express()
 web.use(express.json())
 
+web.use(publicRouter)
 web.use(userRouter)
 
-web.use(error)
+web.use(errorMiddleware)
 
 export { web }

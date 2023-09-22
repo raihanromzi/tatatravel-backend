@@ -54,16 +54,22 @@ Response Body Error :
   "code": "404",
   "status": "NOT FOUND",
   "errors": "string",
-
-  // Atau bisa juga seperti ini kalau error lebih dari 1
+  // Atau bisa juga seperti ini kalau errorMiddleware lebih dari 1
 
   "errors": {
-    "id": ["must be number"],
-    "name": ["must not be empty", "must be string"],
-
+    "id": [
+      "must be number"
+    ],
+    "name": [
+      "must not be empty",
+      "must be string"
+    ],
     // handle nested object
 
-    "address.city": ["must not be empty", "must be string"]
+    "address.city": [
+      "must not be empty",
+      "must be string"
+    ]
   }
 }
 ```

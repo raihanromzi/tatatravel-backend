@@ -1,5 +1,9 @@
 import { validate } from '../validation/validation.js'
-import { addUserValidationSchema, loginValidationSchema } from '../validation/user-validation.js'
+import {
+    addUserValidationSchema,
+    getUserValidationSchema,
+    loginValidationSchema,
+} from '../validation/user-validation.js'
 import { prismaClient } from '../application/database.js'
 import { ResponseError } from '../utils/response-error.js'
 import * as bcrypt from 'bcrypt'
@@ -85,4 +89,24 @@ const login = async (request) => {
     })
 }
 
-export default { add, login }
+const getUser = async (username) => {
+    username = validate(getUserValidationSchema, username)
+
+    const user = await prismaClient.user.findUnique({
+        where: {
+            username: username,
+        },
+        select: {
+            username: true,
+            email: true,
+        },
+    })
+
+    if (!user) {
+        throw new ResponseError(404, 'Not Found', 'user is not found')
+    }
+
+    return user
+}
+
+export default { add, login, getUser }

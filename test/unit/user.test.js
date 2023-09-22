@@ -65,3 +65,35 @@ describe('POST /api/v1/users/login', () => {
         expect(result.body.data.token).not.toBe('test')
     })
 })
+
+describe('GET /api/v1/users/current', () => {
+    beforeEach(async () => {
+        await createUserJohn()
+    })
+
+    afterEach(async () => {
+        await deleteUserJohn()
+    })
+
+    it('should get current user', async () => {
+        const result = await supertest(web)
+            .get('/api/v1/users/current')
+            .set('Authorization', 'Bearer test')
+
+        logger.info(result.headers)
+
+        expect(result.status).toBe(200)
+        expect(result.body.data.username).toBe('johndoe')
+    })
+
+    it('should not get current user', async () => {
+        const result = await supertest(web)
+            .get('/api/v1/users/current')
+            .set('Authorization', 'Bearer wrong')
+
+        logger.info(result.headers)
+
+        expect(result.status).toBe(401)
+        expect(result.body.errors).toBeDefined()
+    })
+})

@@ -54,4 +54,12 @@ const loginValidationSchema = Joi.object({
     }),
 }).unknown(true)
 
-export { addUserValidationSchema, loginValidationSchema }
+const getUserValidationSchema = Joi.string().min(3).max(30).required().messages({
+    'string.base': 'username must be a string',
+    'string.empty': 'username cannot be empty',
+    'string.min': 'min 3 characters',
+    'string.max': 'max 30 characters',
+    'any.required': 'username is required!',
+})
+
+export { addUserValidationSchema, loginValidationSchema, getUserValidationSchema }
