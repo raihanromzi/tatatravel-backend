@@ -176,6 +176,11 @@ const logout = async (username) => {
         },
         select: {
             username: true,
+            role: {
+                select: {
+                    name: true,
+                },
+            },
         },
     })
 }
