@@ -1,6 +1,5 @@
 import { prismaClient } from '../application/database.js'
 import response from '../utils/response-api.js'
-import { logger } from '../application/logging.js'
 
 const authMiddleware = async (req, res, next) => {
     if (!req.get('Authorization')) {
