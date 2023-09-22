@@ -90,9 +90,38 @@ const updateUserValidationSchema = Joi.object({
     }),
 })
 
+const searchUserValidationSchema = Joi.object({
+    page: Joi.number().min(1).positive().default(1),
+    size: Joi.number().min(1).positive().max(100).default(10),
+    username: Joi.string().max(30).optional().messages({
+        'string.base': 'username must be a string',
+        'string.max': 'max 30 characters',
+    }),
+    email: Joi.string().email().optional().messages({
+        'string.base': 'email must be a string',
+        'string.email': 'email must be a valid email',
+    }),
+    name: Joi.string().max(50).optional().messages({
+        'string.base': 'first name must be a string',
+        'string.max': 'max 50 characters',
+    }),
+    role: Joi.string().max(50).optional().messages({
+        'string.base': 'role must be a string',
+        'string.max': 'max 50 characters',
+    }),
+})
+
+const deleteUserValidationSchema = Joi.number().positive().required().messages({
+    'number.base': 'user id must be a number',
+    'number.positive': 'user id must be a positive number',
+    'any.required': 'user id is required!',
+})
+
 export {
     addUserValidationSchema,
     loginValidationSchema,
     getUserValidationSchema,
     updateUserValidationSchema,
+    deleteUserValidationSchema,
+    searchUserValidationSchema,
 }

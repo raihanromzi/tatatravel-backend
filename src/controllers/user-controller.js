@@ -1,6 +1,5 @@
 import userService from '../service/user-service.js'
 import responses from '../utils/response-api.js'
-import { logger } from '../application/logging.js'
 
 const add = async (req, res, next) => {
     try {
@@ -8,7 +7,6 @@ const add = async (req, res, next) => {
 
         res.status(201).send(responses.responseSuccess(201, 'CREATED', result))
     } catch (e) {
-        logger.error(e)
         next(e)
     }
 }
@@ -18,7 +16,6 @@ const login = async (req, res, next) => {
         const result = await userService.login(req.body)
         res.status(200).send(responses.responseSuccess(200, 'OK', result))
     } catch (e) {
-        logger.error(e)
         next(e)
     }
 }
@@ -29,7 +26,6 @@ const getUser = async (req, res, next) => {
         const result = await userService.getUser(username)
         res.status(200).send(responses.responseSuccess(200, 'OK', result))
     } catch (e) {
-        logger.error(e)
         next(e)
     }
 }
@@ -43,7 +39,6 @@ const updateUser = async (req, res, next) => {
         const result = await userService.updateUser(request)
         res.status(200).send(responses.responseSuccess(200, 'OK', result))
     } catch (e) {
-        logger.error(e)
         next(e)
     }
 }
@@ -53,7 +48,6 @@ const logout = async (req, res, next) => {
         await userService.logout(req.user.username)
         res.status(200).send(responses.responseSuccess(200, 'OK', 'Logout success'))
     } catch (e) {
-        logger.error(e)
         next(e)
     }
 }
