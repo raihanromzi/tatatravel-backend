@@ -48,4 +48,14 @@ const updateUser = async (req, res, next) => {
     }
 }
 
-export default { add, login, getUser, updateUser }
+const logout = async (req, res, next) => {
+    try {
+        await userService.logout(req.user.username)
+        res.status(200).send(responses.responseSuccess(200, 'OK', 'Logout success'))
+    } catch (e) {
+        logger.error(e)
+        next(e)
+    }
+}
+
+export default { add, login, getUser, updateUser, logout }

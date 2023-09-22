@@ -3,6 +3,12 @@ import response from '../utils/response-api.js'
 import { logger } from '../application/logging.js'
 
 const authMiddleware = async (req, res, next) => {
+    if (!req.get('Authorization')) {
+        res.status(401)
+            .send(response.responseError(401, 'Unauthorized', 'Authorization header is required'))
+            .end()
+        return
+    }
     const token = req.get('Authorization').split(' ')[1]
 
     if (!token) {

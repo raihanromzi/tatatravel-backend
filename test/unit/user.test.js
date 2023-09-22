@@ -105,6 +105,7 @@ describe('PATCH /api/v1/users/current', () => {
 
     afterEach(async () => {
         await deleteUserJohnNew()
+        await deleteUserJohn()
     })
 
     it('should can update current user', async () => {
@@ -128,5 +129,24 @@ describe('PATCH /api/v1/users/current', () => {
             .send({})
 
         expect(result.status).toBe(401)
+    })
+})
+
+describe('DELETE /api/v1/users/current', () => {
+    beforeEach(async () => {
+        await createUserJohn()
+    })
+
+    afterEach(async () => {
+        await deleteUserJohn()
+    })
+
+    it('should can logout', async () => {
+        const result = await supertest(web)
+            .delete('/api/v1/users/current')
+            .set('Authorization', 'Bearer test')
+
+        expect(result.status).toBe(200)
+        expect(result.body.data).toBe('Logout success')
     })
 })
