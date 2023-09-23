@@ -8,18 +8,18 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  roleId    Int
-  firstName String    @db.VarChar(50)
-  lastName  String?   @db.VarChar(50)
-  username  String    @unique @db.VarChar(30)
-  email     String    @unique @db.VarChar(255)
-  password  String    @db.VarChar(255)
-  isActive  Boolean   @default(true)
-  token     String?   @db.VarChar(255)
-  expiredAt DateTime? @db.DateTime
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now()) @updatedAt
+  id         Int       @id @default(autoincrement())
+  roleId     Int
+  firstName  String    @db.VarChar(50)
+  lastName   String?   @db.VarChar(50)
+  username   String    @unique @db.VarChar(30)
+  email      String    @unique @db.VarChar(255)
+  password   String    @db.VarChar(255)
+  isActive   Boolean   @default(true)
+  token      String?   @db.VarChar(255)
+  validUntil DateTime? @db.DateTime
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @default(now()) @updatedAt
 
   role Role   @relation(fields: [roleId], references: [id])
   blog Blog[]
