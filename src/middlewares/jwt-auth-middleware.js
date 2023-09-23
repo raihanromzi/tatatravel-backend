@@ -4,9 +4,8 @@ import jwt from 'jsonwebtoken'
 
 const jwtAuthMiddleware = async (req, res, next) => {
     const authHeader = req.get('Authorization')
-    const token = authHeader.split(' ')[1]
 
-    if (!authHeader) {
+    if (!authHeader?.startsWith('Bearer ')) {
         res.status(errors.HTTP_CODE_UNAUTHORIZED)
             .send(
                 response.responseError(
@@ -18,6 +17,8 @@ const jwtAuthMiddleware = async (req, res, next) => {
             .end()
         return
     }
+
+    const token = authHeader.split(' ')[1]
 
     if (!token) {
         res.status(errors.HTTP_CODE_UNAUTHORIZED)
@@ -34,12 +35,12 @@ const jwtAuthMiddleware = async (req, res, next) => {
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_KEY, (err, user) => {
         if (err) {
-            res.status(errors.HTTP_CODE_UNAUTHORIZED)
+            res.status(errors.HTTP_CODE_FORBIDDEN)
                 .send(
                     response.responseError(
-                        errors.HTTP_CODE_UNAUTHORIZED,
-                        errors.HTTP_STATUS_UNAUTHORIZED,
-                        errors.ERROR_AUTHORIZATION
+                        errors.HTTP_CODE_FORBIDDEN,
+                        errors.HTTP_STATUS_FORBIDDEN,
+                        errors.ERROR_FORBIDDEN
                     )
                 )
                 .end()
