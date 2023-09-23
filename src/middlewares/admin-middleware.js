@@ -1,6 +1,6 @@
 import response from '../utils/response-api.js'
 
-const adminMiddlewares = async (req, res, next) => {
+const adminMiddleware = async (req, res, next) => {
     const user = req.user
 
     if (!user.role()) {
@@ -18,4 +18,4 @@ const adminMiddlewares = async (req, res, next) => {
     next()
 }
 
-export { adminMiddlewares }
+export { adminMiddleware }
