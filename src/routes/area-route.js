@@ -1,13 +1,13 @@
 import express from 'express'
 
 import { authMiddleware } from '../middlewares/auth-middleware.js'
-import { adminMiddlewares } from '../middlewares/admin-middlewares.js'
+import { adminMiddleware } from '../middlewares/admin-middleware.js'
 import areaController from '../controllers/area-controller.js'
 
 const areaRouter = express.Router()
 
 areaRouter.use(authMiddleware)
-areaRouter.use(adminMiddlewares)
+areaRouter.use(adminMiddleware)
 
 areaRouter.post('/api/v1/areas', areaController.add)
 areaRouter.get('/api/v1/areas', areaController.get)
