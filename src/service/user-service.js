@@ -8,7 +8,7 @@ import {
 import { prismaClient } from '../application/database.js'
 import { ResponseError } from '../utils/response-error.js'
 import * as bcrypt from 'bcrypt'
-import { v4 as uuid } from 'uuid'
+import { errors } from '../utils/message-error.js'
 
 const add = async (request) => {
     const user = validate(addUserValidationSchema, request)
@@ -53,41 +53,44 @@ const add = async (request) => {
 }
 
 const login = async (request) => {
-    const loginRequest = validate(loginValidationSchema, request)
+    const validatedRequest = validate(loginValidationSchema, request)
 
-    const user = await prismaClient.user.findUnique({
+    const foundUser = await prismaClient.user.findUnique({
         where: {
-            email: loginRequest.email,
+            OR: [
+                {
+                    email: validatedRequest.email,
+                },
+                {
+                    username: validatedRequest.username,
+                },
+            ],
         },
         select: {
+            email: true,
             username: true,
             password: true,
+            roleId: true,
         },
     })
 
-    if (!user) {
-        throw new ResponseError(401, 'Unauthorized', 'Username or password is wrong')
+    if (!foundUser) {
+        throw new ResponseError(
+            errors.HTTP_CODE_NOT_FOUND,
+            errors.HTTP_STATUS_NOT_FOUND,
+            errors.ERROR_USER_NOT_FOUND
+        )
     }
 
-    const isPasswordValid = await bcrypt.compare(loginRequest.password, user.password)
+    const isPasswordValid = await bcrypt.compare(validatedRequest.password, foundUser.password)
 
     if (!isPasswordValid) {
-        throw new ResponseError(401, 'Unauthorized', 'Username or password is wrong')
+        throw new ResponseError(
+            errors.HTTP_CODE_UNAUTHORIZED,
+            errors.HTTP_STATUS_UNAUTHORIZED,
+            errors.ERROR_WRONG_AUTHENTICATION
+        )
     }
-
-    const token = uuid().toString()
-
-    return prismaClient.user.update({
-        data: {
-            token: token,
-        },
-        where: {
-            username: user.username,
-        },
-        select: {
-            token: true,
-        },
-    })
 }
 
 const getUser = async (username) => {

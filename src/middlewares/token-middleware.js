@@ -2,7 +2,11 @@ import response from '../utils/response-api.js'
 import { errors } from '../utils/message-error.js'
 import jwt from 'jsonwebtoken'
 
-const jwtAuthMiddleware = async (req, res, next) => {
+const refreshTokenMiddleware = async (req, res, next) => {
+    const authHeader = req.get('Authorization')
+}
+
+const tokenMiddleware = async (req, res, next) => {
     const authHeader = req.get('Authorization')
 
     if (!authHeader?.startsWith('Bearer ')) {
@@ -50,4 +54,4 @@ const jwtAuthMiddleware = async (req, res, next) => {
     })
 }
 
-export { jwtAuthMiddleware }
+export { tokenMiddleware }

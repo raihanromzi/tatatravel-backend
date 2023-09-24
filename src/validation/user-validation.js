@@ -98,13 +98,17 @@ const loginValidationSchema = Joi.object({
         }),
 }).unknown(true)
 
-const getUserValidationSchema = Joi.string().min(3).max(30).required().messages({
-    'string.base': 'username must be a string',
-    'string.empty': 'username cannot be empty',
-    'string.min': 'min 3 characters',
-    'string.max': 'max 30 characters',
-    'any.required': 'username is required!',
-})
+const getUserValidationSchema = Joi.string()
+    .min(3)
+    .max(30)
+    .required()
+    .messages({
+        'string.base': `${errors.ERROR_USERNAME_STRING}}`,
+        'string.empty': `${errors.ERROR_USERNAME_EMPTY}`,
+        'string.min': `${errors.ERROR_USERNAME_MIN}`,
+        'string.max': `${errors.ERROR_USERNAME_MAX}`,
+        'any.required': `${errors.ERROR_USERNAME_REQUIRED}`,
+    })
 
 const updateUserValidationSchema = Joi.object({
     username: Joi.string().min(3).max(30).required().messages({
