@@ -5,16 +5,9 @@ import { prismaClient } from '../application/database.js'
 import { logger } from '../application/logging.js'
 
 const refresh = async (req, res) => {
-    const cookie = req.cookie
+    const cookie = req.headers.cookie
+    logger.info(cookie)
     const foundRefreshToken = cookie.refreshToken
-
-    logger.info('refreshTokenMiddleware', foundRefreshToken)
-
-    res.clearCookie('refreshToken', {
-        httpOnly: true,
-        sameSite: 'None',
-        secure: true,
-    })
 
     if (!foundRefreshToken) {
         throw new ResponseError(

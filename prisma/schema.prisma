@@ -16,7 +16,7 @@ model User {
   email      String    @unique @db.VarChar(255)
   password   String    @db.VarChar(255)
   isActive   Boolean   @default(true)
-  token      String?   @db.VarChar(255)
+  token      String?   @db.Text
   validUntil DateTime? @db.DateTime
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @default(now()) @updatedAt

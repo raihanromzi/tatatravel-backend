@@ -54,6 +54,15 @@ const login = async (req, res) => {
         maxAge: 1000 * 60 * 60 * 24 * 7,
     })
 
+    await prismaClient.user.update({
+        where: {
+            username: foundUser.username,
+        },
+        data: {
+            token: refreshToken,
+        },
+    })
+
     return {
         accessToken: accessToken,
     }

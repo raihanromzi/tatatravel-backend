@@ -7,9 +7,9 @@ import { tokenRouter } from '../routes/token-route.js'
 const web = express()
 web.use(express.json())
 
+web.use(tokenRouter)
 web.use(publicRouter)
 web.use(userRouter)
-web.use(tokenRouter)
 
 web.use(errorMiddleware)
 
