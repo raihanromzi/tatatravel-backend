@@ -2,13 +2,11 @@ import { validate } from '../validation/validation.js'
 import {
     addUserValidationSchema,
     getUserValidationSchema,
-    loginValidationSchema,
     updateUserValidationSchema,
 } from '../validation/user-validation.js'
 import { prismaClient } from '../application/database.js'
 import { ResponseError } from '../utils/response-error.js'
 import * as bcrypt from 'bcrypt'
-import { errors } from '../utils/message-error.js'
 
 const add = async (request) => {
     const user = validate(addUserValidationSchema, request)
@@ -52,49 +50,8 @@ const add = async (request) => {
     return result
 }
 
-const login = async (request) => {
-    const validatedRequest = validate(loginValidationSchema, request)
-
-    const foundUser = await prismaClient.user.findUnique({
-        where: {
-            OR: [
-                {
-                    email: validatedRequest.email,
-                },
-                {
-                    username: validatedRequest.username,
-                },
-            ],
-        },
-        select: {
-            email: true,
-            username: true,
-            password: true,
-            roleId: true,
-        },
-    })
-
-    if (!foundUser) {
-        throw new ResponseError(
-            errors.HTTP_CODE_NOT_FOUND,
-            errors.HTTP_STATUS_NOT_FOUND,
-            errors.ERROR_USER_NOT_FOUND
-        )
-    }
-
-    const isPasswordValid = await bcrypt.compare(validatedRequest.password, foundUser.password)
-
-    if (!isPasswordValid) {
-        throw new ResponseError(
-            errors.HTTP_CODE_UNAUTHORIZED,
-            errors.HTTP_STATUS_UNAUTHORIZED,
-            errors.ERROR_WRONG_AUTHENTICATION
-        )
-    }
-}
-
-const getUser = async (username) => {
-    username = validate(getUserValidationSchema, username)
+const getUser = async (req) => {
+    const username = validate(getUserValidationSchema, req.user.username)
 
     const user = await prismaClient.user.findUnique({
         where: {
@@ -157,8 +114,8 @@ const updateUser = async (request) => {
     })
 }
 
-const logout = async (username) => {
-    username = validate(getUserValidationSchema, username)
+const logout = async (req) => {
+    const username = validate(getUserValidationSchema, req.user.username)
 
     const user = await prismaClient.user.findUnique({
         where: {
@@ -188,4 +145,4 @@ const logout = async (username) => {
     })
 }
 
-export default { add, login, getUser, updateUser, logout }
+export default { add, getUser, updateUser, logout }

@@ -1,12 +1,9 @@
 import response from '../utils/response-api.js'
 import { errors } from '../utils/message-error.js'
 import jwt from 'jsonwebtoken'
+import { logger } from '../application/logging.js'
 
-const refreshTokenMiddleware = async (req, res, next) => {
-    const authHeader = req.get('Authorization')
-}
-
-const tokenMiddleware = async (req, res, next) => {
+const accessTokenMiddleware = async (req, res, next) => {
     const authHeader = req.get('Authorization')
 
     if (!authHeader?.startsWith('Bearer ')) {
@@ -48,10 +45,18 @@ const tokenMiddleware = async (req, res, next) => {
                     )
                 )
                 .end()
+            return
         }
         req.user = user
         next()
     })
 }
 
-export { tokenMiddleware }
+const refreshTokenMiddleware = async (req, res, next) => {
+    const cookie = req.cookie
+    const foundRefreshToken = cookie.refreshToken
+
+    logger.info('refreshTokenMiddleware', foundRefreshToken)
+}
+
+export { accessTokenMiddleware, refreshTokenMiddleware }

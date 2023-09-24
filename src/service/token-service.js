@@ -2,10 +2,13 @@ import jwt from 'jsonwebtoken'
 import { ResponseError } from '../utils/response-error.js'
 import { errors } from '../utils/message-error.js'
 import { prismaClient } from '../application/database.js'
+import { logger } from '../application/logging.js'
 
 const refresh = async (req, res) => {
     const cookie = req.cookie
     const foundRefreshToken = cookie.refreshToken
+
+    logger.info('refreshTokenMiddleware', foundRefreshToken)
 
     res.clearCookie('refreshToken', {
         httpOnly: true,
@@ -90,11 +93,11 @@ const refresh = async (req, res) => {
 }
 
 const generateAccessToken = (validUser) => {
-    return jwt.sign(validUser, process.env.ACCESS_TOKEN_SECRET_KEY, { expiresIn: '1m' })
+    return jwt.sign(validUser, process.env.ACCESS_TOKEN_SECRET_KEY, { expiresIn: '5s' })
 }
 
 const generateRefreshToken = (validUser) => {
-    return jwt.sign(validUser, process.env.REFRESH_TOKEN_SECRET_KEY, { expiresIn: '1d' })
+    return jwt.sign(validUser, process.env.REFRESH_TOKEN_SECRET_KEY, { expiresIn: '10s' })
 }
 
-export default { refresh }
+export default { refresh, generateAccessToken, generateRefreshToken }

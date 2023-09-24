@@ -1,5 +1,6 @@
 import userService from '../service/user-service.js'
 import responses from '../utils/response-api.js'
+import publidService from '../service/public-service.js'
 
 const add = async (req, res, next) => {
     try {
@@ -13,7 +14,7 @@ const add = async (req, res, next) => {
 
 const login = async (req, res, next) => {
     try {
-        const result = await userService.login(req.body)
+        const result = await publidService.login(req.body, res)
         res.status(200).send(responses.responseSuccess(200, 'OK', result))
     } catch (e) {
         next(e)
@@ -22,8 +23,7 @@ const login = async (req, res, next) => {
 
 const getUser = async (req, res, next) => {
     try {
-        const username = req.user.username
-        const result = await userService.getUser(username)
+        const result = await userService.getUser(req)
         res.status(200).send(responses.responseSuccess(200, 'OK', result))
     } catch (e) {
         next(e)
