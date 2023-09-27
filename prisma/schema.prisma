@@ -10,9 +10,9 @@ datasource db {
 model User {
   id         Int       @id @default(autoincrement())
   roleId     Int
-  firstName  String    @db.VarChar(50)
-  lastName   String?   @db.VarChar(50)
+  fullName   String    @db.VarChar(255)
   username   String    @unique @db.VarChar(30)
+  avatar     String?   @db.VarChar(255)
   email      String    @unique @db.VarChar(255)
   password   String    @db.VarChar(255)
   isActive   Boolean   @default(true)
@@ -63,8 +63,9 @@ model Blog {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now()) @updatedAt
 
-  user     User     @relation(fields: [userId], references: [id])
-  category Category @relation(fields: [categoryId], references: [id])
+  user      User        @relation(fields: [userId], references: [id])
+  category  Category    @relation(fields: [categoryId], references: [id])
+  BlogImage BlogImage[]
 
   @@index([slug])
   @@map("blogs")
@@ -104,6 +105,7 @@ model Tour {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @default(now()) @updatedAt
   TourCountry TourCountry[]
+  Images      TourImage[]
 
   @@index([name])
   @@map("tours")
@@ -120,4 +122,28 @@ model TourCountry {
   country Country @relation(fields: [countryId], references: [id])
 
   @@map("tour_countries")
+}
+
+model TourImage {
+  id        Int      @id @default(autoincrement())
+  tourId    Int
+  image     String   @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  tour Tour @relation(fields: [tourId], references: [id])
+
+  @@map("tour_images")
+}
+
+model BlogImage {
+  id        Int      @id @default(autoincrement())
+  blogId    Int
+  image     String   @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  blog Blog @relation(fields: [blogId], references: [id])
+
+  @@map("blog_images")
 }
