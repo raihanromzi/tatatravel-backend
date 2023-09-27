@@ -68,25 +68,23 @@ const refreshTokenVerifyMiddleware = async (req, res, next) => {
             .end()
     }
 
-    if (foundRefreshToken) {
-        jwt.verify(foundRefreshToken, process.env.REFRESH_TOKEN_SECRET_KEY, (err, user) => {
-            if (err) {
-                res.status(errors.HTTP_CODE_FORBIDDEN)
-                    .send(
-                        response.responseError(
-                            errors.HTTP_CODE_FORBIDDEN,
-                            errors.HTTP_STATUS_FORBIDDEN,
-                            errors.ERROR_FORBIDDEN
-                        )
+    jwt.verify(foundRefreshToken, process.env.REFRESH_TOKEN_SECRET_KEY, (err, user) => {
+        if (err) {
+            res.status(errors.HTTP_CODE_FORBIDDEN)
+                .send(
+                    response.responseError(
+                        errors.HTTP_CODE_FORBIDDEN,
+                        errors.HTTP_STATUS_FORBIDDEN,
+                        errors.ERROR_FORBIDDEN
                     )
-                    .end()
-                return
-            }
-            // save user to req.user
-            req.user = user
-            next()
-        })
-    }
+                )
+                .end()
+            return
+        }
+        // save user to req.user
+        req.user = user
+        next()
+    })
 }
 
 export { accessTokenVerifyMiddleware, refreshTokenVerifyMiddleware }
