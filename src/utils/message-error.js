@@ -17,6 +17,7 @@ const errors = {
     ERROR_USER_ALREADY_EXISTS: 'user already exists',
     ERROR_ROLE_REQUIRED: 'role is required',
     ERROR_ROLE_NUMBER: 'role must be a number',
+    ERROR_ROLE_POSITIVE: 'role must be a positive number',
     ERROR_FIRST_NAME_STRING: 'first name must be a string',
     ERROR_FIRST_NAME_EMPTY: 'first name cannot be empty',
     ERROR_FIRST_NAME_MIN: 'min 3 characters',
@@ -36,11 +37,15 @@ const errors = {
     ERROR_EMAIL_EMPTY: 'email cannot be empty',
     ERROR_EMAIL_INVALID: 'email must be a valid email',
     ERROR_EMAIL_REQUIRED: 'email is required',
+    ERROR_USERID_NUMBER: 'user id must be a number',
+    ERROR_USERID_POSITIVE: 'user id must be a positive number',
+    ERROR_USERID_REQUIRED: 'user id is required',
     ERROR_PASSWORD_STRING: 'password must be a string',
     ERROR_PASSWORD_EMPTY: 'password cannot be empty',
     ERROR_PASSWORD_MIN: 'min 6 characters',
     ERROR_PASSWORD_MAX: 'max 255 characters',
     ERROR_PASSWORD_REQUIRED: 'password is required',
+    ERROR_PASSWORD_PATTERN: 'password must be a valid password',
 }
 
 export { errors }
