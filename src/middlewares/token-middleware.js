@@ -1,9 +1,8 @@
 import response from '../utils/response-api.js'
 import { errors } from '../utils/message-error.js'
 import jwt from 'jsonwebtoken'
-import { logger } from '../application/logging.js'
 
-const accessTokenMiddleware = async (req, res, next) => {
+const accessTokenVerifyMiddleware = async (req, res, next) => {
     const authHeader = req.get('Authorization')
 
     if (!authHeader?.startsWith('Bearer ')) {
@@ -47,16 +46,47 @@ const accessTokenMiddleware = async (req, res, next) => {
                 .end()
             return
         }
+        // save user to req.user
         req.user = user
         next()
     })
 }
 
-const refreshTokenMiddleware = async (req, res, next) => {
-    const cookie = req.cookie
+const refreshTokenVerifyMiddleware = async (req, res, next) => {
+    const cookie = req.headers.cookie
     const foundRefreshToken = cookie.refreshToken
 
-    logger.info('refreshTokenMiddleware', foundRefreshToken)
+    if (!foundRefreshToken) {
+        res.status(errors.HTTP_CODE_UNAUTHORIZED)
+            .send(
+                response.responseError(
+                    errors.HTTP_CODE_UNAUTHORIZED,
+                    errors.HTTP_STATUS_UNAUTHORIZED,
+                    errors.ERROR_AUTHORIZATION
+                )
+            )
+            .end()
+    }
+
+    if (foundRefreshToken) {
+        jwt.verify(foundRefreshToken, process.env.REFRESH_TOKEN_SECRET_KEY, (err, user) => {
+            if (err) {
+                res.status(errors.HTTP_CODE_FORBIDDEN)
+                    .send(
+                        response.responseError(
+                            errors.HTTP_CODE_FORBIDDEN,
+                            errors.HTTP_STATUS_FORBIDDEN,
+                            errors.ERROR_FORBIDDEN
+                        )
+                    )
+                    .end()
+                return
+            }
+            // save user to req.user
+            req.user = user
+            next()
+        })
+    }
 }
 
-export { accessTokenMiddleware, refreshTokenMiddleware }
+export { accessTokenVerifyMiddleware, refreshTokenVerifyMiddleware }

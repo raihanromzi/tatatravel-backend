@@ -44,13 +44,21 @@ const login = async (req, res) => {
         roleId: foundUser.roleId,
     }
 
+    const userRefreshTokenData = {
+        username: foundUser.username,
+        roleId: foundUser.roleId,
+        email: foundUser.email,
+    }
+
     const accessToken = tokenService.generateAccessToken(userAccessTokenData)
-    const refreshToken = tokenService.generateRefreshToken(foundUser)
+    const refreshToken = tokenService.generateRefreshToken(userRefreshTokenData)
 
     res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         sameSite: 'None',
         secure: true,
+
+        // maxAge is in milliseconds (1000 * 60 * 60 * 24 * 7 = 7 days)
         maxAge: 1000 * 60 * 60 * 24 * 7,
     })
 

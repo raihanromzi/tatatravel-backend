@@ -71,6 +71,7 @@ model Blog {
   @@map("blogs")
 }
 
+// Region
 model Area {
   id        Int       @id @default(autoincrement())
   name      String    @db.VarChar(100)
@@ -98,17 +99,31 @@ model Tour {
   id          Int           @id @default(autoincrement())
   name        String        @db.VarChar(100)
   price       String        @db.VarChar(255)
-  dateStart   DateTime
-  dateEnd     DateTime
+  dateStart   String        @db.VarChar(255)
+  dateEnd     String        @db.VarChar(255)
+  duration    String        @db.VarChar(255)
   description String?       @db.VarChar(255)
   isActive    Boolean       @default(true)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @default(now()) @updatedAt
   TourCountry TourCountry[]
   Images      TourImage[]
+  Place       Place[]
 
   @@index([name])
   @@map("tours")
+}
+
+model Place {
+  id        Int      @id @default(autoincrement())
+  tourId    Int
+  name      String   @db.VarChar(100)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  tour Tour @relation(fields: [tourId], references: [id])
+
+  @@map("places")
 }
 
 model TourCountry {

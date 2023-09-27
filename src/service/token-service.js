@@ -2,11 +2,9 @@ import jwt from 'jsonwebtoken'
 import { ResponseError } from '../utils/response-error.js'
 import { errors } from '../utils/message-error.js'
 import { prismaClient } from '../application/database.js'
-import { logger } from '../application/logging.js'
 
 const refresh = async (req, res) => {
     const cookie = req.headers.cookie
-    logger.info(cookie)
     const foundRefreshToken = cookie.refreshToken
 
     if (!foundRefreshToken) {
@@ -71,7 +69,7 @@ const refresh = async (req, res) => {
         })
 
         // creates Secure Cookie with refresh token
-        res.cookie('jwt', newRefreshToken, {
+        res.cookie('refreshToken', newRefreshToken, {
             httpOnly: true,
             secure: true,
             sameSite: 'None',

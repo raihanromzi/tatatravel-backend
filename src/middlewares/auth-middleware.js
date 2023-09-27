@@ -29,6 +29,7 @@ const authMiddleware = async (req, res, next) => {
                 .send(response.responseError(404, 'Not Found', 'user is not founds'))
                 .end()
         } else {
+            // save user to req.user
             req.user = user
             next()
         }
