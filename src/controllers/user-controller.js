@@ -6,7 +6,7 @@ import { success } from '../utils/message-success.js'
 const add = async (req, res, next) => {
     try {
         const result = await userService.add(req.body)
-        res.status(201).send(
+        res.status(success.HTTP_CODE_CREATED).send(
             responses.responseSuccess(
                 success.HTTP_CODE_CREATED,
                 success.HTTP_STATUS_CREATED,
@@ -21,7 +21,7 @@ const add = async (req, res, next) => {
 const login = async (req, res, next) => {
     try {
         const result = await publicService.login(req.body, res)
-        res.status(200).send(
+        res.status(success.HTTP_CODE_OK).send(
             responses.responseSuccess(success.HTTP_CODE_OK, success.HTTP_STATUS_OK, result)
         )
     } catch (e) {
@@ -32,7 +32,7 @@ const login = async (req, res, next) => {
 const get = async (req, res, next) => {
     try {
         const result = await userService.get(req)
-        res.status(200).send(
+        res.status(success.HTTP_CODE_OK).send(
             responses.responseSuccess(success.HTTP_CODE_OK, success.HTTP_STATUS_OK, result)
         )
     } catch (e) {
@@ -47,7 +47,7 @@ const update = async (req, res, next) => {
         request.username = username
 
         const result = await userService.update(request)
-        res.status(200).send(
+        res.status(success.HTTP_CODE_OK).send(
             responses.responseSuccess(success.HTTP_CODE_OK, success.HTTP_STATUS_OK, result)
         )
     } catch (e) {
@@ -58,11 +58,11 @@ const update = async (req, res, next) => {
 const logout = async (req, res, next) => {
     try {
         await userService.logout(req.user.username)
-        res.status(200).send(
+        res.status(success.HTTP_CODE_OK).send(
             responses.responseSuccess(
                 success.HTTP_CODE_OK,
                 success.HTTP_STATUS_OK,
-                'Logout success'
+                success.SUCCESS_LOGOUT
             )
         )
     } catch (e) {

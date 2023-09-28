@@ -3,6 +3,7 @@ const success = {
     HTTP_STATUS_OK: 'OK',
     HTTP_CODE_CREATED: 201,
     HTTP_STATUS_CREATED: 'created',
+    SUCCESS_LOGOUT: 'logout success',
 }
 
 export { success }
