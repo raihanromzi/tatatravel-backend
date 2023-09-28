@@ -18,11 +18,11 @@ const errors = {
     ERROR_ROLE_REQUIRED: 'role is required',
     ERROR_ROLE_NUMBER: 'role must be a number',
     ERROR_ROLE_POSITIVE: 'role must be a positive number',
-    ERROR_FULLNAME_STRING: 'full name must be a string',
-    ERROR_FULLNAME_EMPTY: 'full name cannot be empty',
-    ERROR_FULLNAME_MIN: 'min 3 characters',
-    ERROR_FULLNAME_MAX: 'max 255 characters',
-    ERROR_FULLNAME_REQUIRED: 'full name is required',
+    ERROR_FULL_NAME_STRING: 'full name must be a string',
+    ERROR_FULL_NAME_EMPTY: 'full name cannot be empty',
+    ERROR_FULL_NAME_MIN: 'min 3 characters',
+    ERROR_FULL_NAME_MAX: 'max 255 characters',
+    ERROR_FULL_NAME_REQUIRED: 'full name is required',
     ERROR_USERNAME_STRING: 'username must be a string',
     ERROR_USERNAME_EMPTY: 'username cannot be empty',
     ERROR_USERNAME_MIN: 'min 3 characters',
@@ -41,6 +41,7 @@ const errors = {
     ERROR_PASSWORD_MAX: 'max 255 characters',
     ERROR_PASSWORD_REQUIRED: 'password is required',
     ERROR_PASSWORD_PATTERN: 'password must be a valid password',
+    ERROR_FAILED_TO_ADD_USER: 'failed to add user',
 }
 
 export { errors }

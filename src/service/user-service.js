@@ -7,22 +7,27 @@ import {
 import { prismaClient } from '../application/database.js'
 import { ResponseError } from '../utils/response-error.js'
 import * as bcrypt from 'bcrypt'
+import { errors } from '../utils/message-error.js'
 
-const add = async (request) => {
-    const user = validate(addUserValidationSchema, request)
+const add = async (req) => {
+    const user = validate(addUserValidationSchema, req)
 
     const countUser = await prismaClient.user.count({
         where: {
-            username: user.username,
             email: user.email,
+            username: user.username,
         },
     })
 
     if (countUser === 1) {
-        throw new ResponseError(400, 'Bad Request', 'Username or email already exists')
+        throw new ResponseError(
+            errors.HTTP_CODE_BAD_REQUEST,
+            errors.HTTP_STATUS_BAD_REQUEST,
+            errors.ERROR_USER_ALREADY_EXISTS
+        )
     }
 
-    const hashedPassword = await bcrypt.hash(request.password, 10)
+    const hashedPassword = await bcrypt.hash(user.password, 10)
 
     const result = prismaClient.user.create({
         data: {
@@ -43,13 +48,17 @@ const add = async (request) => {
     })
 
     if (!result) {
-        throw new ResponseError(500, 'Internal Server Error', 'Failed to add user')
+        throw new ResponseError(
+            errors.HTTP_CODE_INTERNAL_SERVER_ERROR,
+            errors.HTTP_STATUS_INTERNAL_SERVER_ERROR,
+            errors.ERROR_FAILED_TO_ADD_USER
+        )
     }
 
     return result
 }
 
-const getUser = async (req) => {
+const get = async (req) => {
     const username = validate(getUserValidationSchema, req.user.username)
 
     const user = await prismaClient.user.findUnique({
@@ -63,14 +72,18 @@ const getUser = async (req) => {
     })
 
     if (!user) {
-        throw new ResponseError(404, 'Not Found', 'user is not found')
+        throw new ResponseError(
+            errors.HTTP_CODE_NOT_FOUND,
+            errors.HTTP_STATUS_NOT_FOUND,
+            errors.ERROR_USER_NOT_FOUND
+        )
     }
 
     return user
 }
 
-const updateUser = async (request) => {
-    const user = validate(updateUserValidationSchema, request)
+const update = async (req) => {
+    const user = validate(updateUserValidationSchema, req)
 
     const totalUserInDatabase = await prismaClient.user.count({
         where: {
@@ -79,21 +92,17 @@ const updateUser = async (request) => {
     })
 
     if (totalUserInDatabase !== 1) {
-        throw new ResponseError(404, 'Not Found', 'user is not found')
+        throw new ResponseError(
+            errors.HTTP_CODE_NOT_FOUND,
+            errors.HTTP_STATUS_NOT_FOUND,
+            errors.ERROR_USER_NOT_FOUND
+        )
     }
 
     const data = {}
 
-    if (user.newUsername) {
-        data.username = user.newUsername
-    }
-
-    if (user.firstName) {
-        data.firstName = user.firstName
-    }
-
-    if (user.lastName) {
-        data.lastName = user.lastName
+    if (user.fullName) {
+        data.fullName = user.fullName
     }
 
     if (user.password) {
@@ -107,14 +116,13 @@ const updateUser = async (request) => {
         data: data,
         select: {
             username: true,
-            firstName: true,
-            lastName: true,
+            fullName: true,
         },
     })
 }
 
 const logout = async (req) => {
-    const username = validate(getUserValidationSchema, req.user.username)
+    const username = validate(getUserValidationSchema, req)
 
     const user = await prismaClient.user.findUnique({
         where: {
@@ -123,7 +131,11 @@ const logout = async (req) => {
     })
 
     if (!user) {
-        throw new ResponseError(404, 'Not Found', 'user is not found')
+        throw new ResponseError(
+            errors.HTTP_CODE_NOT_FOUND,
+            errors.HTTP_STATUS_NOT_FOUND,
+            errors.ERROR_USER_NOT_FOUND
+        )
     }
 
     return prismaClient.user.update({
@@ -144,4 +156,4 @@ const logout = async (req) => {
     })
 }
 
-export default { add, getUser, updateUser, logout }
+export default { add, get, update, logout }

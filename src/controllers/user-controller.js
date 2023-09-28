@@ -1,11 +1,18 @@
 import userService from '../service/user-service.js'
 import responses from '../utils/response-api.js'
 import publicService from '../service/public-service.js'
+import { success } from '../utils/message-success.js'
 
 const add = async (req, res, next) => {
     try {
         const result = await userService.add(req.body)
-        res.status(201).send(responses.responseSuccess(201, 'CREATED', result))
+        res.status(201).send(
+            responses.responseSuccess(
+                success.HTTP_CODE_CREATED,
+                success.HTTP_STATUS_CREATED,
+                result
+            )
+        )
     } catch (e) {
         next(e)
     }
@@ -14,29 +21,35 @@ const add = async (req, res, next) => {
 const login = async (req, res, next) => {
     try {
         const result = await publicService.login(req.body, res)
-        res.status(200).send(responses.responseSuccess(200, 'OK', result))
+        res.status(200).send(
+            responses.responseSuccess(success.HTTP_CODE_OK, success.HTTP_STATUS_OK, result)
+        )
     } catch (e) {
         next(e)
     }
 }
 
-const getUser = async (req, res, next) => {
+const get = async (req, res, next) => {
     try {
-        const result = await userService.getUser(req)
-        res.status(200).send(responses.responseSuccess(200, 'OK', result))
+        const result = await userService.get(req)
+        res.status(200).send(
+            responses.responseSuccess(success.HTTP_CODE_OK, success.HTTP_STATUS_OK, result)
+        )
     } catch (e) {
         next(e)
     }
 }
 
-const updateUser = async (req, res, next) => {
+const update = async (req, res, next) => {
     try {
         const username = req.user.username
         const request = req.body
         request.username = username
 
-        const result = await userService.updateUser(request)
-        res.status(200).send(responses.responseSuccess(200, 'OK', result))
+        const result = await userService.update(request)
+        res.status(200).send(
+            responses.responseSuccess(success.HTTP_CODE_OK, success.HTTP_STATUS_OK, result)
+        )
     } catch (e) {
         next(e)
     }
@@ -45,10 +58,16 @@ const updateUser = async (req, res, next) => {
 const logout = async (req, res, next) => {
     try {
         await userService.logout(req.user.username)
-        res.status(200).send(responses.responseSuccess(200, 'OK', 'Logout success'))
+        res.status(200).send(
+            responses.responseSuccess(
+                success.HTTP_CODE_OK,
+                success.HTTP_STATUS_OK,
+                'Logout success'
+            )
+        )
     } catch (e) {
         next(e)
     }
 }
 
-export default { add, login, getUser, updateUser, logout }
+export default { add, login, get, update, logout }

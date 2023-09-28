@@ -7,7 +7,7 @@ const refresh = async (req, res) => {
     const foundRefreshToken = req.cookies.refreshToken
     let validUser = null
 
-    res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true })
+    res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'None', secure: true })
 
     if (!foundRefreshToken) {
         throw new ResponseError(
