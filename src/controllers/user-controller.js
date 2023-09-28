@@ -5,7 +5,6 @@ import publicService from '../service/public-service.js'
 const add = async (req, res, next) => {
     try {
         const result = await userService.add(req.body)
-
         res.status(201).send(responses.responseSuccess(201, 'CREATED', result))
     } catch (e) {
         next(e)

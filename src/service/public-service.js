@@ -57,9 +57,7 @@ const login = async (req, res) => {
         httpOnly: true,
         sameSite: 'None',
         secure: true,
-
-        // maxAge is in milliseconds (1000 * 60 * 60 * 24 * 7 = 7 days)
-        maxAge: 1000 * 60 * 60 * 24 * 7,
+        maxAge: 1000 * 60 * 60 * 24,
     })
 
     await prismaClient.user.update({

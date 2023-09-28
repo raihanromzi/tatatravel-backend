@@ -4,8 +4,10 @@ import { errors } from '../utils/message-error.js'
 import { prismaClient } from '../application/database.js'
 
 const refresh = async (req, res) => {
-    const cookie = req.headers.cookie
-    const foundRefreshToken = cookie.refreshToken
+    const foundRefreshToken = req.cookies.refreshToken
+    let validUser = null
+
+    res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true })
 
     if (!foundRefreshToken) {
         throw new ResponseError(
@@ -15,7 +17,7 @@ const refresh = async (req, res) => {
         )
     }
 
-    const foundUserWithRefreshToken = await prismaClient.user.findUnique({
+    const foundUserWithRefreshToken = await prismaClient.user.findFirst({
         where: {
             token: foundRefreshToken,
         },
@@ -45,6 +47,11 @@ const refresh = async (req, res) => {
                 },
             })
         })
+        throw new ResponseError(
+            errors.HTTP_CODE_UNAUTHORIZED,
+            errors.HTTP_STATUS_UNAUTHORIZED,
+            errors.ERROR_AUTHORIZATION
+        )
     }
 
     jwt.verify(foundRefreshToken, process.env.REFRESH_TOKEN_SECRET_KEY, async (err, user) => {
@@ -56,39 +63,50 @@ const refresh = async (req, res) => {
             )
         }
 
-        const newAccessToken = generateAccessToken(user)
-        const newRefreshToken = generateRefreshToken(user)
-
-        await prismaClient.user.update({
-            where: {
-                username: user.username,
-            },
-            data: {
-                token: newRefreshToken,
-            },
-        })
-
-        // creates Secure Cookie with refresh token
-        res.cookie('refreshToken', newRefreshToken, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'None',
-            maxAge: 24 * 60 * 60 * 1000,
-        })
-
-        return {
-            newAccessToken,
-            newRefreshToken,
-        }
+        validUser = user
     })
+
+    const userAccessTokenData = {
+        username: validUser.username,
+        roleId: validUser.roleId,
+    }
+
+    const userRefreshTokenData = {
+        username: validUser.username,
+        roleId: validUser.roleId,
+        email: validUser.email,
+    }
+
+    const newAccessToken = generateAccessToken(userAccessTokenData)
+    const newRefreshToken = generateRefreshToken(userRefreshTokenData)
+
+    await prismaClient.user.update({
+        where: {
+            username: validUser.username,
+        },
+        data: {
+            token: newRefreshToken,
+        },
+    })
+
+    res.cookie('refreshToken', newRefreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'None',
+        maxAge: 24 * 60 * 60 * 1000,
+    })
+
+    return {
+        accessToken: newAccessToken,
+    }
 }
 
 const generateAccessToken = (validUser) => {
-    return jwt.sign(validUser, process.env.ACCESS_TOKEN_SECRET_KEY, { expiresIn: '5s' })
+    return jwt.sign(validUser, process.env.ACCESS_TOKEN_SECRET_KEY, { expiresIn: '5m' })
 }
 
 const generateRefreshToken = (validUser) => {
-    return jwt.sign(validUser, process.env.REFRESH_TOKEN_SECRET_KEY, { expiresIn: '10s' })
+    return jwt.sign(validUser, process.env.REFRESH_TOKEN_SECRET_KEY, { expiresIn: '1d' })
 }
 
 export default { refresh, generateAccessToken, generateRefreshToken }

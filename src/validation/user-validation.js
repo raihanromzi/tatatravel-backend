@@ -2,27 +2,16 @@ import Joi from 'joi'
 import { errors } from '../utils/message-error.js'
 
 const addUserValidationSchema = Joi.object({
-    firstName: Joi.string()
+    fullName: Joi.string()
         .min(3)
-        .max(50)
+        .max(255)
         .required()
         .messages({
-            'string.base': `${errors.ERROR_FIRST_NAME_STRING}`,
-            'string.empty': `${errors.ERROR_FIRST_NAME_EMPTY}`,
-            'string.min': `${errors.ERROR_FIRST_NAME_MIN}`,
-            'string.max': `${errors.ERROR_FIRST_NAME_MAX}`,
-            'any.required': `${errors.ERROR_FIRSTNAME_REQUIRED}`,
-        }),
-    lastName: Joi.string()
-        .min(3)
-        .max(50)
-        .required()
-        .messages({
-            'string.base': `${errors.ERROR_LAST_NAME_STRING}`,
-            'string.empty': `${errors.ERROR_LAST_NAME_EMPTY}`,
-            'string.min': `${errors.ERROR_LAST_NAME_MIN}`,
-            'string.max': `${errors.ERROR_LAST_NAME_MAX}`,
-            'any.required': `${errors.ERROR_LASTNAME_REQUIRED}`,
+            'string.base': `${errors.ERROR_FULLNAME_STRING}`,
+            'string.empty': `${errors.ERROR_FULLNAME_EMPTY}`,
+            'string.min': `${errors.ERROR_FULLNAME_MIN}`,
+            'string.max': `${errors.ERROR_FULLNAME_MAX}`,
+            'any.required': `${errors.ERROR_FULLNAME_REQUIRED}`,
         }),
     username: Joi.string()
         .min(3)

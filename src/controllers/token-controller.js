@@ -6,9 +6,7 @@ import { logger } from '../application/logging.js'
 const refreshToken = async (req, res, next) => {
     try {
         const result = await tokenService.refresh(req, res)
-
-        logger.info('refreshToken', result)
-
+        logger.info('result', result)
         res.status(201).send(
             responses.responseSuccess(
                 success.HTTP_CODE_CREATED,

@@ -26,8 +26,7 @@ const add = async (request) => {
 
     const result = prismaClient.user.create({
         data: {
-            firstName: user.firstName,
-            lastName: user.lastName,
+            fullName: user.fullName,
             username: user.username,
             email: user.email,
             password: hashedPassword,
