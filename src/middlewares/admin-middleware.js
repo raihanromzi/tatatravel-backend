@@ -9,7 +9,7 @@ const adminMiddleware = async (req, res, next) => {
             .end()
     }
 
-    if (user.role().name !== 'admin') {
+    if (user.role().name !== 'super admin') {
         res.status(401)
             .send(response.responseError(401, 'Unauthorized', 'role is not admin'))
             .end()
