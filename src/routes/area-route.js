@@ -15,7 +15,7 @@ areaRouter.use(adminMiddleware)
 areaRouter.post('/v1/areas', areaController.add)
 areaRouter.get('/v1/areas', areaController.get)
 areaRouter.get('/v1/areas/:id', areaController.getById)
-areaRouter.patch('/v1/areas', areaController.update)
+areaRouter.patch('/v1/areas/:id', areaController.update)
 areaRouter.delete('/v1/areas/:id', areaController.remove)
 
 export { areaRouter }

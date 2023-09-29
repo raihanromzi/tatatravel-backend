@@ -3,13 +3,13 @@ import { errors } from '../utils/message-error.js'
 
 const addAreaValidationSchema = Joi.object({
     name: Joi.string().min(3).max(50).required().messages({
-        'string.base': 'name must be a string',
-        'string.empty': 'name cannot be empty',
-        'string.min': 'min 3 characters',
-        'string.max': 'max 50 characters',
-        'any.required': 'name is required!',
+        'string.base': errors.ERROR_AREA_NAME_STRING,
+        'string.empty': errors.ERROR_AREA_NAME_EMPTY,
+        'string.min': errors.ERROR_AREA_NAME_MIN,
+        'string.max': errors.ERROR_AREA_NAME_MAX,
+        'any.required': errors.ERROR_AREA_NAME_REQUIRED,
     }),
-})
+}).unknown(true)
 
 const updateAreaValidationSchema = Joi.object({
     name: Joi.string().min(3).max(50).required().messages({
@@ -19,7 +19,7 @@ const updateAreaValidationSchema = Joi.object({
         'string.max': 'max 50 characters',
         'any.required': 'name is required!',
     }),
-})
+}).unknown(true)
 
 const getAreaValidationSchema = Joi.object({
     page: Joi.number().min(1).positive().default(1).messages({
@@ -38,7 +38,7 @@ const getAreaValidationSchema = Joi.object({
         'string.min': errors.ERROR_AREA_NAME_MIN,
         'string.max': errors.ERROR_AREA_NAME_MAX,
     }),
-})
+}).unknown(true)
 
 const getAreaByIdValidationSchema = Joi.object({
     id: Joi.number().positive().required().messages({
@@ -46,7 +46,7 @@ const getAreaByIdValidationSchema = Joi.object({
         'number.empty': 'id cannot be empty',
         'number.positive': 'id must be a positive number',
     }),
-})
+}).unknown(true)
 
 const deleteAreaValidationSchema = Joi.object({
     id: Joi.number().positive().required().messages({
@@ -55,7 +55,7 @@ const deleteAreaValidationSchema = Joi.object({
         'number.positive': 'id must be a positive number',
         'any.required': 'id is required!',
     }),
-})
+}).unknown(true)
 
 export {
     addAreaValidationSchema,

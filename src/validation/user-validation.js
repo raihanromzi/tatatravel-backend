@@ -122,7 +122,7 @@ const updateUserValidationSchema = Joi.object({
             'string.min': `${errors.ERROR_FULL_NAME_MIN}`,
             'string.max': `${errors.ERROR_FULL_NAME_MAX}`,
         }),
-})
+}).unknown(true)
 
 const searchUserValidationSchema = Joi.object({
     page: Joi.number().min(1).positive().default(1).messages({
@@ -162,7 +162,7 @@ const searchUserValidationSchema = Joi.object({
             'string.base': `${errors.ERROR_ROLE_STRING}`,
             'string.max': `${errors.ERROR_ROLE_MAX}`,
         }),
-})
+}).unknown(true)
 
 const deleteUserValidationSchema = Joi.number()
     .positive()

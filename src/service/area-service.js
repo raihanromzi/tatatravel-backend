@@ -10,7 +10,7 @@ import {
 import { errors } from '../utils/message-error.js'
 
 const add = async (req) => {
-    const area = validate(addAreaValidationSchema, req)
+    const area = validate(addAreaValidationSchema, req.body)
 
     const countArea = await prismaClient.area.count({
         where: {
@@ -19,56 +19,69 @@ const add = async (req) => {
     })
 
     if (countArea === 1) {
-        throw new ResponseError(400, 'Bad req', 'Area already exists')
+        throw new ResponseError(
+            errors.HTTP_CODE_BAD_REQUEST,
+            errors.HTTP_STATUS_BAD_REQUEST,
+            errors.ERROR_AREA_ALREADY_EXISTS
+        )
     }
 
     const result = prismaClient.area.create({
         data: {
             name: area.name,
-            description: area.description,
         },
         select: {
             name: true,
-            description: true,
         },
     })
 
     if (!result) {
-        throw new ResponseError(500, 'Internal Server Error', 'Failed to add area')
+        throw new ResponseError(
+            errors.HTTP_CODE_INTERNAL_SERVER_ERROR,
+            errors.HTTP_STATUS_INTERNAL_SERVER_ERROR,
+            errors.ERROR_FAILED_TO_ADD_AREA
+        )
     }
 
     return result
 }
 
-const update = async (req) => {
-    const area = validate(updateAreaValidationSchema, req)
+const update = async (req, params) => {
+    const area = validate(updateAreaValidationSchema, req.body)
+    params = validate(getAreaByIdValidationSchema, params)
 
-    const countArea = await prismaClient.area.count({
+    const findArea = await prismaClient.area.findUnique({
         where: {
-            name: area.name,
+            id: params.id,
         },
     })
 
-    if (countArea === 1) {
-        throw new ResponseError(400, 'Bad req', 'Area already exists')
+    if (!findArea) {
+        throw new ResponseError(
+            errors.HTTP_CODE_NOT_FOUND,
+            errors.HTTP_STATUS_NOT_FOUND,
+            errors.ERROR_AREA_NOT_FOUND
+        )
     }
 
     const result = prismaClient.area.update({
         where: {
-            id: req.id,
+            id: params.id,
         },
         data: {
             name: area.name,
-            description: area.description,
         },
         select: {
             name: true,
-            description: true,
         },
     })
 
     if (!result) {
-        throw new ResponseError(500, 'Internal Server Error', 'Failed to update area')
+        throw new ResponseError(
+            errors.HTTP_CODE_INTERNAL_SERVER_ERROR,
+            errors.HTTP_STATUS_INTERNAL_SERVER_ERROR,
+            errors.ERROR_FAILED_TO_UPDATE_AREA
+        )
     }
 
     return result
@@ -94,6 +107,7 @@ const get = async (req) => {
             AND: filters,
         },
         select: {
+            id: true,
             name: true,
         },
         take: query.size,
@@ -138,6 +152,20 @@ const get = async (req) => {
 const getById = async (params) => {
     params = validate(getAreaByIdValidationSchema, params)
 
+    const findArea = await prismaClient.area.findUnique({
+        where: {
+            id: params.id,
+        },
+    })
+
+    if (!findArea) {
+        throw new ResponseError(
+            errors.HTTP_CODE_NOT_FOUND,
+            errors.HTTP_STATUS_NOT_FOUND,
+            errors.ERROR_AREA_NOT_FOUND
+        )
+    }
+
     const result = await prismaClient.area.findUnique({
         where: {
             id: params.id,
@@ -158,15 +186,35 @@ const getById = async (params) => {
     return result
 }
 
-const remove = async (req) => {
+const remove = async (params) => {
+    params = validate(getAreaByIdValidationSchema, params)
+
+    const findArea = await prismaClient.area.findUnique({
+        where: {
+            id: params.id,
+        },
+    })
+
+    if (!findArea) {
+        throw new ResponseError(
+            errors.HTTP_CODE_NOT_FOUND,
+            errors.HTTP_STATUS_NOT_FOUND,
+            errors.ERROR_AREA_NOT_FOUND
+        )
+    }
+
     const result = await prismaClient.area.delete({
         where: {
-            id: req.id,
+            id: params.id,
         },
     })
 
     if (!result) {
-        throw new ResponseError(500, 'Internal Server Error', 'Failed to delete area')
+        throw new ResponseError(
+            errors.HTTP_CODE_INTERNAL_SERVER_ERROR,
+            errors.HTTP_STATUS_INTERNAL_SERVER_ERROR,
+            errors.ERROR_FAILED_TO_DELETE_AREA
+        )
     }
 
     return result

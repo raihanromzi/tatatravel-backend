@@ -56,9 +56,14 @@ const errors = {
     ERROR_AREA_NAME_EMPTY: 'area name cannot be empty',
     ERROR_AREA_NAME_MIN: 'min 3 characters',
     ERROR_AREA_NAME_MAX: 'max 100 characters',
+    ERROR_AREA_NAME_REQUIRED: 'area name is required',
     ERROR_AREA_NOT_FOUND: 'area is not found',
     ERROR_AREA_ID_NUMBER: 'area id must be a number',
     ERROR_AREA_ID_POSITIVE: 'area id must be a positive number',
+    ERROR_AREA_ALREADY_EXISTS: 'area already exists',
+    ERROR_FAILED_TO_ADD_AREA: 'failed to add area',
+    ERROR_FAILED_TO_UPDATE_AREA: 'failed to update area',
+    ERROR_FAILED_TO_DELETE_AREA: 'failed to delete area',
 }
 
 export { errors }
