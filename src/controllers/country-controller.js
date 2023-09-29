@@ -1,11 +1,17 @@
 import responses from '../utils/response-api.js'
 import countryService from '../service/country-service.js'
+import { success } from '../utils/message-success.js'
 
 const add = async (req, res, next) => {
     try {
         const result = await countryService.add(req.body)
-
-        res.status(201).send(responses.responseSuccess(201, 'CREATED', result))
+        res.status(success.HTTP_CODE_CREATED).send(
+            responses.responseSuccess(
+                success.HTTP_CODE_CREATED,
+                success.HTTP_STATUS_CREATED,
+                result
+            )
+        )
     } catch (e) {
         next(e)
     }
@@ -13,32 +19,67 @@ const add = async (req, res, next) => {
 
 const update = async (req, res, next) => {
     try {
-        const result = await countryService.update(req.body)
+        const params = {
+            id: req.params.id,
+        }
 
-        res.status(200).send(responses.responseSuccess(200, 'OK', result))
+        const result = await countryService.update(req.body, params)
+        res.status(success.HTTP_CODE_OK).send(
+            responses.responseSuccess(success.HTTP_CODE_OK, success.HTTP_STATUS_OK, result)
+        )
     } catch (e) {
         next(e)
     }
 }
 
-const deleteCountry = async (req, res, next) => {
+const remove = async (req, res, next) => {
     try {
-        const result = await countryService.deleteCountry(req.params.id)
+        const params = {
+            id: req.params.id,
+        }
 
-        res.status(200).send(responses.responseSuccess(200, 'OK', result))
+        await countryService.remove(params)
+        res.status(success.HTTP_CODE_OK).send(
+            responses.responseSuccess(
+                success.HTTP_CODE_OK,
+                success.HTTP_STATUS_OK,
+                success.SUCCESS_DELETE_COUNTRY
+            )
+        )
     } catch (e) {
         next(e)
     }
 }
 
-const search = async (req, res, next) => {
+const get = async (req, res, next) => {
     try {
-        const result = await countryService.search(req.query)
+        const query = {
+            name: req.query.name,
+            areaId: req.query.areaId,
+        }
 
-        res.status(200).send(responses.responseSuccess(200, 'OK', result))
+        const result = await countryService.get(query)
+        res.status(success.HTTP_CODE_OK).send(
+            responses.responseSuccess(success.HTTP_CODE_OK, success.HTTP_STATUS_OK, result)
+        )
     } catch (e) {
         next(e)
     }
 }
 
-export default { add, update, deleteCountry, search }
+const getById = async (req, res, next) => {
+    try {
+        const params = {
+            id: req.params.id,
+        }
+
+        const result = await countryService.getById(params)
+        res.status(success.HTTP_CODE_OK).send(
+            responses.responseSuccess(success.HTTP_CODE_OK, success.HTTP_STATUS_OK, result)
+        )
+    } catch (e) {
+        next(e)
+    }
+}
+
+export default { add, get, getById, update, remove }

@@ -70,7 +70,7 @@ model Blog {
   @@map("blogs")
 }
 
-// Region
+// Region, Asia, Europe, America
 model Area {
   id        Int       @id @default(autoincrement())
   name      String    @db.VarChar(100)
@@ -81,6 +81,7 @@ model Area {
   @@map("areas")
 }
 
+// Indonesia, Malaysia, Singapore, Thailand
 model Country {
   id        Int      @id @default(autoincrement())
   name      String   @db.VarChar(100)
@@ -113,6 +114,7 @@ model Tour {
   @@map("tours")
 }
 
+// Place tour (tour detail) -> malaysia, singapore, thailand
 model Place {
   id        Int      @id @default(autoincrement())
   tourId    Int

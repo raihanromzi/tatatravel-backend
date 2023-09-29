@@ -1,11 +1,12 @@
 import express from 'express'
+import cookieParser from 'cookie-parser'
+import { errorMiddleware } from '../middlewares/error-middleware.js'
 import { publicRouter } from '../routes/public-route.js'
 import { userRouter } from '../routes/user-route.js'
 import { tokenRouter } from '../routes/token-route.js'
-import cookieParser from 'cookie-parser'
 import { adminRouter } from '../routes/admin-route.js'
 import { areaRouter } from '../routes/area-route.js'
-import { errorMiddleware } from '../middlewares/error-middleware.js'
+import { countryRouter } from '../routes/country-route.js'
 
 const web = express()
 web.use(express.json())
@@ -18,6 +19,7 @@ web.use(publicRouter)
 web.use(userRouter)
 web.use(adminRouter)
 web.use(areaRouter)
+web.use(countryRouter)
 
 web.use(errorMiddleware)
 

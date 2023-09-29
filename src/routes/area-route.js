@@ -1,5 +1,4 @@
 import express from 'express'
-import { adminMiddleware } from '../middlewares/admin-middleware.js'
 import areaController from '../controllers/area-controller.js'
 import {
     accessTokenVerifyMiddleware,
@@ -10,7 +9,6 @@ const areaRouter = express.Router()
 
 areaRouter.use(accessTokenVerifyMiddleware)
 areaRouter.use(refreshTokenVerifyMiddleware)
-areaRouter.use(adminMiddleware)
 
 areaRouter.post('/v1/areas', areaController.add)
 areaRouter.get('/v1/areas', areaController.get)

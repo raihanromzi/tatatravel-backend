@@ -73,12 +73,12 @@ const remove = async (req, res, next) => {
             id: req.params.id,
         }
 
-        const result = await areaService.remove(params)
+        await areaService.remove(params)
         res.status(success.HTTP_CODE_OK).send(
             responses.responseSuccess(
                 success.HTTP_CODE_OK,
                 success.HTTP_STATUS_OK,
-                success.SUCCESS_DELELE_AREA
+                success.SUCCESS_DELETE_AREA
             )
         )
     } catch (e) {
