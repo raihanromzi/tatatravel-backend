@@ -4,7 +4,6 @@ import areaService from '../service/area-service.js'
 const add = async (req, res, next) => {
     try {
         const result = await areaService.add(req.body)
-
         res.status(201).send(responses.responseSuccess(201, 'CREATED', result))
     } catch (e) {
         next(e)
@@ -13,9 +12,12 @@ const add = async (req, res, next) => {
 
 const get = async (req, res, next) => {
     try {
-        const result = await areaService.get(req.query)
+        const query = {
+            name: req.query.name,
+        }
 
-        res.status(200).send(responses.responseSuccess(200, 'OK', result))
+        const result = await areaService.get(query)
+        res.status(200).send(responses.responseSuccess(200, 'OK', result.data, result.pagination))
     } catch (e) {
         next(e)
     }
@@ -23,8 +25,11 @@ const get = async (req, res, next) => {
 
 const getById = async (req, res, next) => {
     try {
-        const result = await areaService.getById(req.params.id)
+        const params = {
+            id: req.params.id,
+        }
 
+        const result = await areaService.getById(params)
         res.status(200).send(responses.responseSuccess(200, 'OK', result))
     } catch (e) {
         next(e)
@@ -34,7 +39,6 @@ const getById = async (req, res, next) => {
 const update = async (req, res, next) => {
     try {
         const result = await areaService.update(req.body)
-
         res.status(200).send(responses.responseSuccess(200, 'OK', result))
     } catch (e) {
         next(e)
@@ -44,7 +48,6 @@ const update = async (req, res, next) => {
 const remove = async (req, res, next) => {
     try {
         const result = await areaService.remove(req.params.id)
-
         res.status(200).send(responses.responseSuccess(200, 'OK', result))
     } catch (e) {
         next(e)

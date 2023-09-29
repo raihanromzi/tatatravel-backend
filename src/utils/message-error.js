@@ -44,6 +44,21 @@ const errors = {
     ERROR_FAILED_TO_ADD_USER: 'failed to add user',
     ERROR_ROLE_STRING: 'role must be a string',
     ERROR_ROLE_MAX: 'max 30 characters',
+    ERROR_ROLE_UNKNOWN: 'role is unknown',
+    ERROR_ROLE_NOT_SUPER_ADMIN: 'role is not super admin',
+    ERROR_PAGE_NUMBER: 'page must be a number',
+    ERROR_PAGE_EMPTY: 'page cannot be empty',
+    ERROR_PAGE_POSITIVE: 'page must be a positive number',
+    ERROR_SIZE_NUMBER: 'size must be a number',
+    ERROR_SIZE_EMPTY: 'size cannot be empty',
+    ERROR_SIZE_POSITIVE: 'size must be a positive number',
+    ERROR_AREA_NAME_STRING: 'area name must be a string',
+    ERROR_AREA_NAME_EMPTY: 'area name cannot be empty',
+    ERROR_AREA_NAME_MIN: 'min 3 characters',
+    ERROR_AREA_NAME_MAX: 'max 100 characters',
+    ERROR_AREA_NOT_FOUND: 'area is not found',
+    ERROR_AREA_ID_NUMBER: 'area id must be a number',
+    ERROR_AREA_ID_POSITIVE: 'area id must be a positive number',
 }
 
 export { errors }

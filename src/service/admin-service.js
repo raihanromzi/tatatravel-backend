@@ -33,7 +33,7 @@ const deleteUser = async (user, userId) => {
     })
 }
 
-const searchUser = async (user, req) => {
+const searchUser = async (req) => {
     const query = validate(searchUserValidationSchema, req)
 
     const skip = (query.page - 1) * query.size

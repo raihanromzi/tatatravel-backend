@@ -1,5 +1,6 @@
 import response from '../utils/response-api.js'
 import { prismaClient } from '../application/database.js'
+import { errors } from '../utils/message-error.js'
 
 const adminMiddleware = async (req, res, next) => {
     const user = req.user
@@ -15,14 +16,26 @@ const adminMiddleware = async (req, res, next) => {
     })
 
     if (!role.name) {
-        res.status(401)
-            .send(response.responseError(401, 'Unauthorized', 'role is unknown'))
+        res.status(errors.HTTP_CODE_UNAUTHORIZED)
+            .send(
+                response.responseError(
+                    errors.HTTP_CODE_UNAUTHORIZED,
+                    errors.HTTP_STATUS_UNAUTHORIZED,
+                    errors.ERROR_ROLE_UNKNOWN
+                )
+            )
             .end()
     }
 
-    if (role.name !== 'admin') {
-        res.status(401)
-            .send(response.responseError(401, 'Unauthorized', 'role is not admin'))
+    if (role.name !== 'super admin') {
+        res.status(errors.HTTP_CODE_UNAUTHORIZED)
+            .send(
+                response.responseError(
+                    errors.HTTP_CODE_UNAUTHORIZED,
+                    errors.HTTP_STATUS_UNAUTHORIZED,
+                    errors.ERROR_ROLE_NOT_SUPER_ADMIN
+                )
+            )
             .end()
     }
 

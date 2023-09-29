@@ -125,8 +125,16 @@ const updateUserValidationSchema = Joi.object({
 })
 
 const searchUserValidationSchema = Joi.object({
-    page: Joi.number().min(1).positive().default(1),
-    size: Joi.number().min(1).positive().max(100).default(10),
+    page: Joi.number().min(1).positive().default(1).messages({
+        'number.base': errors.ERROR_PAGE_NUMBER,
+        'number.empty': errors.ERROR_PAGE_EMPTY,
+        'number.positive': errors.ERROR_PAGE_POSITIVE,
+    }),
+    size: Joi.number().min(1).positive().max(100).default(10).messages({
+        'number.base': errors.ERROR_SIZE_NUMBER,
+        'number.empty': errors.ERROR_SIZE_EMPTY,
+        'number.positive': errors.ERROR_SIZE_POSITIVE,
+    }),
     username: Joi.string()
         .max(30)
         .optional()
