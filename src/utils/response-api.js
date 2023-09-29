@@ -1,10 +1,11 @@
 import { cleanObj } from './clean-obj.js'
 
-const responseSuccess = (code, status, data) =>
+const responseSuccess = (code, status, data, pagination) =>
     cleanObj({
         code,
         status,
         data,
+        pagination,
     })
 
 const responseError = (code, status, error) =>

@@ -102,7 +102,7 @@ const refresh = async (req, res) => {
 }
 
 const generateAccessToken = (validUser) => {
-    return jwt.sign(validUser, process.env.ACCESS_TOKEN_SECRET_KEY, { expiresIn: '5m' })
+    return jwt.sign(validUser, process.env.ACCESS_TOKEN_SECRET_KEY, { expiresIn: '1d' }) // should be 5m
 }
 
 const generateRefreshToken = (validUser) => {

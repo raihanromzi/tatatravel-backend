@@ -42,6 +42,8 @@ const errors = {
     ERROR_PASSWORD_REQUIRED: 'password is required',
     ERROR_PASSWORD_PATTERN: 'password must be a valid password',
     ERROR_FAILED_TO_ADD_USER: 'failed to add user',
+    ERROR_ROLE_STRING: 'role must be a string',
+    ERROR_ROLE_MAX: 'max 30 characters',
 }
 
 export { errors }

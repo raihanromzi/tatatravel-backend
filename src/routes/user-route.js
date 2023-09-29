@@ -10,8 +10,8 @@ const userRouter = express.Router()
 userRouter.use(accessTokenVerifyMiddleware)
 userRouter.use(refreshTokenVerifyMiddleware)
 
-userRouter.get('/api/v1/users/current', userController.get)
-userRouter.patch('/api/v1/users/current', userController.update)
-userRouter.delete('/api/v1/users/current', userController.logout)
+userRouter.get('/v1/users/current', userController.get)
+userRouter.patch('/v1/users/current', userController.update)
+userRouter.delete('/v1/users/current', userController.logout)
 
 export { userRouter }

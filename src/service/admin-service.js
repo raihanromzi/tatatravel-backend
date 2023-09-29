@@ -5,77 +5,70 @@ import {
 } from '../validation/user-validation.js'
 import { prismaClient } from '../application/database.js'
 import { ResponseError } from '../utils/response-error.js'
+import { errors } from '../utils/message-error.js'
 
 const deleteUser = async (user, userId) => {
-    userId = validate(deleteUserValidationSchema, userId)
+    const id = validate(deleteUserValidationSchema, userId)
 
     const totalUserInDatabase = await prismaClient.user.count({
         where: {
             username: user.username,
-            id: userId,
+            id: id,
         },
     })
 
     if (totalUserInDatabase !== 1) {
-        throw new ResponseError(404, 'Not Found', 'user is not found')
+        throw new ResponseError(
+            errors.HTTP_CODE_NOT_FOUND,
+            errors.HTTP_STATUS_NOT_FOUND,
+            errors.ERROR_USER_NOT_FOUND
+        )
     }
 
     return prismaClient.user.delete({
         where: {
             username: user.username,
-            id: userId,
-        },
-        select: {
-            username: true,
+            id: id,
         },
     })
 }
 
-const searchUser = async (user, request) => {
-    request = validate(searchUserValidationSchema, request)
+const searchUser = async (user, req) => {
+    const query = validate(searchUserValidationSchema, req)
 
-    const skip = (request.page - 1) * request.size
+    const skip = (query.page - 1) * query.size
 
     const filters = []
 
-    if (request.name) {
+    if (query.name) {
         filters.push({
-            OR: [
-                {
-                    firstName: {
-                        contains: request.name,
-                    },
-                },
-                {
-                    lastName: {
-                        contains: request.name,
-                    },
-                },
-            ],
+            fullName: {
+                contains: query.name,
+            },
         })
     }
 
-    if (request.email) {
+    if (query.email) {
         filters.push({
             email: {
-                contains: request.email,
+                contains: query.email,
             },
         })
     }
 
-    if (request.username) {
+    if (query.username) {
         filters.push({
             username: {
-                contains: request.username,
+                contains: query.username,
             },
         })
     }
 
-    if (request.role) {
+    if (query.role) {
         filters.push({
             role: {
                 name: {
-                    contains: request.role,
+                    contains: query.role,
                 },
             },
         })
@@ -85,9 +78,28 @@ const searchUser = async (user, request) => {
         where: {
             AND: filters,
         },
-        take: request.size,
+        select: {
+            id: true,
+            fullName: true,
+            username: true,
+            email: true,
+            role: {
+                select: {
+                    name: true,
+                },
+            },
+        },
+        take: query.size,
         skip: skip,
     })
+
+    if (users.length === 0) {
+        throw new ResponseError(
+            errors.HTTP_CODE_NOT_FOUND,
+            errors.HTTP_STATUS_NOT_FOUND,
+            errors.ERROR_USER_NOT_FOUND
+        )
+    }
 
     const totalItems = await prismaClient.user.count({
         where: {
@@ -95,12 +107,28 @@ const searchUser = async (user, request) => {
         },
     })
 
+    if (totalItems === 0) {
+        return {
+            data: [],
+            pagination: {
+                page: query.page,
+                total_item: totalItems,
+                total_page: Math.ceil(totalItems / query.size),
+            },
+        }
+    }
+
+    // convert role object to role name
+    users.forEach((user) => {
+        user.role = user.role.name
+    })
+
     return {
         data: users,
         pagination: {
-            page: request.page,
+            page: query.page,
             total_item: totalItems,
-            total_page: Math.ceil(totalItems / request.size),
+            total_page: Math.ceil(totalItems / query.size),
         },
     }
 }

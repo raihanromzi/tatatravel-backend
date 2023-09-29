@@ -135,7 +135,6 @@ const searchUserValidationSchema = Joi.object({
             'string.max': `${errors.ERROR_USERNAME_MAX}`,
         }),
     email: Joi.string()
-        .email()
         .optional()
         .messages({
             'string.base': `${errors.ERROR_EMAIL_STRING}`,
@@ -145,15 +144,15 @@ const searchUserValidationSchema = Joi.object({
         .max(50)
         .optional()
         .messages({
-            'string.base': `${errors.ERROR_FIRST_NAME_STRING}`,
-            'string.max': `${errors.ERROR_FIRST_NAME_MAX}`,
+            'string.base': `${errors.ERROR_FULL_NAME_STRING}`,
+            'string.max': `${errors.ERROR_FULL_NAME_MAX}`,
         }),
-    role: Joi.number()
-        .positive()
+    role: Joi.string()
+        .max(30)
         .optional()
         .messages({
-            'number.base': `${errors.ERROR_ROLE_NUMBER}`,
-            'number.positive': `${errors.ERROR_ROLE_POSITIVE}`,
+            'string.base': `${errors.ERROR_ROLE_STRING}`,
+            'string.max': `${errors.ERROR_ROLE_MAX}`,
         }),
 })
 
