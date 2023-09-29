@@ -78,6 +78,16 @@ const errors = {
     ERROR_COUNTRY_NAME_MAX: 'max 100 characters',
     ERROR_COUNTRY_NAME_MIN: 'min 3 characters',
     ERROR_COUNTRY_NAME_REQUIRED: 'country name is required',
+    ERROR_ROLE_EMPTY: 'role cannot be empty',
+    ERROR_ROLE_MIN: 'min 3 characters',
+    ERROR_IS_ACTIVE_BOOLEAN: 'is active must be a boolean',
+    ERROR_IS_ACTIVE_EMPTY: 'is active cannot be empty',
+    ERROR_IS_ACTIVE_REQUIRED: 'is active is required',
+    ERROR_ROLE_ALREADY_EXISTS: 'role already exists',
+    ERROR_FAILED_TO_ADD_ROLE: 'failed to add role',
+    ERROR_ROLE_NOT_FOUND: 'role is not found',
+    ERROR_FAILED_TO_UPDATE_ROLE: 'failed to update role',
+    ERROR_FAILED_TO_DELETE_ROLE: 'failed to delete role',
 }
 
 export { errors }

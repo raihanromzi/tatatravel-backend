@@ -8,7 +8,6 @@ import {
     updateAreaValidationSchema,
 } from '../validation/area-validation.js'
 import { errors } from '../utils/message-error.js'
-import { logger } from '../application/logging.js'
 
 const add = async (req) => {
     const area = validate(addAreaValidationSchema, req.body)
@@ -151,7 +150,6 @@ const get = async (req) => {
 }
 
 const getById = async (params) => {
-    logger.info(params)
     params = validate(getAreaByIdValidationSchema, params)
 
     const findArea = await prismaClient.area.findUnique({
