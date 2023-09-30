@@ -16,8 +16,9 @@ web.use(express.urlencoded({ extended: true }))
 web.use(express.static('public'))
 web.use(cookieParser())
 
-web.use(tokenRouter)
 web.use(publicRouter)
+
+web.use(tokenRouter)
 web.use(userRouter)
 web.use(adminRouter)
 web.use(areaRouter)

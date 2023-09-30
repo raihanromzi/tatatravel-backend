@@ -1,6 +1,7 @@
 import response from '../utils/response-api.js'
 import { errors } from '../utils/message-error.js'
 import jwt from 'jsonwebtoken'
+import { logger } from '../application/logging.js'
 
 const accessTokenVerifyMiddleware = async (req, res, next) => {
     const authHeader = req.get('Authorization')
@@ -54,6 +55,8 @@ const accessTokenVerifyMiddleware = async (req, res, next) => {
 
 const refreshTokenVerifyMiddleware = async (req, res, next) => {
     const foundRefreshToken = req.cookies.refreshToken
+
+    logger.info(foundRefreshToken)
 
     if (!foundRefreshToken) {
         res.status(errors.HTTP_CODE_UNAUTHORIZED)
