@@ -95,6 +95,12 @@ const errors = {
     CATEGORY_NAME_REQUIRED: 'category name is required',
     ERROR_CATEGORY_ALREADY_EXISTS: 'category already exists',
     ERROR_FAILED_TO_ADD_CATEGORY: 'failed to add category',
+    ERROR_CATEGORY_ID_REQUIRED: 'category id is required',
+    ERROR_CATEGORY_ID_EMPTY: 'category id cannot be empty',
+    ERROR_CATEGORY_ID_NUMBER: 'category id must be a number',
+    ERROR_FAILED_TO_UPDATE_CATEGORY: 'failed to update category',
+    ERROR_CATEGORY_NOT_FOUND: 'category is not found',
+    ERROR_FAILED_TO_DELETE_CATEGORY: 'failed to delete category',
 }
 
 export { errors }

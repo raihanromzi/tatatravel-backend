@@ -19,7 +19,7 @@ const add = async (req, res, next) => {
 
 const update = async (req, res, next) => {
     try {
-        const result = await categoryService.updateActive(req)
+        const result = await categoryService.update(req)
         res.status(success.HTTP_CODE_OK).send(
             responses.responseSuccess(success.HTTP_CODE_OK, success.HTTP_STATUS_OK, result)
         )
@@ -30,9 +30,13 @@ const update = async (req, res, next) => {
 
 const remove = async (req, res, next) => {
     try {
-        const result = await categoryService.deleteCategory(req)
+        await categoryService.remove(req)
         res.status(success.HTTP_CODE_OK).send(
-            responses.responseSuccess(success.HTTP_CODE_OK, success.HTTP_STATUS_OK, result)
+            responses.responseSuccess(
+                success.HTTP_CODE_OK,
+                success.HTTP_STATUS_OK,
+                success.SUCCESS_DELETE_CATEGORY
+            )
         )
     } catch (e) {
         next(e)
@@ -41,7 +45,7 @@ const remove = async (req, res, next) => {
 
 const get = async (req, res, next) => {
     try {
-        const result = await categoryService.getAll()
+        const result = await categoryService.get(req)
         res.status(success.HTTP_CODE_OK).send(
             responses.responseSuccess(success.HTTP_CODE_OK, success.HTTP_STATUS_OK, result)
         )
@@ -52,7 +56,7 @@ const get = async (req, res, next) => {
 
 const getById = async (req, res, next) => {
     try {
-        const result = await categoryService.getAll()
+        const result = await categoryService.getById(req)
         res.status(success.HTTP_CODE_OK).send(
             responses.responseSuccess(success.HTTP_CODE_OK, success.HTTP_STATUS_OK, result)
         )

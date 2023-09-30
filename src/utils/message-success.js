@@ -8,6 +8,7 @@ const success = {
     SUCCESS_DELETE_AREA: 'success delete area',
     SUCCESS_DELETE_COUNTRY: 'success delete country',
     SUCCESS_DELETE_ROLE: 'success delete role',
+    SUCCESS_DELETE_CATEGORY: 'success delete category',
 }
 
 export { success }
