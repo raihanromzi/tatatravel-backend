@@ -88,6 +88,13 @@ const errors = {
     ERROR_ROLE_NOT_FOUND: 'role is not found',
     ERROR_FAILED_TO_UPDATE_ROLE: 'failed to update role',
     ERROR_FAILED_TO_DELETE_ROLE: 'failed to delete role',
+    CATEGORY_NAME_STRING: 'category name must be a string',
+    CATEGORY_NAME_EMPTY: 'category name cannot be empty',
+    CATEGORY_NAME_MIN: 'category name min 3 characters',
+    CATEGORY_NAME_MAX: 'category name max 50 characters',
+    CATEGORY_NAME_REQUIRED: 'category name is required',
+    ERROR_CATEGORY_ALREADY_EXISTS: 'category already exists',
+    ERROR_FAILED_TO_ADD_CATEGORY: 'failed to add category',
 }
 
 export { errors }

@@ -5,32 +5,56 @@ import {
     updateActiveCategoryValidationSchema,
 } from '../validation/category-validation.js'
 import { prismaClient } from '../application/database.js'
+import { errors } from '../utils/message-error.js'
 
-const add = async (request) => {
-    const addRequest = validate(addCategoryValidationSchema, request)
+const add = async (req) => {
+    const newCategory = validate(addCategoryValidationSchema, req.body)
+
+    const countCategory = await prismaClient.category.count({
+        where: {
+            name: newCategory.name,
+        },
+    })
+
+    if (countCategory === 1) {
+        throw new ResponseError(
+            errors.HTTP_CODE_BAD_REQUEST,
+            errors.HTTP_STATUS_BAD_REQUEST,
+            errors.ERROR_CATEGORY_ALREADY_EXISTS
+        )
+    }
 
     const result = await prismaClient.category.create({
         data: {
-            name: addRequest.name,
+            name: newCategory.name,
+            isActive: newCategory.isActive,
+        },
+        select: {
+            name: true,
+            isActive: true,
         },
     })
 
     if (!result) {
-        throw new ResponseError(500, 'Internal Server Error', 'Failed to add category')
+        throw new ResponseError(
+            errors.HTTP_CODE_INTERNAL_SERVER_ERROR,
+            errors.HTTP_STATUS_INTERNAL_SERVER_ERROR,
+            errors.ERROR_FAILED_TO_ADD_CATEGORY
+        )
     }
 
     return result
 }
 
-const updateActive = async (request) => {
-    const updateRequest = validate(updateActiveCategoryValidationSchema, request)
+const update = async (req) => {
+    const updatereq = validate(updateActiveCategoryValidationSchema, req)
 
     const result = await prismaClient.category.update({
         where: {
-            id: updateRequest.id,
+            id: updatereq.id,
         },
         data: {
-            status: updateRequest.status,
+            status: updatereq.status,
         },
     })
 
@@ -41,10 +65,10 @@ const updateActive = async (request) => {
     return result
 }
 
-const deleteCategory = async (request) => {
+const remove = async (req) => {
     const result = await prismaClient.category.delete({
         where: {
-            id: request.id,
+            id: req.id,
         },
     })
 
@@ -55,7 +79,7 @@ const deleteCategory = async (request) => {
     return result
 }
 
-const getAll = async () => {
+const get = async () => {
     const result = await prismaClient.category.findMany({
         select: {
             id: true,
@@ -71,4 +95,6 @@ const getAll = async () => {
     return result
 }
 
-export default { add, updateActive, deleteCategory, getAll }
+const getById = async (req) => {}
+
+export default { add, update, remove, get, getById }

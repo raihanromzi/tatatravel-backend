@@ -1,44 +1,64 @@
 import categoryService from '../service/category-service.js'
 import responses from '../utils/response-api.js'
+import { success } from '../utils/message-success.js'
 
 const add = async (req, res, next) => {
     try {
-        const result = await categoryService.add(req.body)
-
-        res.status(201).send(responses.responseSuccess(201, 'CREATED', result))
+        const result = await categoryService.add(req)
+        res.status(success.HTTP_CODE_CREATED).send(
+            responses.responseSuccess(
+                success.HTTP_CODE_CREATED,
+                success.HTTP_STATUS_CREATED,
+                result
+            )
+        )
     } catch (e) {
         next(e)
     }
 }
 
-const updateActive = async (req, res, next) => {
+const update = async (req, res, next) => {
     try {
-        const result = await categoryService.updateActive(req.body)
-
-        res.status(200).send(responses.responseSuccess(200, 'OK', result))
+        const result = await categoryService.updateActive(req)
+        res.status(success.HTTP_CODE_OK).send(
+            responses.responseSuccess(success.HTTP_CODE_OK, success.HTTP_STATUS_OK, result)
+        )
     } catch (e) {
         next(e)
     }
 }
 
-const deleteCategory = async (req, res, next) => {
+const remove = async (req, res, next) => {
     try {
-        const result = await categoryService.deleteCategory(req.body)
-
-        res.status(200).send(responses.responseSuccess(200, 'OK', result))
+        const result = await categoryService.deleteCategory(req)
+        res.status(success.HTTP_CODE_OK).send(
+            responses.responseSuccess(success.HTTP_CODE_OK, success.HTTP_STATUS_OK, result)
+        )
     } catch (e) {
         next(e)
     }
 }
 
-const getAll = async (req, res, next) => {
+const get = async (req, res, next) => {
     try {
         const result = await categoryService.getAll()
-
-        res.status(200).send(responses.responseSuccess(200, 'OK', result))
+        res.status(success.HTTP_CODE_OK).send(
+            responses.responseSuccess(success.HTTP_CODE_OK, success.HTTP_STATUS_OK, result)
+        )
     } catch (e) {
         next(e)
     }
 }
 
-export default { add, updateActive, deleteCategory, getAll }
+const getById = async (req, res, next) => {
+    try {
+        const result = await categoryService.getAll()
+        res.status(success.HTTP_CODE_OK).send(
+            responses.responseSuccess(success.HTTP_CODE_OK, success.HTTP_STATUS_OK, result)
+        )
+    } catch (e) {
+        next(e)
+    }
+}
+
+export default { add, update, remove, get, getById }

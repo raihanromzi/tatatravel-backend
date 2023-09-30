@@ -1,16 +1,19 @@
 import express from 'express'
-import { authMiddleware } from '../middlewares/auth-middleware.js'
-import { adminMiddleware } from '../middlewares/admin-middleware.js'
 import categoryController from '../controllers/category-controller.js'
+import {
+    accessTokenVerifyMiddleware,
+    refreshTokenVerifyMiddleware,
+} from '../middlewares/token-middleware.js'
 
 const categoryRouter = express.Router()
 
-categoryRouter.use(authMiddleware)
-categoryRouter.use(adminMiddleware)
+categoryRouter.use(accessTokenVerifyMiddleware)
+categoryRouter.use(refreshTokenVerifyMiddleware)
 
-categoryRouter.post('/api/v1/categories', categoryController.add)
-categoryRouter.patch('/api/v1/categories/:categoryId', categoryController.updateActive)
-categoryRouter.delete('/api/v1/categories/:categoryId', categoryController.deleteCategory)
-categoryRouter.get('/api/v1/categories', categoryController.getAll)
+categoryRouter.post('/v1/categories', categoryController.add)
+categoryRouter.patch('/v1/categories/:id', categoryController.update)
+categoryRouter.delete('/v1/categories/:id', categoryController.remove)
+categoryRouter.get('/v1/categories', categoryController.get)
+categoryRouter.get('/v1/categories/:id', categoryController.getById)
 
 export { categoryRouter }

@@ -65,6 +65,7 @@ const refreshTokenVerifyMiddleware = async (req, res, next) => {
                 )
             )
             .end()
+        return
     }
 
     jwt.verify(foundRefreshToken, process.env.REFRESH_TOKEN_SECRET_KEY, (err, user) => {
