@@ -21,9 +21,9 @@ const add = async (req) => {
 
     if (countCategory === 1) {
         throw new ResponseError(
-            errors.HTTP_CODE_BAD_REQUEST,
-            errors.HTTP_STATUS_BAD_REQUEST,
-            errors.ERROR_CATEGORY_ALREADY_EXISTS
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.CATEGORY.ALREADY_EXISTS
         )
     }
 
@@ -40,9 +40,9 @@ const add = async (req) => {
 
     if (!result) {
         throw new ResponseError(
-            errors.HTTP_CODE_INTERNAL_SERVER_ERROR,
-            errors.HTTP_STATUS_INTERNAL_SERVER_ERROR,
-            errors.ERROR_FAILED_TO_ADD_CATEGORY
+            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+            errors.CATEGORY.FAILED_TO_ADD
         )
     }
 
@@ -66,9 +66,9 @@ const update = async (req) => {
 
     if (!findCategory) {
         throw new ResponseError(
-            errors.HTTP_CODE_NOT_FOUND,
-            errors.HTTP_STATUS_NOT_FOUND,
-            errors.ERROR_CATEGORY_NOT_FOUND
+            errors.HTTP.CODE.NOT_FOUND,
+            errors.HTTP.STATUS.NOT_FOUND,
+            errors.CATEGORY.NOT_FOUND
         )
     }
 
@@ -88,9 +88,9 @@ const update = async (req) => {
 
     if (!result) {
         throw new ResponseError(
-            errors.HTTP_CODE_INTERNAL_SERVER_ERROR,
-            errors.HTTP_STATUS_INTERNAL_SERVER_ERROR,
-            errors.ERROR_FAILED_TO_UPDATE_CATEGORY
+            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+            errors.CATEGORY.FAILED_TO_UPDATE
         )
     }
 
@@ -110,9 +110,9 @@ const remove = async (req) => {
 
     if (!findCategory) {
         throw new ResponseError(
-            errors.HTTP_CODE_NOT_FOUND,
-            errors.HTTP_STATUS_NOT_FOUND,
-            errors.ERROR_CATEGORY_NOT_FOUND
+            errors.HTTP.CODE.NOT_FOUND,
+            errors.HTTP.STATUS.NOT_FOUND,
+            errors.CATEGORY.NOT_FOUND
         )
     }
 
@@ -124,9 +124,9 @@ const remove = async (req) => {
 
     if (!result) {
         throw new ResponseError(
-            errors.HTTP_CODE_INTERNAL_SERVER_ERROR,
-            errors.HTTP_STATUS_INTERNAL_SERVER_ERROR,
-            errors.ERROR_FAILED_TO_DELETE_CATEGORY
+            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+            errors.CATEGORY.FAILED_TO_DELETE
         )
     }
 }
@@ -161,9 +161,9 @@ const get = async (req) => {
 
     if (!categories) {
         throw new ResponseError(
-            errors.HTTP_CODE_NOT_FOUND,
-            errors.HTTP_STATUS_NOT_FOUND,
-            errors.ERROR_CATEGORY_NOT_FOUND
+            errors.HTTP.CODE.NOT_FOUND,
+            errors.HTTP.STATUS.NOT_FOUND,
+            errors.CATEGORY.NOT_FOUND
         )
     }
 
@@ -212,9 +212,9 @@ const getById = async (req) => {
 
     if (!findCategory) {
         throw new ResponseError(
-            errors.HTTP_CODE_NOT_FOUND,
-            errors.HTTP_STATUS_NOT_FOUND,
-            errors.ERROR_CATEGORY_NOT_FOUND
+            errors.HTTP.CODE.NOT_FOUND,
+            errors.HTTP.STATUS.NOT_FOUND,
+            errors.CATEGORY.NOT_FOUND
         )
     }
 

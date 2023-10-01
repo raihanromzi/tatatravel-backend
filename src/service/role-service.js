@@ -21,9 +21,9 @@ const add = async (req) => {
 
     if (countRole === 1) {
         throw new ResponseError(
-            errors.HTTP_CODE_BAD_REQUEST,
-            errors.HTTP_STATUS_BAD_REQUEST,
-            errors.ERROR_ROLE_ALREADY_EXISTS
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.ROLE.ALREADY_EXISTS
         )
     }
 
@@ -39,9 +39,9 @@ const add = async (req) => {
 
     if (!result) {
         throw new ResponseError(
-            errors.HTTP_CODE_INTERNAL_SERVER_ERROR,
-            errors.HTTP_STATUS_INTERNAL_SERVER_ERROR,
-            errors.ERROR_FAILED_TO_ADD_ROLE
+            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+            errors.ROLE.FAILED_TO_ADD
         )
     }
 
@@ -63,9 +63,9 @@ const update = async (req) => {
 
     if (findRole === 0) {
         throw new ResponseError(
-            errors.HTTP_CODE_NOT_FOUND,
-            errors.HTTP_STATUS_NOT_FOUND,
-            errors.ERROR_ROLE_NOT_FOUND
+            errors.HTTP.CODE.NOT_FOUND,
+            errors.HTTP.STATUS.NOT_FOUND,
+            errors.ROLE.NOT_FOUND
         )
     }
 
@@ -77,9 +77,9 @@ const update = async (req) => {
 
     if (findRoleByName === 1) {
         throw new ResponseError(
-            errors.HTTP_CODE_BAD_REQUEST,
-            errors.HTTP_STATUS_BAD_REQUEST,
-            errors.ERROR_ROLE_ALREADY_EXISTS
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.ROLE.ALREADY_EXISTS
         )
     }
 
@@ -100,9 +100,9 @@ const update = async (req) => {
 
     if (!updateRole) {
         throw new ResponseError(
-            errors.HTTP_CODE_INTERNAL_SERVER_ERROR,
-            errors.HTTP_STATUS_INTERNAL_SERVER_ERROR,
-            errors.ERROR_FAILED_TO_UPDATE_ROLE
+            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+            errors.ROLE.FAILED_TO_UPDATE
         )
     }
 
@@ -122,9 +122,9 @@ const remove = async (req) => {
 
     if (countRole === 0) {
         throw new ResponseError(
-            errors.HTTP_CODE_BAD_REQUEST,
-            errors.HTTP_STATUS_BAD_REQUEST,
-            errors.ERROR_ROLE_NOT_FOUND
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.ROLE.NOT_FOUND
         )
     }
 
@@ -136,9 +136,9 @@ const remove = async (req) => {
 
     if (!result) {
         throw new ResponseError(
-            errors.HTTP_CODE_INTERNAL_SERVER_ERROR,
-            errors.HTTP_STATUS_INTERNAL_SERVER_ERROR,
-            errors.ERROR_FAILED_TO_DELETE_ROLE
+            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+            errors.ROLE.FAILED_TO_DELETE
         )
     }
 
@@ -176,9 +176,9 @@ const get = async (req) => {
 
     if (!roles) {
         throw new ResponseError(
-            errors.HTTP_CODE_NOT_FOUND,
-            errors.HTTP_STATUS_NOT_FOUND,
-            errors.ERROR_COUNTRY_NOT_FOUND
+            errors.HTTP.CODE.NOT_FOUND,
+            errors.HTTP.STATUS.NOT_FOUND,
+            errors.ROLE.NOT_FOUND
         )
     }
 
@@ -222,9 +222,9 @@ const getById = async (req) => {
 
     if (findRole === 0) {
         throw new ResponseError(
-            errors.HTTP_CODE_NOT_FOUND,
-            errors.HTTP_STATUS_NOT_FOUND,
-            errors.ERROR_ROLE_NOT_FOUND
+            errors.HTTP.CODE.NOT_FOUND,
+            errors.HTTP.STATUS.NOT_FOUND,
+            errors.ROLE.NOT_FOUND
         )
     }
 
@@ -241,9 +241,9 @@ const getById = async (req) => {
 
     if (!role) {
         throw new ResponseError(
-            errors.HTTP_CODE_NOT_FOUND,
-            errors.HTTP_STATUS_NOT_FOUND,
-            errors.ERROR_COUNTRY_NOT_FOUND
+            errors.HTTP.CODE.NOT_FOUND,
+            errors.HTTP.STATUS.NOT_FOUND,
+            errors.ROLE.NOT_FOUND
         )
     }
 

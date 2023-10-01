@@ -19,9 +19,9 @@ const deleteUser = async (user, userId) => {
 
     if (totalUserInDatabase !== 1) {
         throw new ResponseError(
-            errors.HTTP_CODE_NOT_FOUND,
-            errors.HTTP_STATUS_NOT_FOUND,
-            errors.ERROR_USER_NOT_FOUND
+            errors.HTTP.CODE.NOT_FOUND,
+            errors.HTTP.STATUS.NOT_FOUND,
+            errors.USER.NOT_FOUND
         )
     }
 
@@ -95,9 +95,9 @@ const searchUser = async (req) => {
 
     if (users.length === 0) {
         throw new ResponseError(
-            errors.HTTP_CODE_NOT_FOUND,
-            errors.HTTP_STATUS_NOT_FOUND,
-            errors.ERROR_USER_NOT_FOUND
+            errors.HTTP.CODE.NOT_FOUND,
+            errors.HTTP.STATUS.NOT_FOUND,
+            errors.USER.NOT_FOUND
         )
     }
 

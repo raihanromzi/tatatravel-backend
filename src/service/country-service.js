@@ -21,9 +21,9 @@ const add = async (req) => {
 
     if (countCountry === 1) {
         throw new ResponseError(
-            errors.HTTP_CODE_BAD_REQUEST,
-            errors.HTTP_STATUS_BAD_REQUEST,
-            errors.ERROR_COUNTRY_ALREADY_EXISTS
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.COUNTRY.ALREADY_EXISTS
         )
     }
 
@@ -40,9 +40,9 @@ const add = async (req) => {
 
     if (!result) {
         throw new ResponseError(
-            errors.HTTP_CODE_INTERNAL_SERVER_ERROR,
-            errors.HTTP_STATUS_INTERNAL_SERVER_ERROR,
-            errors.ERROR_FAILED_TO_ADD_COUNTRY
+            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+            errors.COUNTRY.FAILED_TO_ADD
         )
     }
 
@@ -61,9 +61,9 @@ const update = async (req, params) => {
 
     if (!findCountry) {
         throw new ResponseError(
-            errors.HTTP_CODE_NOT_FOUND,
-            errors.HTTP_STATUS_NOT_FOUND,
-            errors.ERROR_COUNTRY_NOT_FOUND
+            errors.HTTP.CODE.NOT_FOUND,
+            errors.HTTP.STATUS.NOT_FOUND,
+            errors.COUNTRY.NOT_FOUND
         )
     }
 
@@ -75,9 +75,9 @@ const update = async (req, params) => {
 
     if (!findArea) {
         throw new ResponseError(
-            errors.HTTP_CODE_NOT_FOUND,
-            errors.HTTP_STATUS_NOT_FOUND,
-            errors.ERROR_AREA_NOT_FOUND
+            errors.HTTP.CODE.NOT_FOUND,
+            errors.HTTP.STATUS.NOT_FOUND,
+            errors.AREA.NOT_FOUND
         )
     }
 
@@ -102,9 +102,9 @@ const update = async (req, params) => {
 
     if (!result) {
         throw new ResponseError(
-            errors.HTTP_CODE_INTERNAL_SERVER_ERROR,
-            errors.HTTP_STATUS_INTERNAL_SERVER_ERROR,
-            errors.ERROR_FAILED_TO_UPDATE_COUNTRY
+            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+            errors.COUNTRY.FAILED_TO_UPDATE
         )
     }
 
@@ -122,9 +122,9 @@ const remove = async (params) => {
 
     if (!findCountry) {
         throw new ResponseError(
-            errors.HTTP_CODE_NOT_FOUND,
-            errors.HTTP_STATUS_NOT_FOUND,
-            errors.ERROR_COUNTRY_NOT_FOUND
+            errors.HTTP.CODE.NOT_FOUND,
+            errors.HTTP.STATUS.NOT_FOUND,
+            errors.COUNTRY.NOT_FOUND
         )
     }
 
@@ -136,9 +136,9 @@ const remove = async (params) => {
 
     if (!result) {
         throw new ResponseError(
-            errors.HTTP_CODE_INTERNAL_SERVER_ERROR,
-            errors.HTTP_STATUS_INTERNAL_SERVER_ERROR,
-            errors.ERROR_FAILED_TO_DELETE_COUNTRY
+            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+            errors.COUNTRY.FAILED_TO_DELETE
         )
     }
 
@@ -188,9 +188,9 @@ const get = async (req) => {
 
     if (!countries) {
         throw new ResponseError(
-            errors.HTTP_CODE_NOT_FOUND,
-            errors.HTTP_STATUS_NOT_FOUND,
-            errors.ERROR_COUNTRY_NOT_FOUND
+            errors.HTTP.CODE.NOT_FOUND,
+            errors.HTTP.STATUS.NOT_FOUND,
+            errors.COUNTRY.NOT_FOUND
         )
     }
 
@@ -251,9 +251,9 @@ const getById = async (req) => {
 
     if (!country) {
         throw new ResponseError(
-            errors.HTTP_CODE_NOT_FOUND,
-            errors.HTTP_STATUS_NOT_FOUND,
-            errors.ERROR_COUNTRY_NOT_FOUND
+            errors.HTTP.CODE.NOT_FOUND,
+            errors.HTTP.STATUS.NOT_FOUND,
+            errors.COUNTRY.NOT_FOUND
         )
     }
 

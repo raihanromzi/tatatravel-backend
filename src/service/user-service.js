@@ -21,9 +21,9 @@ const add = async (req) => {
 
     if (countUser === 1) {
         throw new ResponseError(
-            errors.HTTP_CODE_BAD_REQUEST,
-            errors.HTTP_STATUS_BAD_REQUEST,
-            errors.ERROR_USER_ALREADY_EXISTS
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.USER.ALREADY_EXISTS
         )
     }
 
@@ -49,9 +49,9 @@ const add = async (req) => {
 
     if (!result) {
         throw new ResponseError(
-            errors.HTTP_CODE_INTERNAL_SERVER_ERROR,
-            errors.HTTP_STATUS_INTERNAL_SERVER_ERROR,
-            errors.ERROR_FAILED_TO_ADD_USER
+            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+            errors.USER.FAILED_TO_ADD
         )
     }
 
@@ -73,9 +73,9 @@ const get = async (req) => {
 
     if (!user) {
         throw new ResponseError(
-            errors.HTTP_CODE_NOT_FOUND,
-            errors.HTTP_STATUS_NOT_FOUND,
-            errors.ERROR_USER_NOT_FOUND
+            errors.HTTP.CODE.NOT_FOUND,
+            errors.HTTP.STATUS.NOT_FOUND,
+            errors.USER.NOT_FOUND
         )
     }
 
@@ -93,9 +93,9 @@ const update = async (req) => {
 
     if (totalUserInDatabase !== 1) {
         throw new ResponseError(
-            errors.HTTP_CODE_NOT_FOUND,
-            errors.HTTP_STATUS_NOT_FOUND,
-            errors.ERROR_USER_NOT_FOUND
+            errors.HTTP.CODE.NOT_FOUND,
+            errors.HTTP.STATUS.NOT_FOUND,
+            errors.USER.NOT_FOUND
         )
     }
 
@@ -132,9 +132,9 @@ const logout = async (req) => {
 
     if (!user) {
         throw new ResponseError(
-            errors.HTTP_CODE_NOT_FOUND,
-            errors.HTTP_STATUS_NOT_FOUND,
-            errors.ERROR_USER_NOT_FOUND
+            errors.HTTP.CODE.NOT_FOUND,
+            errors.HTTP.STATUS.NOT_FOUND,
+            errors.USER.NOT_FOUND
         )
     }
 

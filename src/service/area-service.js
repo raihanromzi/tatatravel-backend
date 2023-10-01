@@ -20,9 +20,9 @@ const add = async (req) => {
 
     if (countArea === 1) {
         throw new ResponseError(
-            errors.HTTP_CODE_BAD_REQUEST,
-            errors.HTTP_STATUS_BAD_REQUEST,
-            errors.ERROR_AREA_ALREADY_EXISTS
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.AREA.ALREADY_EXISTS
         )
     }
 
@@ -37,9 +37,9 @@ const add = async (req) => {
 
     if (!result) {
         throw new ResponseError(
-            errors.HTTP_CODE_INTERNAL_SERVER_ERROR,
-            errors.HTTP_STATUS_INTERNAL_SERVER_ERROR,
-            errors.ERROR_FAILED_TO_ADD_AREA
+            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+            errors.AREA.FAILED_TO_ADD
         )
     }
 
@@ -58,9 +58,9 @@ const update = async (req, params) => {
 
     if (!findArea) {
         throw new ResponseError(
-            errors.HTTP_CODE_NOT_FOUND,
-            errors.HTTP_STATUS_NOT_FOUND,
-            errors.ERROR_AREA_NOT_FOUND
+            errors.HTTP.CODE.NOT_FOUND,
+            errors.HTTP.STATUS.NOT_FOUND,
+            errors.AREA.NOT_FOUND
         )
     }
 
@@ -78,9 +78,9 @@ const update = async (req, params) => {
 
     if (!result) {
         throw new ResponseError(
-            errors.HTTP_CODE_INTERNAL_SERVER_ERROR,
-            errors.HTTP_STATUS_INTERNAL_SERVER_ERROR,
-            errors.ERROR_FAILED_TO_UPDATE_AREA
+            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+            errors.AREA.FAILED_TO_UPDATE
         )
     }
 
@@ -116,9 +116,9 @@ const get = async (req) => {
 
     if (!area) {
         throw new ResponseError(
-            errors.HTTP_CODE_NOT_FOUND,
-            errors.HTTP_STATUS_NOT_FOUND,
-            errors.ERROR_AREA_NOT_FOUND
+            errors.HTTP.CODE.NOT_FOUND,
+            errors.HTTP.STATUS.NOT_FOUND,
+            errors.AREA.NOT_FOUND
         )
     }
 
@@ -160,9 +160,9 @@ const getById = async (params) => {
 
     if (!findArea) {
         throw new ResponseError(
-            errors.HTTP_CODE_NOT_FOUND,
-            errors.HTTP_STATUS_NOT_FOUND,
-            errors.ERROR_AREA_NOT_FOUND
+            errors.HTTP.CODE.NOT_FOUND,
+            errors.HTTP.STATUS.NOT_FOUND,
+            errors.AREA.NOT_FOUND
         )
     }
 
@@ -177,9 +177,9 @@ const getById = async (params) => {
 
     if (!result) {
         throw new ResponseError(
-            errors.HTTP_CODE_NOT_FOUND,
-            errors.HTTP_STATUS_NOT_FOUND,
-            errors.ERROR_AREA_NOT_FOUND
+            errors.HTTP.CODE.NOT_FOUND,
+            errors.HTTP.STATUS.NOT_FOUND,
+            errors.AREA.NOT_FOUND
         )
     }
 
@@ -197,9 +197,9 @@ const remove = async (params) => {
 
     if (!findArea) {
         throw new ResponseError(
-            errors.HTTP_CODE_NOT_FOUND,
-            errors.HTTP_STATUS_NOT_FOUND,
-            errors.ERROR_AREA_NOT_FOUND
+            errors.HTTP.CODE.NOT_FOUND,
+            errors.HTTP.STATUS.NOT_FOUND,
+            errors.AREA.NOT_FOUND
         )
     }
 
@@ -211,9 +211,9 @@ const remove = async (params) => {
 
     if (!result) {
         throw new ResponseError(
-            errors.HTTP_CODE_INTERNAL_SERVER_ERROR,
-            errors.HTTP_STATUS_INTERNAL_SERVER_ERROR,
-            errors.ERROR_FAILED_TO_DELETE_AREA
+            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+            errors.AREA.FAILED_TO_DELETE
         )
     }
 
