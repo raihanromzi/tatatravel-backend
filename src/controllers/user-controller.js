@@ -1,6 +1,5 @@
 import userService from '../service/user-service.js'
 import responses from '../utils/response-api.js'
-import publicService from '../service/public-service.js'
 import { success } from '../utils/message-success.js'
 
 const add = async (req, res, next) => {
@@ -12,17 +11,6 @@ const add = async (req, res, next) => {
                 success.HTTP.STATUS.CREATED,
                 result
             )
-        )
-    } catch (e) {
-        next(e)
-    }
-}
-
-const login = async (req, res, next) => {
-    try {
-        const result = await publicService.login(req, res)
-        res.status(success.HTTP.CODE.OK).send(
-            responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
         )
     } catch (e) {
         next(e)
@@ -70,4 +58,4 @@ const logout = async (req, res, next) => {
     }
 }
 
-export default { add, login, get, update, logout }
+export default { add, get, update, logout }
