@@ -1,8 +1,9 @@
 import adminService from '../service/admin-service.js'
 import responses from '../utils/response-api.js'
 import { success } from '../utils/message-success.js'
+import userService from '../service/user-service.js'
 
-const searchUser = async (req, res, next) => {
+const search = async (req, res, next) => {
     try {
         const query = {
             name: req.query.name,
@@ -27,7 +28,7 @@ const searchUser = async (req, res, next) => {
     }
 }
 
-const deleteUser = async (req, res, next) => {
+const remove = async (req, res, next) => {
     try {
         const user = req.user
         const userId = req.params.userId
@@ -44,4 +45,19 @@ const deleteUser = async (req, res, next) => {
     }
 }
 
-export default { searchUser, deleteUser }
+export const add = async (req, res, next) => {
+    try {
+        const result = await userService.add(req.body)
+        res.status(success.HTTP.CODE.CREATED).send(
+            responses.responseSuccess(
+                success.HTTP.CODE.CREATED,
+                success.HTTP.STATUS.CREATED,
+                result
+            )
+        )
+    } catch (e) {
+        next(e)
+    }
+}
+
+export default { add, search, remove }

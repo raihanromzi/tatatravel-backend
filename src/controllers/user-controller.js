@@ -2,21 +2,6 @@ import userService from '../service/user-service.js'
 import responses from '../utils/response-api.js'
 import { success } from '../utils/message-success.js'
 
-const add = async (req, res, next) => {
-    try {
-        const result = await userService.add(req.body)
-        res.status(success.HTTP.CODE.CREATED).send(
-            responses.responseSuccess(
-                success.HTTP.CODE.CREATED,
-                success.HTTP.STATUS.CREATED,
-                result
-            )
-        )
-    } catch (e) {
-        next(e)
-    }
-}
-
 const get = async (req, res, next) => {
     try {
         const result = await userService.get(req)
@@ -58,4 +43,4 @@ const logout = async (req, res, next) => {
     }
 }
 
-export default { add, get, update, logout }
+export default { get, update, logout }

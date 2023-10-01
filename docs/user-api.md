@@ -40,41 +40,6 @@ Response Body Error :
 }
 ```
 
-## Login API
-
-Endpoint : POST /api/v1/users/login
-
-Request Body :
-
-```json
-{
-  "email": "johndoe@email.com",
-  "password": "123456"
-}
-```
-
-Response Body Success :
-
-```json
-{
-  "code": 200,
-  "status": "OK",
-  "data": {
-    "token": "3847230c-f881-4a3a-ab72-b969f03cf318"
-  }
-}
-```
-
-Response Body Error :
-
-```json
-{
-  "code": 400,
-  "status": "Bad Request",
-  "errors": "password cannot be empty"
-}
-```
-
 ## Get Current User API
 
 Endpoint : GET /api/v1/users/current
@@ -90,7 +55,8 @@ Response Body Success :
   "code": 200,
   "status": "OK",
   "data": {
-    "username": "test"
+    "username": "johndoe",
+    "email": "johndoe@email.com"
   }
 }
 ```
@@ -102,6 +68,14 @@ Response Body Error :
   "code": 404,
   "status": "Not Found",
   "errors": "user is not founds"
+}
+```
+
+```json
+{
+  "code": 403,
+  "status": "forbidden",
+  "errors": "you are not allowed to access this resource"
 }
 ```
 

@@ -1,6 +1,5 @@
 import express from 'express'
 import adminController from '../controllers/admin-controller.js'
-import userController from '../controllers/user-controller.js'
 import {
     accessTokenVerifyMiddleware,
     refreshTokenVerifyMiddleware,
@@ -13,8 +12,8 @@ adminRouter.use(accessTokenVerifyMiddleware)
 adminRouter.use(refreshTokenVerifyMiddleware)
 adminRouter.use(adminMiddleware)
 
-adminRouter.post('/v1/users', userController.add)
-adminRouter.get('/v1/users', adminController.searchUser)
-adminRouter.delete('/v1/users/:userId', adminController.deleteUser)
+adminRouter.post('/v1/users', adminController.add)
+adminRouter.get('/v1/users', adminController.search)
+adminRouter.delete('/v1/users/:userId', adminController.remove)
 
 export { adminRouter }

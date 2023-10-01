@@ -59,15 +59,23 @@ const add = async (req) => {
 }
 
 const get = async (req) => {
-    const username = validate(getUserValidationSchema, req.user.username)
+    const currentUser = validate(getUserValidationSchema, req.user)
+
+    const id = currentUser.id
 
     const user = await prismaClient.user.findUnique({
         where: {
-            username: username,
+            id: id,
         },
         select: {
-            username: true,
             email: true,
+            username: true,
+            fullName: true,
+            role: {
+                select: {
+                    name: true,
+                },
+            },
         },
     })
 
@@ -79,7 +87,12 @@ const get = async (req) => {
         )
     }
 
-    return user
+    return {
+        email: user.email,
+        username: user.username,
+        fullName: user.fullName,
+        role: user.role.name,
+    }
 }
 
 const update = async (req) => {
