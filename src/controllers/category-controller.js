@@ -5,10 +5,10 @@ import { success } from '../utils/message-success.js'
 const add = async (req, res, next) => {
     try {
         const result = await categoryService.add(req)
-        res.status(success.HTTP_CODE_CREATED).send(
+        res.status(success.HTTP.CODE.CREATED).send(
             responses.responseSuccess(
-                success.HTTP_CODE_CREATED,
-                success.HTTP_STATUS_CREATED,
+                success.HTTP.CODE.CREATED,
+                success.HTTP.STATUS.CREATED,
                 result
             )
         )
@@ -20,8 +20,8 @@ const add = async (req, res, next) => {
 const update = async (req, res, next) => {
     try {
         const result = await categoryService.update(req)
-        res.status(success.HTTP_CODE_OK).send(
-            responses.responseSuccess(success.HTTP_CODE_OK, success.HTTP_STATUS_OK, result)
+        res.status(success.HTTP.CODE.OK).send(
+            responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
         )
     } catch (e) {
         next(e)
@@ -31,11 +31,11 @@ const update = async (req, res, next) => {
 const remove = async (req, res, next) => {
     try {
         await categoryService.remove(req)
-        res.status(success.HTTP_CODE_OK).send(
+        res.status(success.HTTP.CODE.OK).send(
             responses.responseSuccess(
-                success.HTTP_CODE_OK,
-                success.HTTP_STATUS_OK,
-                success.SUCCESS_DELETE_CATEGORY
+                success.HTTP.CODE.OK,
+                success.HTTP.STATUS.OK,
+                success.CATEGORY.DELETE
             )
         )
     } catch (e) {
@@ -46,8 +46,8 @@ const remove = async (req, res, next) => {
 const get = async (req, res, next) => {
     try {
         const result = await categoryService.get(req)
-        res.status(success.HTTP_CODE_OK).send(
-            responses.responseSuccess(success.HTTP_CODE_OK, success.HTTP_STATUS_OK, result)
+        res.status(success.HTTP.CODE.OK).send(
+            responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
         )
     } catch (e) {
         next(e)
@@ -57,8 +57,8 @@ const get = async (req, res, next) => {
 const getById = async (req, res, next) => {
     try {
         const result = await categoryService.getById(req)
-        res.status(success.HTTP_CODE_OK).send(
-            responses.responseSuccess(success.HTTP_CODE_OK, success.HTTP_STATUS_OK, result)
+        res.status(success.HTTP.CODE.OK).send(
+            responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
         )
     } catch (e) {
         next(e)

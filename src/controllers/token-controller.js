@@ -7,10 +7,10 @@ const refreshToken = async (req, res, next) => {
     try {
         const result = await tokenService.refresh(req, res)
         logger.info('result', result)
-        res.status(success.HTTP_CODE_CREATED).send(
+        res.status(success.HTTP.CODE.CREATED).send(
             responses.responseSuccess(
-                success.HTTP_CODE_CREATED,
-                success.HTTP_STATUS_CREATED,
+                success.HTTP.CODE.CREATED,
+                success.HTTP.STATUS.CREATED,
                 result
             )
         )
