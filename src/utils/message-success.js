@@ -1,14 +1,34 @@
-const success = {
-    HTTP_CODE_OK: 200,
-    HTTP_STATUS_OK: 'OK',
-    HTTP_CODE_CREATED: 201,
-    HTTP_STATUS_CREATED: 'created',
-    SUCCESS_LOGOUT: 'logout success',
-    SUCCESS_DELETE_USER: 'success delete user',
-    SUCCESS_DELETE_AREA: 'success delete area',
-    SUCCESS_DELETE_COUNTRY: 'success delete country',
-    SUCCESS_DELETE_ROLE: 'success delete role',
-    SUCCESS_DELETE_CATEGORY: 'success delete category',
+const httpSuccess = {
+    CODE: {
+        OK: 200,
+        CREATED: 201,
+    },
+    STATUS: {
+        OK: 'OK',
+        CREATED: 'created',
+    },
 }
 
-export { success }
+const success = {
+    HTTP: httpSuccess,
+    AUTHENTICATION: {
+        LOGOUT: 'logout success',
+    },
+    USER: {
+        DELETE: 'success delete user',
+    },
+    AREA: {
+        DELETE: 'success delete area',
+    },
+    COUNTRY: {
+        DELETE: 'success delete country',
+    },
+    ROLE: {
+        DELETE: 'success delete role',
+    },
+    CATEGORY: {
+        DELETE: 'success delete category',
+    },
+}
+
+export default success
