@@ -1,18 +1,17 @@
 import response from '../utils/response-api.js'
 import { errors } from '../utils/message-error.js'
 import jwt from 'jsonwebtoken'
-import { logger } from '../application/logging.js'
 
 const accessTokenVerifyMiddleware = async (req, res, next) => {
     const authHeader = req.get('Authorization')
 
     if (!authHeader?.startsWith('Bearer ')) {
-        res.status(errors.HTTP_CODE_UNAUTHORIZED)
+        res.status(errors.HTTP.CODE.UNAUTHORIZED)
             .send(
                 response.responseError(
-                    errors.HTTP_CODE_UNAUTHORIZED,
-                    errors.HTTP_STATUS_UNAUTHORIZED,
-                    errors.ERROR_AUTHORIZATION
+                    errors.HTTP.CODE.UNAUTHORIZED,
+                    errors.HTTP.STATUS.UNAUTHORIZED,
+                    errors.AUTHORIZATION
                 )
             )
             .end()
@@ -22,12 +21,12 @@ const accessTokenVerifyMiddleware = async (req, res, next) => {
     const token = authHeader.split(' ')[1]
 
     if (!token) {
-        res.status(errors.HTTP_CODE_UNAUTHORIZED)
+        res.status(errors.HTTP.CODE.UNAUTHORIZED)
             .send(
                 response.responseError(
-                    errors.HTTP_CODE_UNAUTHORIZED,
-                    errors.HTTP_STATUS_UNAUTHORIZED,
-                    errors.ERROR_AUTHORIZATION
+                    errors.HTTP.CODE.UNAUTHORIZED,
+                    errors.HTTP.STATUS.UNAUTHORIZED,
+                    errors.AUTHORIZATION
                 )
             )
             .end()
@@ -36,12 +35,12 @@ const accessTokenVerifyMiddleware = async (req, res, next) => {
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_KEY, (err, user) => {
         if (err) {
-            res.status(errors.HTTP_CODE_FORBIDDEN)
+            res.status(errors.HTTP.CODE.FORBIDDEN)
                 .send(
                     response.responseError(
-                        errors.HTTP_CODE_FORBIDDEN,
-                        errors.HTTP_STATUS_FORBIDDEN,
-                        errors.ERROR_FORBIDDEN
+                        errors.HTTP.CODE.FORBIDDEN,
+                        errors.HTTP.STATUS.FORBIDDEN,
+                        errors.FORBIDDEN
                     )
                 )
                 .end()
@@ -56,15 +55,13 @@ const accessTokenVerifyMiddleware = async (req, res, next) => {
 const refreshTokenVerifyMiddleware = async (req, res, next) => {
     const foundRefreshToken = req.cookies.refreshToken
 
-    logger.info(foundRefreshToken)
-
     if (!foundRefreshToken) {
-        res.status(errors.HTTP_CODE_UNAUTHORIZED)
+        res.status(errors.HTTP.CODE.UNAUTHORIZED)
             .send(
                 response.responseError(
-                    errors.HTTP_CODE_UNAUTHORIZED,
-                    errors.HTTP_STATUS_UNAUTHORIZED,
-                    errors.ERROR_AUTHORIZATION
+                    errors.HTTP.CODE.UNAUTHORIZED,
+                    errors.HTTP.STATUS.UNAUTHORIZED,
+                    errors.AUTHORIZATION
                 )
             )
             .end()
@@ -73,12 +70,12 @@ const refreshTokenVerifyMiddleware = async (req, res, next) => {
 
     jwt.verify(foundRefreshToken, process.env.REFRESH_TOKEN_SECRET_KEY, (err, user) => {
         if (err) {
-            res.status(errors.HTTP_CODE_FORBIDDEN)
+            res.status(errors.HTTP.CODE.FORBIDDEN)
                 .send(
                     response.responseError(
-                        errors.HTTP_CODE_FORBIDDEN,
-                        errors.HTTP_STATUS_FORBIDDEN,
-                        errors.ERROR_FORBIDDEN
+                        errors.HTTP.CODE.FORBIDDEN,
+                        errors.HTTP.STATUS.FORBIDDEN,
+                        errors.FORBIDDEN
                     )
                 )
                 .end()

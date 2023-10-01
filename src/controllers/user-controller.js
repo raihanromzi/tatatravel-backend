@@ -20,9 +20,9 @@ const add = async (req, res, next) => {
 
 const login = async (req, res, next) => {
     try {
-        const result = await publicService.login(req.body, res)
-        res.status(success.HTTP_CODE_OK).send(
-            responses.responseSuccess(success.HTTP_CODE_OK, success.HTTP_STATUS_OK, result)
+        const result = await publicService.login(req, res)
+        res.status(success.HTTP.CODE.OK).send(
+            responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
         )
     } catch (e) {
         next(e)

@@ -5,15 +5,16 @@ import { prismaClient } from '../application/database.js'
 
 const refresh = async (req, res) => {
     const foundRefreshToken = req.cookies.refreshToken
+
     let validUser = null
 
     res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'None', secure: true })
 
     if (!foundRefreshToken) {
         throw new ResponseError(
-            errors.HTTP_CODE_UNAUTHORIZED,
-            errors.HTTP_STATUS_UNAUTHORIZED,
-            errors.ERROR_AUTHORIZATION
+            errors.HTTP.CODE.UNAUTHORIZED,
+            errors.HTTP.STATUS.UNAUTHORIZED,
+            errors.AUTHORIZATION
         )
     }
 
@@ -32,9 +33,9 @@ const refresh = async (req, res) => {
         jwt.verify(foundRefreshToken, process.env.REFRESH_TOKEN_SECRET_KEY, async (err, user) => {
             if (err) {
                 throw new ResponseError(
-                    errors.HTTP_CODE_FORBIDDEN,
-                    errors.HTTP_STATUS_FORBIDDEN,
-                    errors.ERROR_FORBIDDEN
+                    errors.HTTP.CODE.FORBIDDEN,
+                    errors.HTTP.STATUS.FORBIDDEN,
+                    errors.FORBIDDEN
                 )
             }
             // if user not found, but refreshToken is reused and valid -> user hacked
@@ -48,18 +49,18 @@ const refresh = async (req, res) => {
             })
         })
         throw new ResponseError(
-            errors.HTTP_CODE_UNAUTHORIZED,
-            errors.HTTP_STATUS_UNAUTHORIZED,
-            errors.ERROR_AUTHORIZATION
+            errors.HTTP.CODE.UNAUTHORIZED,
+            errors.HTTP.STATUS.UNAUTHORIZED,
+            errors.AUTHORIZATION
         )
     }
 
     jwt.verify(foundRefreshToken, process.env.REFRESH_TOKEN_SECRET_KEY, async (err, user) => {
         if (err || foundUserWithRefreshToken.username !== user.username) {
             throw new ResponseError(
-                errors.HTTP_CODE_FORBIDDEN,
-                errors.HTTP_STATUS_FORBIDDEN,
-                errors.ERROR_FORBIDDEN
+                errors.HTTP.CODE.FORBIDDEN,
+                errors.HTTP.STATUS.FORBIDDEN,
+                errors.FORBIDDEN
             )
         }
 
@@ -67,14 +68,14 @@ const refresh = async (req, res) => {
     })
 
     const userAccessTokenData = {
-        username: validUser.username,
+        id: validUser.id,
         roleId: validUser.roleId,
     }
 
     const userRefreshTokenData = {
+        id: validUser.id,
         username: validUser.username,
         roleId: validUser.roleId,
-        email: validUser.email,
     }
 
     const newAccessToken = generateAccessToken(userAccessTokenData)
@@ -93,7 +94,7 @@ const refresh = async (req, res) => {
         httpOnly: true,
         secure: true,
         sameSite: 'None',
-        maxAge: 24 * 60 * 60 * 1000,
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
     })
 
     return {

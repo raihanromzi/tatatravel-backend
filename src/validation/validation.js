@@ -8,8 +8,8 @@ const validate = (schema, request) => {
     })
     if (result.error) {
         throw new ResponseError(
-            errors.HTTP_CODE_BAD_REQUEST,
-            errors.HTTP_STATUS_BAD_REQUEST,
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
             result.error.message
         )
     } else {

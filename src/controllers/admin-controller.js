@@ -14,10 +14,10 @@ const searchUser = async (req, res, next) => {
         }
 
         const result = await adminService.searchUser(query)
-        res.status(success.HTTP_CODE_OK).send(
+        res.status(success.HTTP.CODE.OK).send(
             responses.responseSuccess(
-                success.HTTP_CODE_OK,
-                success.HTTP_STATUS_OK,
+                success.HTTP.CODE.OK,
+                success.HTTP.STATUS.OK,
                 result.data,
                 result.pagination
             )
@@ -32,11 +32,11 @@ const deleteUser = async (req, res, next) => {
         const user = req.user
         const userId = req.params.userId
         await adminService.deleteUser(user, userId)
-        res.status(success.HTTP_CODE_OK).send(
+        res.status(success.HTTP.CODE.OK).send(
             responses.responseSuccess(
-                success.HTTP_CODE_OK,
-                success.HTTP_STATUS_OK,
-                success.SUCCESS_DELETE_USER
+                success.HTTP.CODE.OK,
+                success.HTTP.STATUS.OK,
+                success.USER.DELETE
             )
         )
     } catch (e) {

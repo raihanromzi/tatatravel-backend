@@ -5,10 +5,10 @@ import { success } from '../utils/message-success.js'
 const add = async (req, res, next) => {
     try {
         const result = await areaService.add(req)
-        res.status(success.HTTP_CODE_CREATED).send(
+        res.status(success.HTTP.CODE.CREATED).send(
             responses.responseSuccess(
-                success.HTTP_CODE_CREATED,
-                success.HTTP_STATUS_CREATED,
+                success.HTTP.CODE.CREATED,
+                success.HTTP.STATUS.CREATED,
                 result
             )
         )
@@ -24,10 +24,10 @@ const get = async (req, res, next) => {
         }
 
         const result = await areaService.get(query)
-        res.status(success.HTTP_CODE_OK).send(
+        res.status(success.HTTP.CODE.OK).send(
             responses.responseSuccess(
-                success.HTTP_CODE_OK,
-                success.HTTP_STATUS_OK,
+                success.HTTP.CODE.OK,
+                success.HTTP.STATUS.OK,
                 result.data,
                 result.pagination
             )
@@ -44,8 +44,8 @@ const getById = async (req, res, next) => {
         }
 
         const result = await areaService.getById(params)
-        res.status(success.HTTP_CODE_OK).send(
-            responses.responseSuccess(success.HTTP_CODE_OK, success.HTTP_STATUS_OK, result)
+        res.status(success.HTTP.CODE.OK).send(
+            responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
         )
     } catch (e) {
         next(e)
@@ -59,8 +59,8 @@ const update = async (req, res, next) => {
         }
 
         const result = await areaService.update(req, params)
-        res.status(success.HTTP_CODE_OK).send(
-            responses.responseSuccess(success.HTTP_CODE_OK, success.HTTP_STATUS_OK, result)
+        res.status(success.HTTP.CODE.OK).send(
+            responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
         )
     } catch (e) {
         next(e)
@@ -74,11 +74,11 @@ const remove = async (req, res, next) => {
         }
 
         await areaService.remove(params)
-        res.status(success.HTTP_CODE_OK).send(
+        res.status(success.HTTP.CODE.OK).send(
             responses.responseSuccess(
-                success.HTTP_CODE_OK,
-                success.HTTP_STATUS_OK,
-                success.SUCCESS_DELETE_AREA
+                success.HTTP.CODE.OK,
+                success.HTTP.STATUS.OK,
+                success.AREA.DELETE
             )
         )
     } catch (e) {

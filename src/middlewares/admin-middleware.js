@@ -1,12 +1,13 @@
 import response from '../utils/response-api.js'
 import { prismaClient } from '../application/database.js'
 import { errors } from '../utils/message-error.js'
+import { logger } from '../application/logging.js'
 
 const adminMiddleware = async (req, res, next) => {
     const user = req.user
 
     // find role in database
-    const role = await prismaClient.role.findFirst({
+    const role = await prismaClient.role.findUnique({
         where: {
             id: user.roleId,
         },
@@ -15,25 +16,27 @@ const adminMiddleware = async (req, res, next) => {
         },
     })
 
+    logger.info(`Role: ${role.name}`)
+
     if (!role.name) {
-        res.status(errors.HTTP_CODE_UNAUTHORIZED)
+        res.status(errors.HTTP.CODE.UNAUTHORIZED)
             .send(
                 response.responseError(
-                    errors.HTTP_CODE_UNAUTHORIZED,
-                    errors.HTTP_STATUS_UNAUTHORIZED,
-                    errors.ERROR_ROLE_UNKNOWN
+                    errors.HTTP.CODE.UNAUTHORIZED,
+                    errors.HTTP.STATUS.UNAUTHORIZED,
+                    errors.ROLE.IS_UNKNOWN
                 )
             )
             .end()
     }
 
     if (role.name !== 'super admin') {
-        res.status(errors.HTTP_CODE_UNAUTHORIZED)
+        res.status(errors.HTTP.CODE.UNAUTHORIZED)
             .send(
                 response.responseError(
-                    errors.HTTP_CODE_UNAUTHORIZED,
-                    errors.HTTP_STATUS_UNAUTHORIZED,
-                    errors.ERROR_ROLE_NOT_SUPER_ADMIN
+                    errors.HTTP.CODE.UNAUTHORIZED,
+                    errors.HTTP.STATUS.UNAUTHORIZED,
+                    errors.ROLE.IS_NOT_SUPER_ADMIN
                 )
             )
             .end()

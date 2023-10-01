@@ -7,31 +7,31 @@ const addUserValidationSchema = Joi.object({
         .max(255)
         .required()
         .messages({
-            'string.base': `${errors.ERROR_FULL_NAME_STRING}`,
-            'string.empty': `${errors.ERROR_FULL_NAME_EMPTY}`,
-            'string.min': `${errors.ERROR_FULL_NAME_MIN}`,
-            'string.max': `${errors.ERROR_FULL_NAME_MAX}`,
-            'any.required': `${errors.ERROR_FULL_NAME_REQUIRED}`,
+            'string.base': `${errors.FULL_NAME.MUST_STRING}`,
+            'string.empty': `${errors.FULL_NAME.CANNOT_EMPTY}`,
+            'string.min': `${errors.FULL_NAME.MUST_MIN}`,
+            'string.max': `${errors.FULL_NAME.MUST_MAX}`,
+            'any.required': `${errors.FULL_NAME.IS_REQUIRED}`,
         }),
     username: Joi.string()
         .min(3)
         .max(30)
         .required()
         .messages({
-            'string.base': `${errors.ERROR_USERNAME_STRING}`,
-            'string.empty': `${errors.ERROR_USERNAME_EMPTY}`,
-            'string.min': `${errors.ERROR_USERNAME_MIN}`,
-            'string.max': `${errors.ERROR_USERNAME_MAX}`,
-            'any.required': `${errors.ERROR_USERNAME_REQUIRED}`,
+            'string.base': `${errors.USERNAME.MUST_STRING}`,
+            'string.empty': `${errors.USERNAME.CANNOT_EMPTY}`,
+            'string.min': `${errors.USERNAME.MUST_MIN}`,
+            'string.max': `${errors.USERNAME.MUST_MAX}`,
+            'any.required': `${errors.USERNAME.IS_REQUIRED}`,
         }),
     email: Joi.string()
         .email()
         .required()
         .messages({
-            'string.base': `${errors.ERROR_EMAIL_STRING}`,
-            'string.empty': `${errors.ERROR_EMAIL_EMPTY}`,
-            'string.email': `${errors.ERROR_EMAIL_INVALID}`,
-            'any.required': `${errors.ERROR_EMAIL_REQUIRED}`,
+            'string.base': `${errors.EMAIL.MUST_STRING}`,
+            'string.empty': `${errors.EMAIL.CANNOT_EMPTY}`,
+            'string.email': `${errors.EMAIL.MUST_VALID}`,
+            'any.required': `${errors.EMAIL.IS_REQUIRED}`,
         }),
     password: Joi.string()
         .min(6)
@@ -39,19 +39,19 @@ const addUserValidationSchema = Joi.object({
         .required()
         .pattern(new RegExp('^[a-zA-Z0-9]{6,255}$'))
         .messages({
-            'string.base': `${errors.ERROR_PASSWORD_STRING}`,
-            'string.empty': `${errors.ERROR_PASSWORD_EMPTY}`,
-            'string.min': `${errors.ERROR_PASSWORD_MIN}`,
-            'string.max': `${errors.ERROR_PASSWORD_MAX}`,
-            'string.pattern.base': `${errors.ERROR_PASSWORD_PATTERN}`,
-            'any.required': `${errors.ERROR_PASSWORD_REQUIRED}`,
+            'string.base': `${errors.PASSWORD.MUST_STRING}`,
+            'string.empty': `${errors.PASSWORD.CANNOT_EMPTY}`,
+            'string.min': `${errors.PASSWORD.MUST_MIN}`,
+            'string.max': `${errors.PASSWORD.MUST_MAX}`,
+            'string.pattern.base': `${errors.PASSWORD.MUST_VALID}`,
+            'any.required': `${errors.PASSWORD.IS_REQUIRED}`,
         }),
     role: Joi.number()
         .required()
         .positive()
         .messages({
-            'number.base': `${errors.ERROR_ROLE_NUMBER}`,
-            'number.positive': `${errors.ERROR_ROLE_POSITIVE}`,
+            'number.base': `${errors.ROLE.MUST_NUMBER}`,
+            'number.positive': `${errors.ROLE.MUST_POSITIVE}`,
         }),
 }).unknown(true)
 
@@ -60,10 +60,10 @@ const loginValidationSchema = Joi.object({
         .email()
         .required()
         .messages({
-            'string.base': `${errors.ERROR_EMAIL_STRING}`,
-            'string.empty': `${errors.ERROR_EMAIL_EMPTY}`,
-            'string.email': `${errors.ERROR_EMAIL_INVALID}`,
-            'any.required': `${errors.ERROR_EMAIL_REQUIRED}`,
+            'string.base': `${errors.EMAIL.MUST_STRING}`,
+            'string.empty': `${errors.EMAIL.CANNOT_EMPTY}`,
+            'string.email': `${errors.EMAIL.MUST_VALID}`,
+            'any.required': `${errors.EMAIL.IS_REQUIRED}`,
         }),
     password: Joi.string()
         .min(6)
@@ -71,12 +71,12 @@ const loginValidationSchema = Joi.object({
         .required()
         .pattern(new RegExp('^[a-zA-Z0-9]{6,255}$'))
         .messages({
-            'string.base': `${errors.ERROR_PASSWORD_STRING}`,
-            'string.empty': `${errors.ERROR_PASSWORD_EMPTY}`,
-            'string.min': `${errors.ERROR_PASSWORD_MIN}`,
-            'string.max': `${errors.ERROR_PASSWORD_MAX}`,
-            'string.pattern.base': `${errors.ERROR_PASSWORD_PATTERN}`,
-            'any.required': `${errors.ERROR_PASSWORD_REQUIRED}`,
+            'string.base': `${errors.PASSWORD.MUST_STRING}`,
+            'string.empty': `${errors.PASSWORD.CANNOT_EMPTY}`,
+            'string.min': `${errors.PASSWORD.MUST_MIN}`,
+            'string.max': `${errors.PASSWORD.MUST_MAX}`,
+            'string.pattern.base': `${errors.PASSWORD.MUST_VALID}`,
+            'any.required': `${errors.PASSWORD.IS_REQUIRED}`,
         }),
 }).unknown(true)
 
@@ -85,11 +85,11 @@ const getUserValidationSchema = Joi.string()
     .max(30)
     .required()
     .messages({
-        'string.base': `${errors.ERROR_USERNAME_STRING}}`,
-        'string.empty': `${errors.ERROR_USERNAME_EMPTY}`,
-        'string.min': `${errors.ERROR_USERNAME_MIN}`,
-        'string.max': `${errors.ERROR_USERNAME_MAX}`,
-        'any.required': `${errors.ERROR_USERNAME_REQUIRED}`,
+        'string.base': `${errors.USERNAME.MUST_STRING}}`,
+        'string.empty': `${errors.USERNAME.CANNOT_EMPTY}`,
+        'string.min': `${errors.USERNAME.MUST_MIN}`,
+        'string.max': `${errors.USERNAME.MUST_MAX}`,
+        'any.required': `${errors.USERNAME.IS_REQUIRED}`,
     })
 
 const updateUserValidationSchema = Joi.object({
@@ -98,9 +98,9 @@ const updateUserValidationSchema = Joi.object({
         .max(30)
         .required()
         .messages({
-            'string.base': `${errors.ERROR_USERNAME_STRING}}`,
-            'string.min': `${errors.ERROR_USERNAME_MIN}`,
-            'string.max': `${errors.ERROR_USERNAME_MAX}`,
+            'string.base': `${errors.USERNAME.MUST_STRING}}`,
+            'string.min': `${errors.USERNAME.MUST_MIN}`,
+            'string.max': `${errors.USERNAME.MUST_MAX}`,
         }),
 
     password: Joi.string()
@@ -108,59 +108,59 @@ const updateUserValidationSchema = Joi.object({
         .max(255)
         .optional()
         .messages({
-            'string.base': `${errors.ERROR_PASSWORD_STRING}`,
-            'string.min': `${errors.ERROR_PASSWORD_MIN}`,
-            'string.max': `${errors.ERROR_PASSWORD_MAX}`,
+            'string.base': `${errors.PASSWORD.MUST_STRING}`,
+            'string.min': `${errors.PASSWORD.MUST_MIN}`,
+            'string.max': `${errors.PASSWORD.MUST_MAX}`,
         }),
     fullName: Joi.string()
         .min(3)
         .max(255)
         .optional()
         .messages({
-            'string.base': `${errors.ERROR_FULL_NAME_STRING}`,
-            'string.empty': `${errors.ERROR_FULL_NAME_EMPTY}`,
-            'string.min': `${errors.ERROR_FULL_NAME_MIN}`,
-            'string.max': `${errors.ERROR_FULL_NAME_MAX}`,
+            'string.base': `${errors.FULL_NAME.MUST_STRING}`,
+            'string.empty': `${errors.FULL_NAME.CANNOT_EMPTY}`,
+            'string.min': `${errors.FULL_NAME.MUST_MIN}`,
+            'string.max': `${errors.FULL_NAME.MUST_MAX}`,
         }),
 }).unknown(true)
 
 const searchUserValidationSchema = Joi.object({
     page: Joi.number().min(1).positive().default(1).messages({
-        'number.base': errors.ERROR_PAGE_NUMBER,
-        'number.empty': errors.ERROR_PAGE_EMPTY,
-        'number.positive': errors.ERROR_PAGE_POSITIVE,
+        'number.base': errors.PAGE.MUST_NUMBER,
+        'number.empty': errors.PAGE.CANNOT_EMPTY,
+        'number.positive': errors.PAGE.MUST_POSITIVE,
     }),
     size: Joi.number().min(1).positive().max(100).default(10).messages({
-        'number.base': errors.ERROR_SIZE_NUMBER,
-        'number.empty': errors.ERROR_SIZE_EMPTY,
-        'number.positive': errors.ERROR_SIZE_POSITIVE,
+        'number.base': errors.SIZE.MUST_NUMBER,
+        'number.empty': errors.SIZE.CANNOT_EMPTY,
+        'number.positive': errors.SIZE.MUST_POSITIVE,
     }),
     username: Joi.string()
         .max(30)
         .optional()
         .messages({
-            'string.base': `${errors.ERROR_USERNAME_STRING}`,
-            'string.max': `${errors.ERROR_USERNAME_MAX}`,
+            'string.base': `${errors.USERNAME.MUST_STRING}`,
+            'string.max': `${errors.USERNAME.MUST_MAX}`,
         }),
     email: Joi.string()
         .optional()
         .messages({
-            'string.base': `${errors.ERROR_EMAIL_STRING}`,
-            'string.email': `${errors.ERROR_EMAIL_INVALID}`,
+            'string.base': `${errors.EMAIL.MUST_STRING}`,
+            'string.email': `${errors.EMAIL.MUST_VALID}`,
         }),
     name: Joi.string()
         .max(50)
         .optional()
         .messages({
-            'string.base': `${errors.ERROR_FULL_NAME_STRING}`,
-            'string.max': `${errors.ERROR_FULL_NAME_MAX}`,
+            'string.base': `${errors.FULL_NAME.MUST_STRING}`,
+            'string.max': `${errors.FULL_NAME.MUST_MAX}`,
         }),
     role: Joi.string()
         .max(30)
         .optional()
         .messages({
-            'string.base': `${errors.ERROR_ROLE_STRING}`,
-            'string.max': `${errors.ERROR_ROLE_MAX}`,
+            'string.base': `${errors.ROLE.MUST_STRING}`,
+            'string.max': `${errors.ROLE.MUST_MAX}`,
         }),
 }).unknown(true)
 
@@ -168,9 +168,9 @@ const deleteUserValidationSchema = Joi.number()
     .positive()
     .required()
     .messages({
-        'number.base': `${errors.ERROR_USERID_NUMBER}`,
-        'number.positive': `${errors.ERROR_USERID_POSITIVE}`,
-        'any.required': `${errors.ERROR_USERID_REQUIRED}`,
+        'number.base': `${errors.USERID.MUST_NUMBER}`,
+        'number.positive': `${errors.USERID.MUST_POSITIVE}`,
+        'any.required': `${errors.USERID.IS_REQUIRED}`,
     })
 
 export {

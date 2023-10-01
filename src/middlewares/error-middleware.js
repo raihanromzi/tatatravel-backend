@@ -1,6 +1,6 @@
 import { ResponseError } from '../utils/response-error.js'
 import response from '../utils/response-api.js'
-import { logger } from '../application/logging.js'
+import { errors } from '../utils/message-error.js'
 
 const errorMiddleware = async (err, req, res, next) => {
     if (!err) {
@@ -13,9 +13,14 @@ const errorMiddleware = async (err, req, res, next) => {
             .send(response.responseError(err.code, err.status, err.message))
             .end()
     } else {
-        logger.info(err.message)
-        res.status(500)
-            .send(response.responseError(500, 'Internal Server Error', err.message))
+        res.status(errors.HTTP.CODE.INTERNAL_SERVER_ERROR)
+            .send(
+                response.responseError(
+                    errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                    errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                    err.message
+                )
+            )
             .end()
     }
 }

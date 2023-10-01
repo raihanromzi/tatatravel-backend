@@ -29,6 +29,11 @@ const categoryErrors = {
         MUST_POSITIVE: 'category id must be a positive number',
         CANNOT_EMPTY: 'category id cannot be empty',
     },
+    IS_ACTIVE: {
+        IS_REQUIRED: 'is active is required',
+        MUST_BOOLEAN: 'is active must be a boolean',
+        CANNOT_EMPTY: 'is active cannot be empty',
+    },
     ALREADY_EXISTS: 'category already exists',
     NOT_FOUND: 'category is not found',
     FAILED_TO_ADD: 'failed to add category',
@@ -183,4 +188,4 @@ const errors = {
     SERVER_ERROR: 'server error, please try again',
 }
 
-export default errors
+export { errors }

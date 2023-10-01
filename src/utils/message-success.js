@@ -31,4 +31,4 @@ const success = {
     },
 }
 
-export default success
+export { success }
