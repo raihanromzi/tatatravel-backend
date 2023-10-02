@@ -2,7 +2,9 @@ import { validate } from '../validation/validation.js'
 import {
     addUserValidationSchema,
     deleteUserValidationSchema,
+    getUserValidationSchema,
     searchUserValidationSchema,
+    updateActiveUserValidationSchema,
 } from '../validation/user-validation.js'
 import { prismaClient } from '../application/database.js'
 import { ResponseError } from '../utils/response-error.js'
@@ -221,4 +223,56 @@ const get = async (req) => {
     }
 }
 
-export default { add, remove, get }
+const update = async (req) => {
+    const id = validate(getUserValidationSchema, req.params)
+
+    const currentUserId = req.user.id
+
+    if (id === currentUserId) {
+        throw new ResponseError(
+            errors.HTTP.CODE.FORBIDDEN,
+            errors.HTTP.STATUS.FORBIDDEN,
+            errors.USER.CANNOT_UPDATE_YOURSELF
+        )
+    }
+
+    const user = validate(updateActiveUserValidationSchema, req.body)
+
+    const { isActive } = user
+
+    const [countUser, result] = await prismaClient.$transaction([
+        prismaClient.user.count({
+            where: {
+                id: id,
+            },
+        }),
+        prismaClient.user.update({
+            where: {
+                id: id,
+            },
+            data: {
+                isActive: isActive,
+            },
+        }),
+    ])
+
+    if (countUser !== 1) {
+        throw new ResponseError(
+            errors.HTTP.CODE.NOT_FOUND,
+            errors.HTTP.STATUS.NOT_FOUND,
+            errors.USER.NOT_FOUND
+        )
+    }
+
+    if (!result) {
+        throw new ResponseError(
+            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+            errors.USER.FAILED_TO_UPDATE
+        )
+    }
+
+    return result
+}
+
+export default { add, remove, get, update }

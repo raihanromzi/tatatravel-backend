@@ -42,12 +42,18 @@ const categoryErrors = {
 }
 
 const userErrors = {
+    IS_ACTIVE: {
+        IS_REQUIRED: 'is active is required',
+        MUST_BOOLEAN: 'is active must be a boolean',
+        CANNOT_EMPTY: 'is active cannot be empty',
+    },
     ALREADY_EXISTS: 'user already exists',
     NOT_FOUND: 'user is not found',
     FAILED_TO_ADD: 'failed to add user',
     FAILED_TO_UPDATE: 'failed to update user',
     CANNOT_DELETE_YOURSELF: 'cannot delete yourself',
     FAILED_TO_DELETE_DIRECTORY: 'failed to delete user avatar directory',
+    CANNOT_UPDATE_YOURSELF: 'cannot update yourself',
 }
 
 const roleErrors = {

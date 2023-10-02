@@ -196,11 +196,21 @@ const deleteUserValidationSchema = Joi.number()
         'any.required': `${errors.USERID.IS_REQUIRED}`,
     })
 
+const updateActiveUserValidationSchema = Joi.object({
+    isActive: Joi.boolean()
+        .required()
+        .messages({
+            'boolean.base': `${errors.USER.IS_ACTIVE.MUST_BOOLEAN}`,
+            'any.required': `${errors.USER.IS_ACTIVE.IS_REQUIRED}`,
+        }),
+}).unknown(true)
+
 export {
     addUserValidationSchema,
     loginValidationSchema,
     getUserValidationSchema,
     updateUserValidationSchema,
+    updateActiveUserValidationSchema,
     avatarValidationSchema,
     deleteUserValidationSchema,
     searchUserValidationSchema,
