@@ -178,6 +178,16 @@ const avatarErrors = {
     MUST_LESS_THAN_2MB: 'avatar must be less than 2MB',
 }
 
+const sortByErrors = {
+    MUST_STRING: 'sort by must be a string',
+    MUST_VALID: 'column sort by must be valid',
+}
+
+const orderByErrors = {
+    MUST_STRING: 'order by must be a string',
+    MUST_VALID: 'order by must be asc or desc',
+}
+
 const errors = {
     HTTP: httpErrors,
     CATEGORY: categoryErrors,
@@ -190,6 +200,8 @@ const errors = {
     USERID: useridErrors,
     PASSWORD: passwordErrors,
     PAGE: pageErrors,
+    SORT_BY: sortByErrors,
+    ORDER_BY: orderByErrors,
     SIZE: sizeErrors,
     AREA: areaErrors,
     COUNTRY: countryErrors,

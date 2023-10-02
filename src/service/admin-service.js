@@ -114,7 +114,34 @@ const get = async (req) => {
 
     const id = req.user.id
 
-    const { name, email, username, role, page, size } = query
+    const { name, email, username, role, page, size, sortBy, orderBy } = query
+
+    // validation for sortBy and orderBy
+    if (sortBy) {
+        if (
+            sortBy !== 'id' &&
+            sortBy !== 'fullName' &&
+            sortBy !== 'username' &&
+            sortBy !== 'email' &&
+            sortBy !== 'role'
+        ) {
+            throw new ResponseError(
+                errors.HTTP.CODE.BAD_REQUEST,
+                errors.HTTP.STATUS.BAD_REQUEST,
+                errors.SORT_BY.MUST_VALID
+            )
+        }
+    }
+
+    if (orderBy) {
+        if (orderBy !== 'asc' && orderBy !== 'desc') {
+            throw new ResponseError(
+                errors.HTTP.CODE.BAD_REQUEST,
+                errors.HTTP.STATUS.BAD_REQUEST,
+                errors.ORDER_BY.MUST_VALID
+            )
+        }
+    }
 
     const skip = (page - 1) * size
 
@@ -151,6 +178,12 @@ const get = async (req) => {
                     contains: role,
                 },
             },
+        })
+    }
+
+    if (sortBy && orderBy) {
+        filters.push({
+            [sortBy]: orderBy,
         })
     }
 

@@ -171,6 +171,19 @@ const searchUserValidationSchema = Joi.object({
             'string.base': `${errors.ROLE.MUST_STRING}`,
             'string.max': `${errors.ROLE.MUST_MAX}`,
         }),
+    sortBy: Joi.string()
+        .optional()
+        .default('id')
+        .messages({
+            'string.base': `${errors.SORT_BY.MUST_STRING}`,
+        }),
+    orderBy: Joi.string()
+        .valid('asc', 'desc')
+        .optional()
+        .default('asc')
+        .messages({
+            'string.base': `${errors.ORDER_BY.MUST_STRING}`,
+        }),
 }).unknown(true)
 
 const deleteUserValidationSchema = Joi.number()
