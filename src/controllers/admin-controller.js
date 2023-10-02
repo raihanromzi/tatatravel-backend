@@ -2,18 +2,9 @@ import adminService from '../service/admin-service.js'
 import responses from '../utils/response-api.js'
 import { success } from '../utils/message-success.js'
 
-const search = async (req, res, next) => {
+const get = async (req, res, next) => {
     try {
-        const query = {
-            name: req.query.name,
-            email: req.query.email,
-            username: req.query.username,
-            role: req.query.role,
-            page: req.query.page,
-            size: req.query.size,
-        }
-
-        const result = await adminService.searchUser(query)
+        const result = await adminService.get(req)
         res.status(success.HTTP.CODE.OK).send(
             responses.responseSuccess(
                 success.HTTP.CODE.OK,
@@ -29,9 +20,7 @@ const search = async (req, res, next) => {
 
 const remove = async (req, res, next) => {
     try {
-        const user = req.user
-        const userId = req.params.userId
-        await adminService.deleteUser(user, userId)
+        await adminService.remove(req)
         res.status(success.HTTP.CODE.OK).send(
             responses.responseSuccess(
                 success.HTTP.CODE.OK,
@@ -46,7 +35,7 @@ const remove = async (req, res, next) => {
 
 export const add = async (req, res, next) => {
     try {
-        const result = await adminService.add(req.body)
+        const result = await adminService.add(req)
         res.status(success.HTTP.CODE.CREATED).send(
             responses.responseSuccess(
                 success.HTTP.CODE.CREATED,
@@ -59,4 +48,4 @@ export const add = async (req, res, next) => {
     }
 }
 
-export default { add, search, remove }
+export default { add, get, remove }
