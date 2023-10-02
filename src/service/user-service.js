@@ -53,36 +53,6 @@ const update = async (req) => {
 
     const { path } = avatar
 
-    const foundUser = await prismaClient.user.findUnique({
-        where: {
-            id: id,
-        },
-    })
-
-    if (!foundUser) {
-        throw new ResponseError(
-            errors.HTTP.CODE.NOT_FOUND,
-            errors.HTTP.STATUS.NOT_FOUND,
-            errors.USER.NOT_FOUND
-        )
-    }
-
-    const anotherUser = await prismaClient.user.findMany({
-        where: {
-            username: username,
-        },
-    })
-
-    if (anotherUser.length === 1) {
-        if (anotherUser[0].id !== id) {
-            throw new ResponseError(
-                errors.HTTP.CODE.NOT_FOUND,
-                errors.HTTP.STATUS.NOT_FOUND,
-                errors.USER.FAILED_TO_UPDATE
-            )
-        }
-    }
-
     const data = {}
 
     if (fullName) {
@@ -101,17 +71,41 @@ const update = async (req) => {
         data.username = username
     }
 
-    return prismaClient.user.update({
-        where: {
-            id: id,
-        },
-        data: data,
-        select: {
-            username: true,
-            fullName: true,
-            avatar: true,
-        },
-    })
+    const [, anotherUser, updatedUser] = await prismaClient.$transaction([
+        prismaClient.user.findUniqueOrThrow({
+            where: {
+                id: id,
+            },
+        }),
+        prismaClient.user.findMany({
+            where: {
+                username: username,
+            },
+        }),
+        prismaClient.user.update({
+            where: {
+                id: id,
+            },
+            data: data,
+            select: {
+                username: true,
+                fullName: true,
+                avatar: true,
+            },
+        }),
+    ])
+
+    if (anotherUser.length === 1) {
+        if (anotherUser[0].id !== id) {
+            throw new ResponseError(
+                errors.HTTP.CODE.NOT_FOUND,
+                errors.HTTP.STATUS.NOT_FOUND,
+                errors.USER.FAILED_TO_UPDATE
+            )
+        }
+    }
+
+    return updatedUser
 }
 
 const logout = async (req, res) => {
@@ -119,30 +113,25 @@ const logout = async (req, res) => {
 
     const id = user.id
 
-    const foundUser = await prismaClient.user.findUnique({
-        where: {
-            id: id,
-        },
-    })
-
-    if (!foundUser) {
-        throw new ResponseError(
-            errors.HTTP.CODE.NOT_FOUND,
-            errors.HTTP.STATUS.NOT_FOUND,
-            errors.USER.NOT_FOUND
-        )
-    }
-
-    await prismaClient.user.update({
-        where: {
-            id: id,
-        },
-        data: {
-            token: null,
-        },
-    })
+    const [, logoutUser] = await prismaClient.$transaction([
+        prismaClient.user.findUniqueOrThrow({
+            where: {
+                id: id,
+            },
+        }),
+        prismaClient.user.update({
+            where: {
+                id: id,
+            },
+            data: {
+                token: null,
+            },
+        }),
+    ])
 
     res.clearCookie('refreshToken')
+
+    return logoutUser
 }
 
 export default { get, update, logout }

@@ -11,7 +11,7 @@ const login = async (req, res) => {
 
     const { email, password } = user
 
-    const foundUser = await prismaClient.user.findUnique({
+    const foundUser = await prismaClient.user.findUniqueOrThrow({
         where: {
             email: email,
         },
@@ -22,14 +22,6 @@ const login = async (req, res) => {
             roleId: true,
         },
     })
-
-    if (!foundUser) {
-        throw new ResponseError(
-            errors.HTTP.CODE.NOT_FOUND,
-            errors.HTTP.STATUS.NOT_FOUND,
-            errors.AUTHENTICATION
-        )
-    }
 
     const { id, username, password: passwordHash, roleId } = foundUser
 
