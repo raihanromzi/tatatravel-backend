@@ -168,6 +168,13 @@ const countryErrors = {
     FAILED_TO_DELETE: 'failed to delete country',
 }
 
+const avatarErrors = {
+    MUST_VALID: 'file format must be PNG, JPG, or JPEG',
+    MUST_STRING: 'avatar must be a string',
+    PATH_MUST_STRING: 'avatar path must be a string',
+    MUST_LESS_THAN_2MB: 'avatar must be less than 2MB',
+}
+
 const errors = {
     HTTP: httpErrors,
     CATEGORY: categoryErrors,
@@ -175,6 +182,7 @@ const errors = {
     ROLE: roleErrors,
     FULL_NAME: fullNameErrors,
     USERNAME: usernameErrors,
+    AVATAR: avatarErrors,
     EMAIL: emailErrors,
     USERID: useridErrors,
     PASSWORD: passwordErrors,
