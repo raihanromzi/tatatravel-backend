@@ -8,14 +8,29 @@ import { prismaClient } from '../application/database.js'
 import { ResponseError } from '../utils/response-error.js'
 import { errors } from '../utils/message-error.js'
 import * as bcrypt from 'bcrypt'
+import fs from 'fs'
 
 const add = async (req) => {
-    const user = validate(addUserValidationSchema, req)
+    const user = validate(addUserValidationSchema, req.body)
+
+    const { fullName, username, email, password, role } = user
+
+    await prismaClient.role.findFirstOrThrow({
+        where: {
+            id: role,
+        },
+    })
 
     const countUser = await prismaClient.user.count({
         where: {
-            email: user.email,
-            username: user.username,
+            OR: [
+                {
+                    email: user.email,
+                },
+                {
+                    username: user.username,
+                },
+            ],
         },
     })
 
@@ -27,17 +42,17 @@ const add = async (req) => {
         )
     }
 
-    const hashedPassword = await bcrypt.hash(user.password, 10)
+    const hashedPassword = await bcrypt.hash(password, 10)
 
     const result = prismaClient.user.create({
         data: {
-            fullName: user.fullName,
-            username: user.username,
-            email: user.email,
+            fullName: fullName,
+            username: username,
+            email: email,
             password: hashedPassword,
             role: {
                 connect: {
-                    id: user.role,
+                    id: role,
                 },
             },
         },
@@ -57,17 +72,26 @@ const add = async (req) => {
 
     return result
 }
-const deleteUser = async (user, userId) => {
-    const id = validate(deleteUserValidationSchema, userId)
+const remove = async (req) => {
+    const id = validate(deleteUserValidationSchema, req.params.id)
 
-    const totalUserInDatabase = await prismaClient.user.count({
+    const currentUserId = req.user.id
+
+    if (id === currentUserId) {
+        throw new ResponseError(
+            errors.HTTP.CODE.FORBIDDEN,
+            errors.HTTP.STATUS.FORBIDDEN,
+            errors.USER.CANNOT_DELETE_YOURSELF
+        )
+    }
+
+    const foundUser = await prismaClient.user.count({
         where: {
-            username: user.username,
             id: id,
         },
     })
 
-    if (totalUserInDatabase !== 1) {
+    if (!foundUser) {
         throw new ResponseError(
             errors.HTTP.CODE.NOT_FOUND,
             errors.HTTP.STATUS.NOT_FOUND,
@@ -75,50 +99,55 @@ const deleteUser = async (user, userId) => {
         )
     }
 
+    fs.rmSync(`public/images/avatar/${id}`, { recursive: true, force: true })
+
     return prismaClient.user.delete({
         where: {
-            username: user.username,
             id: id,
         },
     })
 }
 
-const searchUser = async (req) => {
-    const query = validate(searchUserValidationSchema, req)
+const get = async (req) => {
+    const query = validate(searchUserValidationSchema, req.query)
 
-    const skip = (query.page - 1) * query.size
+    const id = req.user.id
+
+    const { name, email, username, role, page, size } = query
+
+    const skip = (page - 1) * size
 
     const filters = []
 
-    if (query.name) {
+    if (name) {
         filters.push({
             fullName: {
-                contains: query.name,
+                contains: name,
             },
         })
     }
 
-    if (query.email) {
+    if (email) {
         filters.push({
             email: {
-                contains: query.email,
+                contains: email,
             },
         })
     }
 
-    if (query.username) {
+    if (username) {
         filters.push({
             username: {
-                contains: query.username,
+                contains: username,
             },
         })
     }
 
-    if (query.role) {
+    if (role) {
         filters.push({
             role: {
                 name: {
-                    contains: query.role,
+                    contains: role,
                 },
             },
         })
@@ -127,6 +156,9 @@ const searchUser = async (req) => {
     const users = await prismaClient.user.findMany({
         where: {
             AND: filters,
+            NOT: {
+                id: id,
+            },
         },
         select: {
             id: true,
@@ -139,34 +171,15 @@ const searchUser = async (req) => {
                 },
             },
         },
-        take: query.size,
+        take: size,
         skip: skip,
     })
-
-    if (users.length === 0) {
-        throw new ResponseError(
-            errors.HTTP.CODE.NOT_FOUND,
-            errors.HTTP.STATUS.NOT_FOUND,
-            errors.USER.NOT_FOUND
-        )
-    }
 
     const totalItems = await prismaClient.user.count({
         where: {
             AND: filters,
         },
     })
-
-    if (totalItems === 0) {
-        return {
-            data: [],
-            pagination: {
-                page: query.page,
-                total_item: totalItems,
-                total_page: Math.ceil(totalItems / query.size),
-            },
-        }
-    }
 
     // convert role object to role name
     users.forEach((user) => {
@@ -176,11 +189,11 @@ const searchUser = async (req) => {
     return {
         data: users,
         pagination: {
-            page: query.page,
+            page: page,
             total_item: totalItems,
-            total_page: Math.ceil(totalItems / query.size),
+            total_page: Math.ceil(totalItems / size),
         },
     }
 }
 
-export default { add, deleteUser, searchUser }
+export default { add, remove, get }
