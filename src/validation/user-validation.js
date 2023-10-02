@@ -1,6 +1,59 @@
 import Joi from 'joi'
 import { errors } from '../utils/message-error.js'
 
+const getUserValidationSchema = Joi.object({
+    id: Joi.number()
+        .required()
+        .positive()
+        .messages({
+            'number.base': `${errors.USERID.MUST_NUMBER}`,
+            'number.positive': `${errors.USERID.MUST_POSITIVE}`,
+            'any.required': `${errors.USERID.IS_REQUIRED}`,
+        }),
+}).unknown(true)
+
+const updateUserValidationSchema = Joi.object({
+    username: Joi.string()
+        .min(3)
+        .max(30)
+        .required()
+        .messages({
+            'string.base': `${errors.USERNAME.MUST_STRING}}`,
+            'string.min': `${errors.USERNAME.MUST_MIN}`,
+            'string.max': `${errors.USERNAME.MUST_MAX}`,
+            'any.required': `${errors.USERNAME.IS_REQUIRED}`,
+        }),
+    password: Joi.string()
+        .min(6)
+        .max(255)
+        .required()
+        .messages({
+            'string.base': `${errors.PASSWORD.MUST_STRING}`,
+            'string.min': `${errors.PASSWORD.MUST_MIN}`,
+            'string.max': `${errors.PASSWORD.MUST_MAX}`,
+            'any.required': `${errors.PASSWORD.IS_REQUIRED}`,
+        }),
+    fullName: Joi.string()
+        .min(3)
+        .max(255)
+        .required()
+        .messages({
+            'string.base': `${errors.FULL_NAME.MUST_STRING}`,
+            'string.empty': `${errors.FULL_NAME.CANNOT_EMPTY}`,
+            'string.min': `${errors.FULL_NAME.MUST_MIN}`,
+            'string.max': `${errors.FULL_NAME.MUST_MAX}`,
+            'any.required': `${errors.FULL_NAME.IS_REQUIRED}`,
+        }),
+}).unknown(true)
+
+const avatarValidationSchema = Joi.object({
+    path: Joi.string()
+        .optional()
+        .messages({
+            'string.base': `${errors.AVATAR.PATH_MUST_STRING}`,
+        }),
+}).unknown(true)
+
 const addUserValidationSchema = Joi.object({
     fullName: Joi.string()
         .min(3)
@@ -80,49 +133,6 @@ const loginValidationSchema = Joi.object({
         }),
 }).unknown(true)
 
-const getUserValidationSchema = Joi.object({
-    id: Joi.number()
-        .required()
-        .positive()
-        .messages({
-            'number.base': `${errors.USERID.MUST_NUMBER}`,
-            'number.positive': `${errors.USERID.MUST_POSITIVE}`,
-            'any.required': `${errors.USERID.IS_REQUIRED}`,
-        }),
-}).unknown(true)
-
-const updateUserValidationSchema = Joi.object({
-    username: Joi.string()
-        .min(3)
-        .max(30)
-        .required()
-        .messages({
-            'string.base': `${errors.USERNAME.MUST_STRING}}`,
-            'string.min': `${errors.USERNAME.MUST_MIN}`,
-            'string.max': `${errors.USERNAME.MUST_MAX}`,
-        }),
-
-    password: Joi.string()
-        .min(6)
-        .max(255)
-        .optional()
-        .messages({
-            'string.base': `${errors.PASSWORD.MUST_STRING}`,
-            'string.min': `${errors.PASSWORD.MUST_MIN}`,
-            'string.max': `${errors.PASSWORD.MUST_MAX}`,
-        }),
-    fullName: Joi.string()
-        .min(3)
-        .max(255)
-        .optional()
-        .messages({
-            'string.base': `${errors.FULL_NAME.MUST_STRING}`,
-            'string.empty': `${errors.FULL_NAME.CANNOT_EMPTY}`,
-            'string.min': `${errors.FULL_NAME.MUST_MIN}`,
-            'string.max': `${errors.FULL_NAME.MUST_MAX}`,
-        }),
-}).unknown(true)
-
 const searchUserValidationSchema = Joi.object({
     page: Joi.number().min(1).positive().default(1).messages({
         'number.base': errors.PAGE.MUST_NUMBER,
@@ -177,6 +187,7 @@ export {
     loginValidationSchema,
     getUserValidationSchema,
     updateUserValidationSchema,
+    avatarValidationSchema,
     deleteUserValidationSchema,
     searchUserValidationSchema,
 }
