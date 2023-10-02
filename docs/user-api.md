@@ -101,3 +101,31 @@ Response Body Error :
   "errors": "avatar must be less than 2MB"
 }
 ```
+
+## Logout Current User API
+
+Endpoint : DELETE /v1/users/current
+
+Headers :
+
+- Authorization : token
+
+Response Body Success :
+
+```json
+{
+  "code": 200,
+  "status": "OK",
+  "data": "logout success"
+}
+```
+
+Response Body Error :
+
+```json
+{
+  "code": 401,
+  "status": "unauthorized",
+  "errors": "you are not authorized to access this resource"
+}
+```
