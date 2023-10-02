@@ -14,7 +14,7 @@ const get = async (req) => {
 
     const id = user.id
 
-    const foundUser = await prismaClient.user.findUnique({
+    const foundUser = await prismaClient.user.findUniqueOrThrow({
         where: {
             id: id,
         },
@@ -30,14 +30,6 @@ const get = async (req) => {
             },
         },
     })
-
-    if (!foundUser) {
-        throw new ResponseError(
-            errors.HTTP.CODE.NOT_FOUND,
-            errors.HTTP.STATUS.NOT_FOUND,
-            errors.USER.NOT_FOUND
-        )
-    }
 
     const { email, username, fullName, avatar, role } = foundUser
 
