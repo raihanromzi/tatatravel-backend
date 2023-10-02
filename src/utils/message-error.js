@@ -46,6 +46,8 @@ const userErrors = {
     NOT_FOUND: 'user is not found',
     FAILED_TO_ADD: 'failed to add user',
     FAILED_TO_UPDATE: 'failed to update user',
+    CANNOT_DELETE_YOURSELF: 'cannot delete yourself',
+    FAILED_TO_DELETE_DIRECTORY: 'failed to delete user avatar directory',
 }
 
 const roleErrors = {
