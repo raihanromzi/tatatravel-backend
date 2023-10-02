@@ -13,7 +13,7 @@ adminRouter.use(refreshTokenVerifyMiddleware)
 adminRouter.use(adminMiddleware)
 
 adminRouter.post('/v1/users', adminController.add)
-adminRouter.get('/v1/users', adminController.search)
-adminRouter.delete('/v1/users/:userId', adminController.remove)
+adminRouter.get('/v1/users', adminController.get)
+adminRouter.delete('/v1/users/:id', adminController.remove)
 
 export { adminRouter }
