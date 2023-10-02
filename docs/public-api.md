@@ -2,7 +2,7 @@
 
 ## Login API
 
-**Endpoint :** POST /api/v1/users/login
+**Endpoint :** POST /v1/users/login
 
 Request Body :
 

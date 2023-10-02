@@ -1,48 +1,8 @@
 # USER API
 
-## Register API
-
-Endpoint : POST /api/v1/users
-
-Request Body :
-
-```json
-{
-  "firstName": "John",
-  "lastName": "Doe",
-  "username": "johndoe",
-  "email": "johndoe@email.com",
-  "password": "123456",
-  "role": 1
-}
-```
-
-Response Body Success :
-
-```json
-{
-  "code": 201,
-  "status": "CREATED",
-  "data": {
-    "username": "johndoe",
-    "email": "johndoe@email.com"
-  }
-}
-```
-
-Response Body Error :
-
-```json
-{
-  "code": 400,
-  "status": "Bad Request",
-  "errors": "first name cannot be empty"
-}
-```
-
 ## Get Current User API
 
-Endpoint : GET /api/v1/users/current
+Endpoint : GET /v1/users/current
 
 Headers :
 
@@ -81,7 +41,7 @@ Response Body Error :
 
 ## Update Current User API
 
-Endpoint : PATCH /api/v1/users/current
+Endpoint : PATCH /v1/users/current
 
 Headers :
 
@@ -91,10 +51,11 @@ Request Body:
 
 ```json
 {
-  "newUsername": "johndoenew",
-  "firstName": "John new",
+  "username": "johndoenew",
+  "fullName": "John new",
   "lastName": "Doe New",
-  "password": "123456"
+  "password": "123456",
+  "avatar": "https://www.google.com"
 }
 ```
 
@@ -105,7 +66,9 @@ Response Body Success :
   "code": 200,
   "status": "OK",
   "data": {
-    "username": "test"
+    "username": "johndoenew",
+    "fullName": "john doe new new",
+    "avatar": "public/images/avatar/1696205310695-selfie.jpg"
   }
 }
 ```
@@ -114,9 +77,24 @@ Response Body Error :
 
 ```json
 {
-  "code": 404,
-  "status": "Not Found",
-  "errors": "user is not founds"
+  "code": 400,
+  "status": "bad request",
+  "errors": "full name is required"
 }
 ```
 
+```json
+{
+  "code": 400,
+  "status": "bad request",
+  "errors": "file format must be PNG, JPG, or JPEG"
+}
+```
+
+```json
+{
+  "code": 400,
+  "status": "bad request",
+  "errors": "avatar must be less than 2MB"
+}
+```
