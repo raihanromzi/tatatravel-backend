@@ -61,18 +61,34 @@ const update = async (req) => {
 
     const { path } = avatar
 
-    const foundUser = await prismaClient.user.count({
+    const foundUser = await prismaClient.user.findUnique({
         where: {
             id: id,
         },
     })
 
-    if (foundUser !== 1) {
+    if (!foundUser) {
         throw new ResponseError(
             errors.HTTP.CODE.NOT_FOUND,
             errors.HTTP.STATUS.NOT_FOUND,
             errors.USER.NOT_FOUND
         )
+    }
+
+    const anotherUser = await prismaClient.user.findMany({
+        where: {
+            username: username,
+        },
+    })
+
+    if (anotherUser.length === 1) {
+        if (anotherUser[0].id !== id) {
+            throw new ResponseError(
+                errors.HTTP.CODE.NOT_FOUND,
+                errors.HTTP.STATUS.NOT_FOUND,
+                errors.USER.FAILED_TO_UPDATE
+            )
+        }
     }
 
     const data = {}

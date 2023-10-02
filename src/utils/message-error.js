@@ -45,6 +45,7 @@ const userErrors = {
     ALREADY_EXISTS: 'user already exists',
     NOT_FOUND: 'user is not found',
     FAILED_TO_ADD: 'failed to add user',
+    FAILED_TO_UPDATE: 'failed to update user',
 }
 
 const roleErrors = {
