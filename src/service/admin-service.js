@@ -133,16 +133,6 @@ const get = async (req) => {
         }
     }
 
-    if (orderBy) {
-        if (orderBy !== 'asc' && orderBy !== 'desc') {
-            throw new ResponseError(
-                errors.HTTP.CODE.BAD_REQUEST,
-                errors.HTTP.STATUS.BAD_REQUEST,
-                errors.ORDER_BY.MUST_VALID
-            )
-        }
-    }
-
     const skip = (page - 1) * size
 
     const filters = []
