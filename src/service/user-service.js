@@ -22,6 +22,7 @@ const get = async (req) => {
             email: true,
             username: true,
             fullName: true,
+            avatar: true,
             role: {
                 select: {
                     name: true,
@@ -38,12 +39,13 @@ const get = async (req) => {
         )
     }
 
-    const { email, username, fullName, role } = foundUser
+    const { email, username, fullName, avatar, role } = foundUser
 
     return {
         email: email,
         username: username,
         fullName: fullName,
+        avatar: avatar,
         role: role.name,
     }
 }

@@ -15,8 +15,11 @@ Response Body Success :
   "code": 200,
   "status": "OK",
   "data": {
-    "username": "johndoe",
-    "email": "johndoe@email.com"
+    "email": "johndoe@email.com",
+    "username": "johndoenew",
+    "fullName": "john doe new new",
+    "avatar": "public/images/avatar/3/km84MoXyk_-3-selfie.jpg",
+    "role": "super admin"
   }
 }
 ```
