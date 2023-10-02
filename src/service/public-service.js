@@ -7,11 +7,13 @@ import * as bcrypt from 'bcrypt'
 import tokenService from './token-service.js'
 
 const login = async (req, res) => {
-    const userLoggedIn = validate(loginValidationSchema, req.body)
+    const user = validate(loginValidationSchema, req.body)
+
+    const { email, password } = user
 
     const foundUser = await prismaClient.user.findUnique({
         where: {
-            email: userLoggedIn.email,
+            email: email,
         },
         select: {
             id: true,
@@ -29,7 +31,9 @@ const login = async (req, res) => {
         )
     }
 
-    const isPasswordValid = await bcrypt.compare(userLoggedIn.password, foundUser.password)
+    const { id, username, password: passwordHash, roleId } = foundUser
+
+    const isPasswordValid = await bcrypt.compare(password, passwordHash)
 
     if (!isPasswordValid) {
         throw new ResponseError(
@@ -40,17 +44,18 @@ const login = async (req, res) => {
     }
 
     const userAccessTokenData = {
-        id: foundUser.id,
-        roleId: foundUser.roleId,
+        id: id,
+        roleId: roleId,
     }
 
     const userRefreshTokenData = {
-        id: foundUser.id,
-        username: foundUser.username,
-        roleId: foundUser.roleId,
+        id: id,
+        username: username,
+        roleId: roleId,
     }
 
     const accessToken = tokenService.generateAccessToken(userAccessTokenData)
+
     const refreshToken = tokenService.generateRefreshToken(userRefreshTokenData)
 
     res.cookie('refreshToken', refreshToken, {
@@ -62,8 +67,8 @@ const login = async (req, res) => {
 
     await prismaClient.user.update({
         where: {
-            id: foundUser.id,
-            username: foundUser.username,
+            id: id,
+            username: username,
         },
         data: {
             token: refreshToken,
