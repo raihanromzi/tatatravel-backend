@@ -1,12 +1,62 @@
 import { validate } from '../validation/validation.js'
 import {
+    addUserValidationSchema,
     deleteUserValidationSchema,
     searchUserValidationSchema,
 } from '../validation/user-validation.js'
 import { prismaClient } from '../application/database.js'
 import { ResponseError } from '../utils/response-error.js'
 import { errors } from '../utils/message-error.js'
+import * as bcrypt from 'bcrypt'
 
+const add = async (req) => {
+    const user = validate(addUserValidationSchema, req)
+
+    const countUser = await prismaClient.user.count({
+        where: {
+            email: user.email,
+            username: user.username,
+        },
+    })
+
+    if (countUser === 1) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.USER.ALREADY_EXISTS
+        )
+    }
+
+    const hashedPassword = await bcrypt.hash(user.password, 10)
+
+    const result = prismaClient.user.create({
+        data: {
+            fullName: user.fullName,
+            username: user.username,
+            email: user.email,
+            password: hashedPassword,
+            role: {
+                connect: {
+                    id: user.role,
+                },
+            },
+        },
+        select: {
+            username: true,
+            email: true,
+        },
+    })
+
+    if (!result) {
+        throw new ResponseError(
+            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+            errors.USER.FAILED_TO_ADD
+        )
+    }
+
+    return result
+}
 const deleteUser = async (user, userId) => {
     const id = validate(deleteUserValidationSchema, userId)
 
@@ -133,4 +183,4 @@ const searchUser = async (req) => {
     }
 }
 
-export default { deleteUser, searchUser }
+export default { add, deleteUser, searchUser }
