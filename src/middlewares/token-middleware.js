@@ -1,6 +1,7 @@
 import response from '../utils/response-api.js'
 import { errors } from '../utils/message-error.js'
 import jwt from 'jsonwebtoken'
+import { prismaClient } from '../application/database.js'
 
 const accessTokenVerifyMiddleware = async (req, res, next) => {
     const authHeader = req.get('Authorization')
@@ -56,6 +57,26 @@ const refreshTokenVerifyMiddleware = async (req, res, next) => {
     const foundRefreshToken = req.cookies.refreshToken
 
     if (!foundRefreshToken) {
+        res.status(errors.HTTP.CODE.UNAUTHORIZED)
+            .send(
+                response.responseError(
+                    errors.HTTP.CODE.UNAUTHORIZED,
+                    errors.HTTP.STATUS.UNAUTHORIZED,
+                    errors.AUTHORIZATION
+                )
+            )
+            .end()
+        return
+    }
+
+    // check refresh token in db
+    const foundRefreshTokenInDB = await prismaClient.user.count({
+        where: {
+            token: foundRefreshToken,
+        },
+    })
+
+    if (foundRefreshTokenInDB !== 1) {
         res.status(errors.HTTP.CODE.UNAUTHORIZED)
             .send(
                 response.responseError(
