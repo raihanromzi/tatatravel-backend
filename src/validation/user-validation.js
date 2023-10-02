@@ -183,6 +183,7 @@ const searchUserValidationSchema = Joi.object({
         .default('asc')
         .messages({
             'string.base': `${errors.ORDER_BY.MUST_STRING}`,
+            'any.valid': `${errors.ORDER_BY.MUST_VALID}`,
         }),
 }).unknown(true)
 

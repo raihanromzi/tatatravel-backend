@@ -19,11 +19,7 @@ const add = async (req, res, next) => {
 
 const get = async (req, res, next) => {
     try {
-        const query = {
-            name: req.query.name,
-        }
-
-        const result = await areaService.get(query)
+        const result = await areaService.get(req)
         res.status(success.HTTP.CODE.OK).send(
             responses.responseSuccess(
                 success.HTTP.CODE.OK,
@@ -39,11 +35,7 @@ const get = async (req, res, next) => {
 
 const getById = async (req, res, next) => {
     try {
-        const params = {
-            id: req.params.id,
-        }
-
-        const result = await areaService.getById(params)
+        const result = await areaService.getById(req)
         res.status(success.HTTP.CODE.OK).send(
             responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
         )
@@ -54,11 +46,7 @@ const getById = async (req, res, next) => {
 
 const update = async (req, res, next) => {
     try {
-        const params = {
-            id: req.params.id,
-        }
-
-        const result = await areaService.update(req, params)
+        const result = await areaService.update(req)
         res.status(success.HTTP.CODE.OK).send(
             responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
         )
@@ -69,11 +57,7 @@ const update = async (req, res, next) => {
 
 const remove = async (req, res, next) => {
     try {
-        const params = {
-            id: req.params.id,
-        }
-
-        await areaService.remove(params)
+        await areaService.remove(req)
         res.status(success.HTTP.CODE.OK).send(
             responses.responseSuccess(
                 success.HTTP.CODE.OK,

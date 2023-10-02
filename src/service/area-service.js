@@ -12,11 +12,21 @@ import { errors } from '../utils/message-error.js'
 const add = async (req) => {
     const area = validate(addAreaValidationSchema, req.body)
 
-    const countArea = await prismaClient.area.count({
-        where: {
-            name: area.name,
-        },
-    })
+    const [countArea, result] = await prismaClient.$transaction([
+        prismaClient.area.count({
+            where: {
+                name: area.name,
+            },
+        }),
+        prismaClient.area.create({
+            data: {
+                name: area.name,
+            },
+            select: {
+                name: true,
+            },
+        }),
+    ])
 
     if (countArea === 1) {
         throw new ResponseError(
@@ -25,15 +35,6 @@ const add = async (req) => {
             errors.AREA.ALREADY_EXISTS
         )
     }
-
-    const result = prismaClient.area.create({
-        data: {
-            name: area.name,
-        },
-        select: {
-            name: true,
-        },
-    })
 
     if (!result) {
         throw new ResponseError(
@@ -46,35 +47,31 @@ const add = async (req) => {
     return result
 }
 
-const update = async (req, params) => {
+const update = async (req) => {
     const area = validate(updateAreaValidationSchema, req.body)
-    params = validate(getAreaByIdValidationSchema, params)
 
-    const findArea = await prismaClient.area.findUnique({
-        where: {
-            id: params.id,
-        },
-    })
+    const params = validate(getAreaByIdValidationSchema, req.params)
 
-    if (!findArea) {
-        throw new ResponseError(
-            errors.HTTP.CODE.NOT_FOUND,
-            errors.HTTP.STATUS.NOT_FOUND,
-            errors.AREA.NOT_FOUND
-        )
-    }
+    const areaId = params.id
 
-    const result = prismaClient.area.update({
-        where: {
-            id: params.id,
-        },
-        data: {
-            name: area.name,
-        },
-        select: {
-            name: true,
-        },
-    })
+    const [, result] = await prismaClient.$transaction([
+        prismaClient.area.findUniqueOrThrow({
+            where: {
+                id: areaId,
+            },
+        }),
+        prismaClient.area.update({
+            where: {
+                id: areaId,
+            },
+            data: {
+                name: area.name,
+            },
+            select: {
+                name: true,
+            },
+        }),
+    ])
 
     if (!result) {
         throw new ResponseError(
@@ -88,56 +85,51 @@ const update = async (req, params) => {
 }
 
 const get = async (req) => {
-    const query = validate(getAreaValidationSchema, req)
+    const query = validate(getAreaValidationSchema, req.query)
 
-    const skip = (query.page - 1) * query.size
+    const { name, page, size, sortBy } = query
+
+    // validation for sortBy and orderBy
+    if (sortBy) {
+        if (sortBy !== 'id' && sortBy !== 'name') {
+            throw new ResponseError(
+                errors.HTTP.CODE.BAD_REQUEST,
+                errors.HTTP.STATUS.BAD_REQUEST,
+                errors.SORT_BY.MUST_VALID
+            )
+        }
+    }
+
+    const skip = (page - 1) * size
 
     const filters = []
 
-    if (query.name) {
+    if (name) {
         filters.push({
             name: {
-                contains: query.name,
+                contains: name,
             },
         })
     }
 
-    const area = await prismaClient.area.findMany({
-        where: {
-            AND: filters,
-        },
-        select: {
-            id: true,
-            name: true,
-        },
-        take: query.size,
-        skip: skip,
-    })
-
-    if (!area) {
-        throw new ResponseError(
-            errors.HTTP.CODE.NOT_FOUND,
-            errors.HTTP.STATUS.NOT_FOUND,
-            errors.AREA.NOT_FOUND
-        )
-    }
-
-    const totalItems = await prismaClient.area.count({
-        where: {
-            AND: filters,
-        },
-    })
-
-    if (!totalItems) {
-        return {
-            data: [],
-            pagination: {
-                page: query.page,
-                total_item: totalItems,
-                total_page: Math.ceil(totalItems / query.size),
+    const [area, totalItems] = await prismaClient.$transaction([
+        prismaClient.area.findMany({
+            where: {
+                AND: filters,
             },
-        }
-    }
+            select: {
+                id: true,
+                name: true,
+            },
+            take: size,
+            skip: skip,
+        }),
+        prismaClient.area.count({
+            where: {
+                AND: filters,
+            },
+        }),
+    ])
 
     return {
         data: area,
@@ -149,65 +141,47 @@ const get = async (req) => {
     }
 }
 
-const getById = async (params) => {
-    params = validate(getAreaByIdValidationSchema, params)
+const getById = async (req) => {
+    const params = validate(getAreaByIdValidationSchema, req.params)
 
-    const findArea = await prismaClient.area.findUnique({
-        where: {
-            id: params.id,
-        },
-    })
+    const areaId = params.id
 
-    if (!findArea) {
-        throw new ResponseError(
-            errors.HTTP.CODE.NOT_FOUND,
-            errors.HTTP.STATUS.NOT_FOUND,
-            errors.AREA.NOT_FOUND
-        )
-    }
-
-    const result = await prismaClient.area.findUnique({
-        where: {
-            id: params.id,
-        },
-        select: {
-            name: true,
-        },
-    })
-
-    if (!result) {
-        throw new ResponseError(
-            errors.HTTP.CODE.NOT_FOUND,
-            errors.HTTP.STATUS.NOT_FOUND,
-            errors.AREA.NOT_FOUND
-        )
-    }
+    const [, result] = await prismaClient.$transaction([
+        prismaClient.area.findUniqueOrThrow({
+            where: {
+                id: areaId,
+            },
+        }),
+        prismaClient.area.findUniqueOrThrow({
+            where: {
+                id: areaId,
+            },
+            select: {
+                name: true,
+            },
+        }),
+    ])
 
     return result
 }
 
-const remove = async (params) => {
-    params = validate(getAreaByIdValidationSchema, params)
+const remove = async (req) => {
+    const params = validate(getAreaByIdValidationSchema, req.params)
 
-    const findArea = await prismaClient.area.findUnique({
-        where: {
-            id: params.id,
-        },
-    })
+    const areaId = params.id
 
-    if (!findArea) {
-        throw new ResponseError(
-            errors.HTTP.CODE.NOT_FOUND,
-            errors.HTTP.STATUS.NOT_FOUND,
-            errors.AREA.NOT_FOUND
-        )
-    }
-
-    const result = await prismaClient.area.delete({
-        where: {
-            id: params.id,
-        },
-    })
+    const [, result] = await prismaClient.$transaction([
+        prismaClient.area.findUniqueOrThrow({
+            where: {
+                id: areaId,
+            },
+        }),
+        prismaClient.area.delete({
+            where: {
+                id: areaId,
+            },
+        }),
+    ])
 
     if (!result) {
         throw new ResponseError(
