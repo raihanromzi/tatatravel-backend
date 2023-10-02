@@ -15,24 +15,42 @@ const add = async (req) => {
 
     const { fullName, username, email, password, role } = user
 
-    await prismaClient.role.findFirstOrThrow({
-        where: {
-            id: role,
-        },
-    })
-
-    const countUser = await prismaClient.user.count({
-        where: {
-            OR: [
-                {
-                    email: user.email,
+    const [, countUser, result] = await prismaClient.$transaction([
+        prismaClient.role.findFirstOrThrow({
+            where: {
+                id: role,
+            },
+        }),
+        prismaClient.user.count({
+            where: {
+                OR: [
+                    {
+                        email: user.email,
+                    },
+                    {
+                        username: user.username,
+                    },
+                ],
+            },
+        }),
+        prismaClient.user.create({
+            data: {
+                fullName: fullName,
+                username: username,
+                email: email,
+                password: await bcrypt.hash(password, 10),
+                role: {
+                    connect: {
+                        id: role,
+                    },
                 },
-                {
-                    username: user.username,
-                },
-            ],
-        },
-    })
+            },
+            select: {
+                username: true,
+                email: true,
+            },
+        }),
+    ])
 
     if (countUser === 1) {
         throw new ResponseError(
@@ -41,26 +59,6 @@ const add = async (req) => {
             errors.USER.ALREADY_EXISTS
         )
     }
-
-    const hashedPassword = await bcrypt.hash(password, 10)
-
-    const result = prismaClient.user.create({
-        data: {
-            fullName: fullName,
-            username: username,
-            email: email,
-            password: hashedPassword,
-            role: {
-                connect: {
-                    id: role,
-                },
-            },
-        },
-        select: {
-            username: true,
-            email: true,
-        },
-    })
 
     if (!result) {
         throw new ResponseError(
@@ -85,11 +83,18 @@ const remove = async (req) => {
         )
     }
 
-    const foundUser = await prismaClient.user.count({
-        where: {
-            id: id,
-        },
-    })
+    const [foundUser, deletedUser] = await prismaClient.$transaction([
+        prismaClient.user.count({
+            where: {
+                id: id,
+            },
+        }),
+        prismaClient.user.delete({
+            where: {
+                id: id,
+            },
+        }),
+    ])
 
     if (!foundUser) {
         throw new ResponseError(
@@ -101,11 +106,7 @@ const remove = async (req) => {
 
     fs.rmSync(`public/images/avatar/${id}`, { recursive: true, force: true })
 
-    return prismaClient.user.delete({
-        where: {
-            id: id,
-        },
-    })
+    return deletedUser
 }
 
 const get = async (req) => {
@@ -153,33 +154,34 @@ const get = async (req) => {
         })
     }
 
-    const users = await prismaClient.user.findMany({
-        where: {
-            AND: filters,
-            NOT: {
-                id: id,
-            },
-        },
-        select: {
-            id: true,
-            fullName: true,
-            username: true,
-            email: true,
-            role: {
-                select: {
-                    name: true,
+    const [users, totalItems] = await prismaClient.$transaction([
+        prismaClient.user.findMany({
+            where: {
+                AND: filters,
+                NOT: {
+                    id: id,
                 },
             },
-        },
-        take: size,
-        skip: skip,
-    })
-
-    const totalItems = await prismaClient.user.count({
-        where: {
-            AND: filters,
-        },
-    })
+            select: {
+                id: true,
+                fullName: true,
+                username: true,
+                email: true,
+                role: {
+                    select: {
+                        name: true,
+                    },
+                },
+            },
+            take: size,
+            skip: skip,
+        }),
+        prismaClient.user.count({
+            where: {
+                AND: filters,
+            },
+        }),
+    ])
 
     // convert role object to role name
     users.forEach((user) => {
