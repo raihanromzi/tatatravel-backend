@@ -67,23 +67,26 @@ const refresh = async (req, res) => {
         validUser = user
     })
 
+    const { id, roleId, username } = validUser
+
     const userAccessTokenData = {
-        id: validUser.id,
-        roleId: validUser.roleId,
+        id: id,
+        roleId: roleId,
     }
 
     const userRefreshTokenData = {
-        id: validUser.id,
-        username: validUser.username,
-        roleId: validUser.roleId,
+        id: id,
+        username: username,
+        roleId: roleId,
     }
 
     const newAccessToken = generateAccessToken(userAccessTokenData)
+
     const newRefreshToken = generateRefreshToken(userRefreshTokenData)
 
     await prismaClient.user.update({
         where: {
-            username: validUser.username,
+            username: username,
         },
         data: {
             token: newRefreshToken,

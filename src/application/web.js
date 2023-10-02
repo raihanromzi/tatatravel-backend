@@ -14,7 +14,7 @@ const web = express()
 
 web.use(express.json())
 web.use(express.urlencoded({ extended: true }))
-web.use(express.static('public'))
+web.use(express.static('public', { etag: true }))
 web.use(cookieParser())
 
 web.use(publicRouter)
