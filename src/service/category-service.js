@@ -13,11 +13,23 @@ const add = async (req) => {
 
     const { name, isActive } = newCategory
 
-    const countCategory = await prismaClient.category.count({
-        where: {
-            name: name,
-        },
-    })
+    const [countCategory, result] = await prismaClient.$transaction([
+        prismaClient.category.count({
+            where: {
+                name: name,
+            },
+        }),
+        prismaClient.category.create({
+            data: {
+                name: name,
+                isActive: isActive,
+            },
+            select: {
+                name: true,
+                isActive: true,
+            },
+        }),
+    ])
 
     if (countCategory === 1) {
         throw new ResponseError(
@@ -26,17 +38,6 @@ const add = async (req) => {
             errors.CATEGORY.ALREADY_EXISTS
         )
     }
-
-    const result = await prismaClient.category.create({
-        data: {
-            name: name,
-            isActive: isActive,
-        },
-        select: {
-            name: true,
-            isActive: true,
-        },
-    })
 
     if (!result) {
         throw new ResponseError(
@@ -58,33 +59,26 @@ const update = async (req) => {
 
     const categoryId = params.id
 
-    const findCategory = await prismaClient.category.findUnique({
-        where: {
-            id: categoryId,
-        },
-    })
-
-    if (!findCategory) {
-        throw new ResponseError(
-            errors.HTTP.CODE.NOT_FOUND,
-            errors.HTTP.STATUS.NOT_FOUND,
-            errors.CATEGORY.NOT_FOUND
-        )
-    }
-
-    const result = await prismaClient.category.update({
-        where: {
-            id: categoryId,
-        },
-        data: {
-            name: name,
-            isActive: isActive,
-        },
-        select: {
-            name: true,
-            isActive: true,
-        },
-    })
+    const [, result] = await prismaClient.$transaction([
+        prismaClient.category.findUniqueOrThrow({
+            where: {
+                id: categoryId,
+            },
+        }),
+        prismaClient.category.update({
+            where: {
+                id: categoryId,
+            },
+            data: {
+                name: name,
+                isActive: isActive,
+            },
+            select: {
+                name: true,
+                isActive: true,
+            },
+        }),
+    ])
 
     if (!result) {
         throw new ResponseError(
@@ -102,25 +96,18 @@ const remove = async (req) => {
 
     const categoryId = params.id
 
-    const findCategory = await prismaClient.category.findUnique({
-        where: {
-            id: categoryId,
-        },
-    })
-
-    if (!findCategory) {
-        throw new ResponseError(
-            errors.HTTP.CODE.NOT_FOUND,
-            errors.HTTP.STATUS.NOT_FOUND,
-            errors.CATEGORY.NOT_FOUND
-        )
-    }
-
-    const result = await prismaClient.category.delete({
-        where: {
-            id: categoryId,
-        },
-    })
+    const [result] = await prismaClient.$transaction([
+        prismaClient.category.findUniqueOrThrow({
+            where: {
+                id: categoryId,
+            },
+        }),
+        prismaClient.category.delete({
+            where: {
+                id: categoryId,
+            },
+        }),
+    ])
 
     if (!result) {
         throw new ResponseError(
@@ -146,43 +133,25 @@ const get = async (req) => {
         })
     }
 
-    const categories = await prismaClient.category.findMany({
-        where: {
-            AND: filters,
-        },
-        select: {
-            id: true,
-            name: true,
-            isActive: true,
-        },
-        skip: skip,
-        take: query.size,
-    })
-
-    if (!categories) {
-        throw new ResponseError(
-            errors.HTTP.CODE.NOT_FOUND,
-            errors.HTTP.STATUS.NOT_FOUND,
-            errors.CATEGORY.NOT_FOUND
-        )
-    }
-
-    const totalItems = await prismaClient.category.count({
-        where: {
-            AND: filters,
-        },
-    })
-
-    if (!totalItems) {
-        return {
-            data: [],
-            pagination: {
-                page: query.page,
-                total_item: totalItems,
-                total_page: Math.ceil(totalItems / query.size),
+    const [categories, totalItems] = await prismaClient.$transaction([
+        prismaClient.category.findMany({
+            where: {
+                AND: filters,
             },
-        }
-    }
+            select: {
+                id: true,
+                name: true,
+                isActive: true,
+            },
+            skip: skip,
+            take: query.size,
+        }),
+        prismaClient.category.count({
+            where: {
+                AND: filters,
+            },
+        }),
+    ])
 
     return {
         data: categories,
@@ -199,7 +168,7 @@ const getById = async (req) => {
 
     const categoryId = params.id
 
-    const findCategory = await prismaClient.category.findUnique({
+    return prismaClient.category.findUniqueOrThrow({
         where: {
             id: categoryId,
         },
@@ -209,16 +178,6 @@ const getById = async (req) => {
             isActive: true,
         },
     })
-
-    if (!findCategory) {
-        throw new ResponseError(
-            errors.HTTP.CODE.NOT_FOUND,
-            errors.HTTP.STATUS.NOT_FOUND,
-            errors.CATEGORY.NOT_FOUND
-        )
-    }
-
-    return findCategory
 }
 
 export default { add, update, remove, get, getById }
