@@ -11,13 +11,26 @@ import { validate } from '../validation/validation.js'
 import { errors } from '../utils/message-error.js'
 
 const add = async (req) => {
-    const newRole = validate(addRoleValidationSchema, req.body)
+    const role = validate(addRoleValidationSchema, req.body)
 
-    const countRole = await prismaClient.role.count({
-        where: {
-            name: newRole.name,
-        },
-    })
+    const { name } = role
+
+    const [countRole, result] = await prismaClient.$transaction([
+        prismaClient.role.count({
+            where: {
+                name: name,
+            },
+        }),
+        prismaClient.role.create({
+            data: {
+                name: name,
+            },
+            select: {
+                name: true,
+                isActive: true,
+            },
+        }),
+    ])
 
     if (countRole === 1) {
         throw new ResponseError(
@@ -26,16 +39,6 @@ const add = async (req) => {
             errors.ROLE.ALREADY_EXISTS
         )
     }
-
-    const result = prismaClient.role.create({
-        data: {
-            name: newRole.name,
-        },
-        select: {
-            name: true,
-            isActive: true,
-        },
-    })
 
     if (!result) {
         throw new ResponseError(
@@ -49,17 +52,40 @@ const add = async (req) => {
 }
 
 const update = async (req) => {
-    const updatedRole = validate(updateRoleValidationSchema, req.body)
-    const idParams = validate(getRoleByIdValidationSchema, req.params)
+    const role = validate(updateRoleValidationSchema, req.body)
 
-    const { name, isActive } = updatedRole
-    const roleId = idParams.id
+    const params = validate(getRoleByIdValidationSchema, req.params)
 
-    const findRole = await prismaClient.role.count({
-        where: {
-            id: roleId,
-        },
-    })
+    const { name, isActive } = role
+
+    const roleId = params.id
+
+    const [findRole, findRoleByName, updateRole] = await prismaClient.$transaction([
+        prismaClient.role.count({
+            where: {
+                id: roleId,
+            },
+        }),
+        prismaClient.role.count({
+            where: {
+                name: name,
+            },
+        }),
+        prismaClient.role.update({
+            where: {
+                id: roleId,
+            },
+            data: {
+                name: name,
+                isActive: isActive,
+            },
+            select: {
+                id: true,
+                name: true,
+                isActive: true,
+            },
+        }),
+    ])
 
     if (findRole === 0) {
         throw new ResponseError(
@@ -69,12 +95,6 @@ const update = async (req) => {
         )
     }
 
-    const findRoleByName = await prismaClient.role.count({
-        where: {
-            name: name,
-        },
-    })
-
     if (findRoleByName === 1) {
         throw new ResponseError(
             errors.HTTP.CODE.BAD_REQUEST,
@@ -82,21 +102,6 @@ const update = async (req) => {
             errors.ROLE.ALREADY_EXISTS
         )
     }
-
-    const updateRole = await prismaClient.role.update({
-        where: {
-            id: roleId,
-        },
-        data: {
-            name: name,
-            isActive: isActive,
-        },
-        select: {
-            id: true,
-            name: true,
-            isActive: true,
-        },
-    })
 
     if (!updateRole) {
         throw new ResponseError(
@@ -110,15 +115,22 @@ const update = async (req) => {
 }
 
 const remove = async (req) => {
-    const idParams = validate(deleteRoleValidationSchema, req.params)
+    const params = validate(deleteRoleValidationSchema, req.params)
 
-    const roleId = idParams.id
+    const roleId = params.id
 
-    const countRole = await prismaClient.role.count({
-        where: {
-            id: roleId,
-        },
-    })
+    const [countRole, result] = await prismaClient.$transaction([
+        prismaClient.role.count({
+            where: {
+                id: roleId,
+            },
+        }),
+        prismaClient.role.delete({
+            where: {
+                id: roleId,
+            },
+        }),
+    ])
 
     if (countRole === 0) {
         throw new ResponseError(
@@ -127,12 +139,6 @@ const remove = async (req) => {
             errors.ROLE.NOT_FOUND
         )
     }
-
-    const result = await prismaClient.role.delete({
-        where: {
-            id: roleId,
-        },
-    })
 
     if (!result) {
         throw new ResponseError(
@@ -147,6 +153,7 @@ const remove = async (req) => {
 
 const get = async (req) => {
     const query = validate(getRoleValidationSchema, req.query)
+
     const { name, page, size } = query
 
     const skip = (page - 1) * size
@@ -161,43 +168,25 @@ const get = async (req) => {
         })
     }
 
-    const roles = await prismaClient.role.findMany({
-        where: {
-            AND: filters,
-        },
-        select: {
-            id: true,
-            name: true,
-            isActive: true,
-        },
-        take: size,
-        skip: skip,
-    })
-
-    if (!roles) {
-        throw new ResponseError(
-            errors.HTTP.CODE.NOT_FOUND,
-            errors.HTTP.STATUS.NOT_FOUND,
-            errors.ROLE.NOT_FOUND
-        )
-    }
-
-    const totalItems = await prismaClient.role.count({
-        where: {
-            AND: filters,
-        },
-    })
-
-    if (!totalItems) {
-        return {
-            data: [],
-            pagination: {
-                page: page,
-                total_item: totalItems,
-                total_page: Math.ceil(totalItems / size),
+    const [roles, totalItems] = await prismaClient.$transaction([
+        prismaClient.role.findMany({
+            where: {
+                AND: filters,
             },
-        }
-    }
+            select: {
+                id: true,
+                name: true,
+                isActive: true,
+            },
+            take: size,
+            skip: skip,
+        }),
+        prismaClient.role.count({
+            where: {
+                AND: filters,
+            },
+        }),
+    ])
 
     return {
         data: roles,
@@ -214,11 +203,13 @@ const getById = async (req) => {
 
     const roleId = params.id
 
-    const findRole = await prismaClient.role.count({
-        where: {
-            id: roleId,
-        },
-    })
+    const [findRole] = await prismaClient.$transaction([
+        prismaClient.role.count({
+            where: {
+                id: roleId,
+            },
+        }),
+    ])
 
     if (findRole === 0) {
         throw new ResponseError(
@@ -228,7 +219,7 @@ const getById = async (req) => {
         )
     }
 
-    const role = await prismaClient.role.findUnique({
+    return prismaClient.role.findUniqueOrThrow({
         where: {
             id: roleId,
         },
@@ -238,16 +229,6 @@ const getById = async (req) => {
             isActive: true,
         },
     })
-
-    if (!role) {
-        throw new ResponseError(
-            errors.HTTP.CODE.NOT_FOUND,
-            errors.HTTP.STATUS.NOT_FOUND,
-            errors.ROLE.NOT_FOUND
-        )
-    }
-
-    return role
 }
 
 export default { add, update, remove, get, getById }
