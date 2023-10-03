@@ -11,7 +11,7 @@ const login = async (req, res) => {
 
     const { email, password } = user
 
-    const foundUser = await prismaClient.user.findUniqueOrThrow({
+    const findUser = await prismaClient.user.findUnique({
         where: {
             email: email,
         },
@@ -23,7 +23,15 @@ const login = async (req, res) => {
         },
     })
 
-    const { id, username, password: passwordHash, roleId } = foundUser
+    if (!findUser) {
+        throw new ResponseError(
+            errors.HTTP.CODE.UNAUTHORIZED,
+            errors.HTTP.STATUS.UNAUTHORIZED,
+            errors.AUTHENTICATION
+        )
+    }
+
+    const { id, username, password: passwordHash, roleId } = findUser
 
     const isPasswordValid = await bcrypt.compare(password, passwordHash)
 
