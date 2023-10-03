@@ -57,7 +57,7 @@ model Blog {
   title       String   @db.VarChar(255)
   slug        String   @unique @db.VarChar(100)
   description String?  @db.VarChar(255)
-  content     String   @db.Text
+  content     String   @db.LongText
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now()) @updatedAt
