@@ -11,13 +11,25 @@ import { getAreaValidationSchema } from '../validation/area-validation.js'
 import { errors } from '../utils/message-error.js'
 
 const add = async (req) => {
-    const country = validate(addCountryValidationSchema, req)
+    const country = validate(addCountryValidationSchema, req.body)
 
-    const countCountry = await prismaClient.country.count({
-        where: {
-            name: country.name,
-        },
-    })
+    const [countCountry, result] = await prismaClient.$transaction([
+        prismaClient.country.count({
+            where: {
+                name: country.name,
+            },
+        }),
+        prismaClient.country.create({
+            data: {
+                name: country.name,
+                areaId: country.areaId,
+            },
+            select: {
+                id: true,
+                name: true,
+            },
+        }),
+    ])
 
     if (countCountry === 1) {
         throw new ResponseError(
@@ -26,17 +38,6 @@ const add = async (req) => {
             errors.COUNTRY.ALREADY_EXISTS
         )
     }
-
-    const result = prismaClient.country.create({
-        data: {
-            name: country.name,
-            areaId: country.areaId,
-        },
-        select: {
-            id: true,
-            name: true,
-        },
-    })
 
     if (!result) {
         throw new ResponseError(
@@ -49,56 +50,45 @@ const add = async (req) => {
     return result
 }
 
-const update = async (req, params) => {
-    const country = validate(updateCountryValidationSchema, req)
-    const countryId = validate(getCountryByIdValidationSchema, params)
+const update = async (req) => {
+    const country = validate(updateCountryValidationSchema, req.body)
 
-    const findCountry = await prismaClient.country.findUnique({
-        where: {
-            id: countryId.id,
-        },
-    })
+    const params = validate(getCountryByIdValidationSchema, req.params)
 
-    if (!findCountry) {
-        throw new ResponseError(
-            errors.HTTP.CODE.NOT_FOUND,
-            errors.HTTP.STATUS.NOT_FOUND,
-            errors.COUNTRY.NOT_FOUND
-        )
-    }
+    const { name, areaId } = country
 
-    const findArea = await prismaClient.area.findUnique({
-        where: {
-            id: country.areaId,
-        },
-    })
+    const countryId = params.id
 
-    if (!findArea) {
-        throw new ResponseError(
-            errors.HTTP.CODE.NOT_FOUND,
-            errors.HTTP.STATUS.NOT_FOUND,
-            errors.AREA.NOT_FOUND
-        )
-    }
-
-    const result = prismaClient.country.update({
-        where: {
-            id: countryId.id,
-        },
-        data: {
-            name: country.name,
-            areaId: country.areaId,
-        },
-        select: {
-            id: true,
-            name: true,
-            area: {
-                select: {
-                    name: true,
+    const [, , result] = await prismaClient.$transaction([
+        prismaClient.country.findUniqueOrThrow({
+            where: {
+                id: countryId,
+            },
+        }),
+        prismaClient.area.findUniqueOrThrow({
+            where: {
+                id: areaId,
+            },
+        }),
+        prismaClient.country.update({
+            where: {
+                id: countryId,
+            },
+            data: {
+                name: name,
+                areaId: areaId,
+            },
+            select: {
+                id: true,
+                name: true,
+                area: {
+                    select: {
+                        name: true,
+                    },
                 },
             },
-        },
-    })
+        }),
+    ])
 
     if (!result) {
         throw new ResponseError(
@@ -111,28 +101,23 @@ const update = async (req, params) => {
     return result
 }
 
-const remove = async (params) => {
-    const countryId = validate(deleteCountryValidationSchema, params)
+const remove = async (req) => {
+    const country = validate(deleteCountryValidationSchema, req.params)
 
-    const findCountry = await prismaClient.country.findUnique({
-        where: {
-            id: countryId.id,
-        },
-    })
+    const countryId = country.id
 
-    if (!findCountry) {
-        throw new ResponseError(
-            errors.HTTP.CODE.NOT_FOUND,
-            errors.HTTP.STATUS.NOT_FOUND,
-            errors.COUNTRY.NOT_FOUND
-        )
-    }
-
-    const result = prismaClient.country.delete({
-        where: {
-            id: countryId.id,
-        },
-    })
+    const [, result] = await prismaClient.$transaction([
+        prismaClient.country.findUniqueOrThrow({
+            where: {
+                id: countryId,
+            },
+        }),
+        prismaClient.country.delete({
+            where: {
+                id: countryId,
+            },
+        }),
+    ])
 
     if (!result) {
         throw new ResponseError(
@@ -146,96 +131,75 @@ const remove = async (params) => {
 }
 
 const get = async (req) => {
-    const query = validate(getAreaValidationSchema, req)
+    const query = validate(getAreaValidationSchema, req.query)
 
-    const skip = (query.page - 1) * query.size
+    const { name, page, size } = query
+
+    const skip = (page - 1) * size
 
     const filters = []
 
     if (query.name) {
         filters.push({
             name: {
-                contains: query.name,
+                contains: name,
             },
         })
     }
 
-    if (query.areaId) {
-        filters.push({
-            area: {
-                id: query.areaId,
+    const [countries, totalItems] = await prismaClient.$transaction([
+        prismaClient.country.findMany({
+            where: {
+                AND: filters,
             },
-        })
-    }
-
-    const countries = await prismaClient.country.findMany({
-        where: {
-            AND: filters,
-        },
-        select: {
-            id: true,
-            name: true,
-            area: {
-                select: {
-                    id: true,
-                    name: true,
+            select: {
+                id: true,
+                name: true,
+                area: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
                 },
             },
-        },
-        take: query.size,
-        skip: skip,
-    })
-
-    if (!countries) {
-        throw new ResponseError(
-            errors.HTTP.CODE.NOT_FOUND,
-            errors.HTTP.STATUS.NOT_FOUND,
-            errors.COUNTRY.NOT_FOUND
-        )
-    }
-
-    const totalItems = await prismaClient.country.count({
-        where: {
-            AND: filters,
-        },
-    })
-
-    if (!totalItems) {
-        return {
-            data: [],
-            pagination: {
-                page: query.page,
-                total_item: totalItems,
-                total_page: Math.ceil(totalItems / query.size),
+            take: size,
+            skip: skip,
+        }),
+        prismaClient.country.count({
+            where: {
+                AND: filters,
             },
-        }
-    }
+        }),
+    ])
 
     const result = countries.map((country) => {
+        const { id, name, area } = country
         return {
-            id: country.id,
-            name: country.name,
-            areaId: country.area.id,
-            area: country.area.name,
+            id: id,
+            name: name,
+            areaId: area.id,
+            area: area.name,
         }
     })
 
     return {
         data: result,
         pagination: {
-            page: query.page,
+            page: page,
             total_item: totalItems,
-            total_page: Math.ceil(totalItems / query.size),
+            total_page: Math.ceil(totalItems / size),
         },
     }
 }
 
 const getById = async (req) => {
-    const params = validate(getCountryByIdValidationSchema, req)
+    const params = validate(getCountryByIdValidationSchema, req.params)
 
-    const country = await prismaClient.country.findUnique({
+    const id = params.id
+
+    const country = await prismaClient.country.findUniqueOrThrow({
         where: {
-            id: params.id,
+            id: id,
         },
         select: {
             id: true,
@@ -249,19 +213,13 @@ const getById = async (req) => {
         },
     })
 
-    if (!country) {
-        throw new ResponseError(
-            errors.HTTP.CODE.NOT_FOUND,
-            errors.HTTP.STATUS.NOT_FOUND,
-            errors.COUNTRY.NOT_FOUND
-        )
-    }
+    const { countryId, name, area } = country
 
     return {
-        id: country.id,
-        name: country.name,
-        areaId: country.area.id,
-        area: country.area.name,
+        id: countryId,
+        name: name,
+        areaId: area.id,
+        area: area.name,
     }
 }
 export default { add, get, getById, update, remove }

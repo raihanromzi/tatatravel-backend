@@ -4,7 +4,7 @@ import { success } from '../utils/message-success.js'
 
 const add = async (req, res, next) => {
     try {
-        const result = await countryService.add(req.body)
+        const result = await countryService.add(req)
         res.status(success.HTTP.CODE.CREATED).send(
             responses.responseSuccess(
                 success.HTTP.CODE.CREATED,
@@ -19,11 +19,7 @@ const add = async (req, res, next) => {
 
 const update = async (req, res, next) => {
     try {
-        const params = {
-            id: req.params.id,
-        }
-
-        const result = await countryService.update(req.body, params)
+        const result = await countryService.update(req)
         res.status(success.HTTP.CODE.OK).send(
             responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
         )
@@ -34,11 +30,7 @@ const update = async (req, res, next) => {
 
 const remove = async (req, res, next) => {
     try {
-        const params = {
-            id: req.params.id,
-        }
-
-        await countryService.remove(params)
+        await countryService.remove(req)
         res.status(success.HTTP.CODE.OK).send(
             responses.responseSuccess(
                 success.HTTP.CODE.OK,
@@ -53,12 +45,7 @@ const remove = async (req, res, next) => {
 
 const get = async (req, res, next) => {
     try {
-        const query = {
-            name: req.query.name,
-            areaId: req.query.areaId,
-        }
-
-        const result = await countryService.get(query)
+        const result = await countryService.get(req)
         res.status(success.HTTP.CODE.OK).send(
             responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
         )
@@ -69,11 +56,7 @@ const get = async (req, res, next) => {
 
 const getById = async (req, res, next) => {
     try {
-        const params = {
-            id: req.params.id,
-        }
-
-        const result = await countryService.getById(params)
+        const result = await countryService.getById(req)
         res.status(success.HTTP.CODE.OK).send(
             responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
         )
