@@ -12,39 +12,42 @@ import { errors } from '../utils/message-error.js'
 const add = async (req) => {
     const area = validate(addAreaValidationSchema, req.body)
 
-    const [countArea, result] = await prismaClient.$transaction([
-        prismaClient.area.count({
+    const { name } = area
+
+    return prismaClient.$transaction(async (prisma) => {
+        const countArea = await prisma.area.count({
             where: {
-                name: area.name,
+                name: name,
             },
-        }),
-        prismaClient.area.create({
+        })
+
+        if (countArea === 1) {
+            throw new ResponseError(
+                errors.HTTP.CODE.BAD_REQUEST,
+                errors.HTTP.STATUS.BAD_REQUEST,
+                errors.AREA.ALREADY_EXISTS
+            )
+        }
+
+        const result = await prisma.area.create({
             data: {
-                name: area.name,
+                name: name,
             },
             select: {
                 name: true,
             },
-        }),
-    ])
+        })
 
-    if (countArea === 1) {
-        throw new ResponseError(
-            errors.HTTP.CODE.BAD_REQUEST,
-            errors.HTTP.STATUS.BAD_REQUEST,
-            errors.AREA.ALREADY_EXISTS
-        )
-    }
+        if (!result) {
+            throw new ResponseError(
+                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                errors.AREA.FAILED_TO_ADD
+            )
+        }
 
-    if (!result) {
-        throw new ResponseError(
-            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-            errors.AREA.FAILED_TO_ADD
-        )
-    }
-
-    return result
+        return result
+    })
 }
 
 const update = async (req) => {
@@ -52,36 +55,47 @@ const update = async (req) => {
 
     const params = validate(getAreaByIdValidationSchema, req.params)
 
-    const areaId = params.id
+    const { name } = area
 
-    const [, result] = await prismaClient.$transaction([
-        prismaClient.area.findUniqueOrThrow({
+    const { id: areaId } = params
+
+    return prismaClient.$transaction(async (prisma) => {
+        const findArea = await prisma.area.findUnique({
             where: {
                 id: areaId,
             },
-        }),
-        prismaClient.area.update({
+        })
+
+        if (!findArea) {
+            throw new ResponseError(
+                errors.HTTP.CODE.BAD_REQUEST,
+                errors.HTTP.STATUS.BAD_REQUEST,
+                errors.AREA.ALREADY_EXISTS
+            )
+        }
+
+        const result = await prisma.area.update({
             where: {
                 id: areaId,
             },
             data: {
-                name: area.name,
+                name: name,
             },
             select: {
                 name: true,
             },
-        }),
-    ])
+        })
 
-    if (!result) {
-        throw new ResponseError(
-            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-            errors.AREA.FAILED_TO_UPDATE
-        )
-    }
+        if (!result) {
+            throw new ResponseError(
+                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                errors.AREA.FAILED_TO_UPDATE
+            )
+        }
 
-    return result
+        return result
+    })
 }
 
 const get = async (req) => {
@@ -112,8 +126,8 @@ const get = async (req) => {
         })
     }
 
-    const [area, totalItems] = await prismaClient.$transaction([
-        prismaClient.area.findMany({
+    return prismaClient.$transaction(async (prisma) => {
+        const areas = await prisma.area.findMany({
             where: {
                 AND: filters,
             },
@@ -123,75 +137,102 @@ const get = async (req) => {
             },
             take: size,
             skip: skip,
-        }),
-        prismaClient.area.count({
+        })
+
+        const totalItems = await prisma.area.count({
             where: {
                 AND: filters,
             },
-        }),
-    ])
+        })
 
-    return {
-        data: area,
-        pagination: {
-            page: query.page,
-            total_item: totalItems,
-            total_page: Math.ceil(totalItems / query.size),
-        },
-    }
+        return {
+            data: areas,
+            pagination: {
+                page: page,
+                total_item: totalItems,
+                total_page: Math.ceil(totalItems / size),
+            },
+        }
+    })
 }
 
 const getById = async (req) => {
     const params = validate(getAreaByIdValidationSchema, req.params)
 
-    const areaId = params.id
+    const { id: areaId } = params
 
-    const [, result] = await prismaClient.$transaction([
-        prismaClient.area.findUniqueOrThrow({
+    return prismaClient.$transaction(async (prisma) => {
+        const area = await prisma.area.findUnique({
             where: {
                 id: areaId,
             },
-        }),
-        prismaClient.area.findUniqueOrThrow({
+        })
+
+        if (!area) {
+            throw new ResponseError(
+                errors.HTTP.CODE.BAD_REQUEST,
+                errors.HTTP.STATUS.BAD_REQUEST,
+                errors.AREA.NOT_FOUND
+            )
+        }
+
+        const result = await prisma.area.findUnique({
             where: {
                 id: areaId,
             },
             select: {
                 name: true,
             },
-        }),
-    ])
+        })
 
-    return result
+        if (!result) {
+            throw new ResponseError(
+                errors.HTTP.CODE.NOT_FOUND,
+                errors.HTTP.STATUS.NOT_FOUND,
+                errors.AREA.NOT_FOUND
+            )
+        }
+
+        return result
+    })
 }
 
 const remove = async (req) => {
     const params = validate(getAreaByIdValidationSchema, req.params)
 
-    const areaId = params.id
+    const { id: areaId } = params
 
-    const [, result] = await prismaClient.$transaction([
-        prismaClient.area.findUniqueOrThrow({
+    return prismaClient.$transaction(async (prisma) => {
+        const findArea = await prisma.area.findUniqueOrThrow({
             where: {
                 id: areaId,
             },
-        }),
-        prismaClient.area.delete({
+        })
+
+        if (!findArea) {
+            throw new ResponseError(
+                errors.HTTP.CODE.BAD_REQUEST,
+                errors.HTTP.STATUS.BAD_REQUEST,
+                errors.AREA.NOT_FOUND
+            )
+        }
+
+        const result = await prisma.area.delete({
             where: {
                 id: areaId,
             },
-        }),
-    ])
+        })
 
-    if (!result) {
-        throw new ResponseError(
-            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-            errors.AREA.FAILED_TO_DELETE
-        )
-    }
+        if (!result) {
+            throw new ResponseError(
+                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                errors.AREA.FAILED_TO_DELETE
+            )
+        }
 
-    return result
+        return result
+    })
 }
 
 export default { add, update, get, getById, remove }
