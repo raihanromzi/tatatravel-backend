@@ -174,6 +174,7 @@ const get = async (req) => {
 
     const result = countries.map((country) => {
         const { id, name, area } = country
+
         return {
             id: id,
             name: name,

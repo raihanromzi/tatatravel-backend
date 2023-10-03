@@ -15,13 +15,22 @@ const add = async (req) => {
 
     const { name } = role
 
-    const [countRole, result] = await prismaClient.$transaction([
-        prismaClient.role.count({
+    return prismaClient.$transaction(async (prisma) => {
+        const countRole = await prisma.role.count({
             where: {
                 name: name,
             },
-        }),
-        prismaClient.role.create({
+        })
+
+        if (countRole === 1) {
+            throw new ResponseError(
+                errors.HTTP.CODE.BAD_REQUEST,
+                errors.HTTP.STATUS.BAD_REQUEST,
+                errors.ROLE.ALREADY_EXISTS
+            )
+        }
+
+        const result = await prisma.role.create({
             data: {
                 name: name,
             },
@@ -29,26 +38,18 @@ const add = async (req) => {
                 name: true,
                 isActive: true,
             },
-        }),
-    ])
+        })
 
-    if (countRole === 1) {
-        throw new ResponseError(
-            errors.HTTP.CODE.BAD_REQUEST,
-            errors.HTTP.STATUS.BAD_REQUEST,
-            errors.ROLE.ALREADY_EXISTS
-        )
-    }
+        if (!result) {
+            throw new ResponseError(
+                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                errors.ROLE.FAILED_TO_ADD
+            )
+        }
 
-    if (!result) {
-        throw new ResponseError(
-            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-            errors.ROLE.FAILED_TO_ADD
-        )
-    }
-
-    return result
+        return result
+    })
 }
 
 const update = async (req) => {
@@ -58,20 +59,38 @@ const update = async (req) => {
 
     const { name, isActive } = role
 
-    const roleId = params.id
+    const { id: roleId } = params
 
-    const [findRole, findRoleByName, updateRole] = await prismaClient.$transaction([
-        prismaClient.role.count({
+    return prismaClient.$transaction(async (prisma) => {
+        const findRole = await prisma.role.findUnique({
             where: {
                 id: roleId,
             },
-        }),
-        prismaClient.role.count({
+        })
+
+        if (!findRole) {
+            throw new ResponseError(
+                errors.HTTP.CODE.NOT_FOUND,
+                errors.HTTP.STATUS.NOT_FOUND,
+                errors.ROLE.NOT_FOUND
+            )
+        }
+
+        const findRoleByName = await prisma.role.findUnique({
             where: {
                 name: name,
             },
-        }),
-        prismaClient.role.update({
+        })
+
+        if (findRoleByName) {
+            throw new ResponseError(
+                errors.HTTP.CODE.BAD_REQUEST,
+                errors.HTTP.STATUS.BAD_REQUEST,
+                errors.ROLE.ALREADY_EXISTS
+            )
+        }
+
+        const updateRole = await prisma.role.update({
             where: {
                 id: roleId,
             },
@@ -84,71 +103,56 @@ const update = async (req) => {
                 name: true,
                 isActive: true,
             },
-        }),
-    ])
+        })
 
-    if (findRole === 0) {
-        throw new ResponseError(
-            errors.HTTP.CODE.NOT_FOUND,
-            errors.HTTP.STATUS.NOT_FOUND,
-            errors.ROLE.NOT_FOUND
-        )
-    }
+        if (!updateRole) {
+            throw new ResponseError(
+                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                errors.ROLE.FAILED_TO_UPDATE
+            )
+        }
 
-    if (findRoleByName === 1) {
-        throw new ResponseError(
-            errors.HTTP.CODE.BAD_REQUEST,
-            errors.HTTP.STATUS.BAD_REQUEST,
-            errors.ROLE.ALREADY_EXISTS
-        )
-    }
-
-    if (!updateRole) {
-        throw new ResponseError(
-            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-            errors.ROLE.FAILED_TO_UPDATE
-        )
-    }
-
-    return updateRole
+        return updateRole
+    })
 }
 
 const remove = async (req) => {
     const params = validate(deleteRoleValidationSchema, req.params)
 
-    const roleId = params.id
+    const { id: roleId } = params
 
-    const [countRole, result] = await prismaClient.$transaction([
-        prismaClient.role.count({
+    return prismaClient.$transaction(async (prisma) => {
+        const countRole = await prisma.role.count({
             where: {
                 id: roleId,
             },
-        }),
-        prismaClient.role.delete({
+        })
+
+        if (countRole === 0) {
+            throw new ResponseError(
+                errors.HTTP.CODE.BAD_REQUEST,
+                errors.HTTP.STATUS.BAD_REQUEST,
+                errors.ROLE.NOT_FOUND
+            )
+        }
+
+        const result = await prisma.role.delete({
             where: {
                 id: roleId,
             },
-        }),
-    ])
+        })
 
-    if (countRole === 0) {
-        throw new ResponseError(
-            errors.HTTP.CODE.BAD_REQUEST,
-            errors.HTTP.STATUS.BAD_REQUEST,
-            errors.ROLE.NOT_FOUND
-        )
-    }
+        if (!result) {
+            throw new ResponseError(
+                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                errors.ROLE.FAILED_TO_DELETE
+            )
+        }
 
-    if (!result) {
-        throw new ResponseError(
-            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-            errors.ROLE.FAILED_TO_DELETE
-        )
-    }
-
-    return result
+        return result
+    })
 }
 
 const get = async (req) => {
@@ -168,8 +172,8 @@ const get = async (req) => {
         })
     }
 
-    const [roles, totalItems] = await prismaClient.$transaction([
-        prismaClient.role.findMany({
+    return prismaClient.$transaction(async (prisma) => {
+        const roles = await prisma.role.findMany({
             where: {
                 AND: filters,
             },
@@ -180,54 +184,55 @@ const get = async (req) => {
             },
             take: size,
             skip: skip,
-        }),
-        prismaClient.role.count({
+        })
+
+        const totalItems = await prisma.role.count({
             where: {
                 AND: filters,
             },
-        }),
-    ])
+        })
 
-    return {
-        data: roles,
-        pagination: {
-            page: page,
-            total_item: totalItems,
-            total_page: Math.ceil(totalItems / size),
-        },
-    }
+        return {
+            data: roles,
+            pagination: {
+                page: page,
+                total_item: totalItems,
+                total_page: Math.ceil(totalItems / size),
+            },
+        }
+    })
 }
 
 const getById = async (req) => {
     const params = await validate(getRoleByIdValidationSchema, req.params)
 
-    const roleId = params.id
+    const { id: roleId } = params
 
-    const [findRole] = await prismaClient.$transaction([
-        prismaClient.role.count({
+    return prismaClient.$transaction(async (prisma) => {
+        const findRole = await prisma.role.count({
             where: {
                 id: roleId,
             },
-        }),
-    ])
+        })
 
-    if (findRole === 0) {
-        throw new ResponseError(
-            errors.HTTP.CODE.NOT_FOUND,
-            errors.HTTP.STATUS.NOT_FOUND,
-            errors.ROLE.NOT_FOUND
-        )
-    }
+        if (findRole === 0) {
+            throw new ResponseError(
+                errors.HTTP.CODE.NOT_FOUND,
+                errors.HTTP.STATUS.NOT_FOUND,
+                errors.ROLE.NOT_FOUND
+            )
+        }
 
-    return prismaClient.role.findUniqueOrThrow({
-        where: {
-            id: roleId,
-        },
-        select: {
-            id: true,
-            name: true,
-            isActive: true,
-        },
+        return prisma.role.findUnique({
+            where: {
+                id: roleId,
+            },
+            select: {
+                id: true,
+                name: true,
+                isActive: true,
+            },
+        })
     })
 }
 
