@@ -19,6 +19,7 @@ web.use(express.static('public', { etag: true }))
 web.use(cookieParser())
 
 web.use(publicRouter)
+web.use(blogRouter)
 web.use(tokenRouter)
 web.use(userRouter)
 web.use(adminRouter)
@@ -26,7 +27,6 @@ web.use(areaRouter)
 web.use(countryRouter)
 web.use(roleRouter)
 web.use(categoryRouter)
-web.use(blogRouter)
 
 web.use(errorMiddleware)
 
