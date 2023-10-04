@@ -12,7 +12,6 @@ import { errors } from '../utils/message-error.js'
 
 const add = async (req) => {
     const role = validate(addRoleValidationSchema, req.body)
-
     const { name } = role
 
     return prismaClient.$transaction(async (prisma) => {
@@ -54,11 +53,8 @@ const add = async (req) => {
 
 const update = async (req) => {
     const role = validate(updateRoleValidationSchema, req.body)
-
     const params = validate(getRoleByIdValidationSchema, req.params)
-
     const { name, isActive } = role
-
     const { id: roleId } = params
 
     return prismaClient.$transaction(async (prisma) => {
@@ -119,7 +115,6 @@ const update = async (req) => {
 
 const remove = async (req) => {
     const params = validate(deleteRoleValidationSchema, req.params)
-
     const { id: roleId } = params
 
     return prismaClient.$transaction(async (prisma) => {
@@ -157,11 +152,8 @@ const remove = async (req) => {
 
 const get = async (req) => {
     const query = validate(getRoleValidationSchema, req.query)
-
     const { name, page, size } = query
-
     const skip = (page - 1) * size
-
     const filters = []
 
     if (name) {
@@ -205,7 +197,6 @@ const get = async (req) => {
 
 const getById = async (req) => {
     const params = await validate(getRoleByIdValidationSchema, req.params)
-
     const { id: roleId } = params
 
     return prismaClient.$transaction(async (prisma) => {

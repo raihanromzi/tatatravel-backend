@@ -5,7 +5,6 @@ import { prismaClient } from '../application/database.js'
 
 const refresh = async (req, res) => {
     const foundRefreshToken = req.cookies.refreshToken
-
     let validUser = null
 
     res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'None', secure: true })
@@ -81,7 +80,6 @@ const refresh = async (req, res) => {
     }
 
     const newAccessToken = generateAccessToken(userAccessTokenData)
-
     const newRefreshToken = generateRefreshToken(userRefreshTokenData)
 
     await prismaClient.user.update({

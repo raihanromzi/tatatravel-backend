@@ -7,15 +7,11 @@ import fs from 'fs/promises'
 
 const add = async (req) => {
     const blog = validate(addBlogValidationSchema, req.body)
-
     const images = validate(imagesValidationSchema, req.files)
-
     const blogImages = images.map((image) => {
         return image.path
     })
-
     const { id: userId } = req.user
-
     const { categoryId, title, slug, description, content } = blog
 
     return prismaClient.$transaction(async (prisma) => {

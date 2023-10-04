@@ -11,7 +11,6 @@ import { errors } from '../utils/message-error.js'
 
 const add = async (req) => {
     const area = validate(addAreaValidationSchema, req.body)
-
     const { name } = area
 
     return prismaClient.$transaction(async (prisma) => {
@@ -52,11 +51,8 @@ const add = async (req) => {
 
 const update = async (req) => {
     const area = validate(updateAreaValidationSchema, req.body)
-
     const params = validate(getAreaByIdValidationSchema, req.params)
-
     const { name } = area
-
     const { id: areaId } = params
 
     return prismaClient.$transaction(async (prisma) => {
@@ -100,10 +96,10 @@ const update = async (req) => {
 
 const get = async (req) => {
     const query = validate(getAreaValidationSchema, req.query)
-
     const { name, page, size, sortBy } = query
+    const skip = (page - 1) * size
+    const filters = []
 
-    // validation for sortBy and orderBy
     if (sortBy) {
         if (sortBy !== 'id' && sortBy !== 'name') {
             throw new ResponseError(
@@ -113,10 +109,6 @@ const get = async (req) => {
             )
         }
     }
-
-    const skip = (page - 1) * size
-
-    const filters = []
 
     if (name) {
         filters.push({
@@ -158,7 +150,6 @@ const get = async (req) => {
 
 const getById = async (req) => {
     const params = validate(getAreaByIdValidationSchema, req.params)
-
     const { id: areaId } = params
 
     return prismaClient.$transaction(async (prisma) => {
@@ -199,7 +190,6 @@ const getById = async (req) => {
 
 const remove = async (req) => {
     const params = validate(getAreaByIdValidationSchema, req.params)
-
     const { id: areaId } = params
 
     return prismaClient.$transaction(async (prisma) => {

@@ -10,7 +10,6 @@ import { errors } from '../utils/message-error.js'
 
 const add = async (req) => {
     const category = validate(addOrUpdateCategoryValidationSchema, req.body)
-
     const { name, isActive } = category
 
     return prismaClient.$transaction(async (prisma) => {
@@ -53,11 +52,8 @@ const add = async (req) => {
 
 const update = async (req) => {
     const category = validate(addOrUpdateCategoryValidationSchema, req.body)
-
     const params = validate(idCategoryValidationSchema, req.params)
-
     const { name, isActive } = category
-
     const { id: categoryId } = params
 
     return prismaClient.$transaction(async (prisma) => {
@@ -103,7 +99,6 @@ const update = async (req) => {
 
 const remove = async (req) => {
     const params = validate(idCategoryValidationSchema, req.params)
-
     const { id: categoryId } = params
 
     return prismaClient.$transaction(async (prisma) => {
@@ -139,11 +134,8 @@ const remove = async (req) => {
 
 const get = async (req) => {
     const query = validate(getCategoryValidationSchema, req.query)
-
     const { name, page, size } = query
-
     const skip = (page - 1) * size
-
     const filters = []
 
     if (name) {
@@ -187,7 +179,6 @@ const get = async (req) => {
 
 const getById = async (req) => {
     const params = validate(idCategoryValidationSchema, req.params)
-
     const { id: categoryId } = params
 
     return prismaClient.$transaction(async (prisma) => {

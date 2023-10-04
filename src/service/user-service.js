@@ -11,7 +11,6 @@ import { errors } from '../utils/message-error.js'
 
 const get = async (req) => {
     const user = validate(getUserValidationSchema, req.user)
-
     const { id: userId } = user
 
     const findUser = await prismaClient.user.findUnique({
@@ -52,15 +51,10 @@ const get = async (req) => {
 
 const update = async (req) => {
     const user = validate(updateUserValidationSchema, req.body)
-
     const avatar = validate(avatarValidationSchema, req.file)
-
     const { id: userId } = req.user
-
     const { username, fullName, password } = user
-
     const { path } = avatar
-
     const data = {}
 
     if (fullName) {
@@ -126,7 +120,6 @@ const update = async (req) => {
 
 const logout = async (req, res) => {
     const user = validate(getUserValidationSchema, req.user)
-
     const { id: userId } = user
 
     return prismaClient.$transaction(async (prisma) => {

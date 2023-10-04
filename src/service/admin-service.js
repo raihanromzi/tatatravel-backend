@@ -14,7 +14,6 @@ import fs from 'fs'
 
 const add = async (req) => {
     const user = validate(addUserValidationSchema, req.body)
-
     const { fullName, username, email, password, role } = user
 
     return prismaClient.$transaction(async (prisma) => {
@@ -84,7 +83,6 @@ const add = async (req) => {
 }
 const remove = async (req) => {
     const paramUserId = validate(deleteUserValidationSchema, req.params.id)
-
     const { id: currentUserId } = req.user
 
     if (paramUserId === currentUserId) {
@@ -122,12 +120,11 @@ const remove = async (req) => {
 
 const get = async (req) => {
     const query = validate(searchUserValidationSchema, req.query)
-
     const userId = req.user.id
-
     const { name, email, username, role, page, size, sortBy, orderBy } = query
+    const skip = (page - 1) * size
+    const filters = []
 
-    // validation for sortBy and orderBy
     if (sortBy) {
         if (
             sortBy !== 'id' &&
@@ -143,10 +140,6 @@ const get = async (req) => {
             )
         }
     }
-
-    const skip = (page - 1) * size
-
-    const filters = []
 
     if (name) {
         filters.push({
@@ -232,7 +225,6 @@ const get = async (req) => {
 
 const update = async (req) => {
     const paramUserid = validate(getUserValidationSchema, req.params)
-
     const currentUserId = req.user.id
 
     if (paramUserid === currentUserId) {
@@ -244,7 +236,6 @@ const update = async (req) => {
     }
 
     const user = validate(updateActiveUserValidationSchema, req.body)
-
     const { isActive } = user
 
     return prismaClient.$transaction(async (prisma) => {

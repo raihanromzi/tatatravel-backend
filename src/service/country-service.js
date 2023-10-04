@@ -12,7 +12,6 @@ import { errors } from '../utils/message-error.js'
 
 const add = async (req) => {
     const country = validate(addCountryValidationSchema, req.body)
-
     const { name, areaId } = country
 
     return prismaClient.$transaction(async (prisma) => {
@@ -55,11 +54,8 @@ const add = async (req) => {
 
 const update = async (req) => {
     const country = validate(updateCountryValidationSchema, req.body)
-
     const params = validate(getCountryByIdValidationSchema, req.params)
-
     const { name, areaId } = country
-
     const { id: countryId } = params
 
     return prismaClient.$transaction(async (prisma) => {
@@ -124,7 +120,6 @@ const update = async (req) => {
 
 const remove = async (req) => {
     const country = validate(deleteCountryValidationSchema, req.params)
-
     const { id: countryId } = country
 
     return prismaClient.$transaction(async (prisma) => {
@@ -162,11 +157,8 @@ const remove = async (req) => {
 
 const get = async (req) => {
     const query = validate(getAreaValidationSchema, req.query)
-
     const { name, page, size } = query
-
     const skip = (page - 1) * size
-
     const filters = []
 
     if (name) {
@@ -226,7 +218,6 @@ const get = async (req) => {
 
 const getById = async (req) => {
     const params = validate(getCountryByIdValidationSchema, req.params)
-
     const { id } = params
 
     return prismaClient.$transaction(async (prisma) => {
