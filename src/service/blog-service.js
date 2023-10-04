@@ -1,24 +1,22 @@
 import { validate } from '../validation/validation.js'
-import {
-    addBlogValidationSchema,
-    deleteBlogValidationSchema,
-    imagesValidationSchema,
-    updateBlogValidationSchema,
-} from '../validation/blog-validation.js'
+import { addBlogValidationSchema, imagesValidationSchema } from '../validation/blog-validation.js'
 import { ResponseError } from '../utils/response-error.js'
 import { prismaClient } from '../application/database.js'
 import { errors } from '../utils/message-error.js'
+import fs from 'fs/promises'
 
 const add = async (req) => {
     const blog = validate(addBlogValidationSchema, req.body)
 
     const images = validate(imagesValidationSchema, req.files)
 
+    const blogImages = images.map((image) => {
+        return image.path
+    })
+
     const { id: userId } = req.user
 
     const { categoryId, title, slug, description, content } = blog
-
-    const { path } = images
 
     return prismaClient.$transaction(async (prisma) => {
         const findUser = await prisma.user.findUnique({
@@ -65,16 +63,16 @@ const add = async (req) => {
             )
         }
 
-        const result = await prisma.blog.create({
+        const newBlog = await prisma.blog.create({
             data: {
-                category: {
-                    connect: {
-                        id: categoryId,
-                    },
-                },
                 user: {
                     connect: {
                         id: userId,
+                    },
+                },
+                category: {
+                    connect: {
+                        id: categoryId,
                     },
                 },
                 title: title,
@@ -86,176 +84,51 @@ const add = async (req) => {
                 id: true,
                 title: true,
                 slug: true,
-            },
-            include: {
-                category: {
-                    select: {
-                        name: true,
-                    },
-                },
-                user: {
-                    select: {
-                        username: true,
-                    },
-                },
+                description: true,
             },
         })
 
-        if (!result) {
-            throw new ResponseError(500, 'Internal Server Error', 'Failed to add blog')
+        if (!newBlog) {
+            throw new ResponseError(
+                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                errors.BLOG.FAILED_ADD
+            )
         }
 
-        return result
+        const { id } = newBlog
+
+        await fs.mkdir(`public/images/blog/${id}`, { recursive: true })
+
+        const blogImagesNewPath = blogImages.map((image) => {
+            const oldPath = image
+
+            const newPath = `public/images/blog/${id}/${image.split('/')[3]}`
+
+            fs.rename(oldPath, newPath)
+
+            return newPath
+        })
+
+        const newImages = await prisma.blogImage.createMany({
+            data: await blogImagesNewPath.map((image) => {
+                return {
+                    blogId: id,
+                    image: image,
+                }
+            }),
+        })
+
+        if (!newImages) {
+            throw new ResponseError(
+                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                errors.BLOG.FAILED_ADD
+            )
+        }
+
+        return newBlog
     })
 }
 
-const update = async (reqm) => {
-    const blog = validate(updateBlogValidationSchema, req)
-
-    const blogData = await prismaClient.blog.findUnique({
-        where: {
-            id: blog.id,
-        },
-        select: {
-            id: true,
-            title: true,
-            slug: true,
-        },
-    })
-
-    if (!blogData) {
-        throw new ResponseError(404, 'Not Found', 'Blog not found')
-    }
-
-    const result = await prismaClient.blog.update({
-        where: {
-            id: blog.id,
-        },
-        data: {
-            category: {
-                connect: {
-                    id: blog.categoryId,
-                },
-            },
-            user: {
-                connect: {
-                    id: blog.authorId,
-                },
-            },
-            title: blog.title,
-            slug: blog.slug,
-            description: blog.description,
-            content: blog.content,
-        },
-        select: {
-            id: true,
-            title: true,
-            slug: true,
-        },
-    })
-
-    if (!result) {
-        throw new ResponseError(500, 'Internal Server Error', 'Failed to update blog')
-    }
-
-    return result
-}
-
-const remove = async (id) => {
-    id = validate(deleteBlogValidationSchema, id)
-
-    const blog = await prismaClient.blog.findUnique({
-        where: {
-            id: id,
-        },
-        select: {
-            id: true,
-        },
-    })
-
-    if (!blog) {
-        throw new ResponseError(404, 'Not Found', 'Blog not found')
-    }
-
-    const result = await prismaClient.blog.delete({
-        where: {
-            id: id,
-        },
-    })
-
-    if (!result) {
-        throw new ResponseError(500, 'Internal Server Error', 'Failed to delete blog')
-    }
-
-    return result
-}
-
-const get = async (id) => {
-    id = validate(deleteBlogValidationSchema, id)
-
-    const blog = await prismaClient.blog.findUnique({
-        where: {
-            id: id,
-        },
-        select: {
-            id: true,
-            title: true,
-            slug: true,
-            description: true,
-            content: true,
-            createdAt: true,
-            updatedAt: true,
-            user: {
-                select: {
-                    username: true,
-                },
-            },
-            category: {
-                select: {
-                    name: true,
-                },
-            },
-        },
-    })
-
-    if (!blog) {
-        throw new ResponseError(404, 'Not Found', 'Blog not found')
-    }
-
-    return blog
-}
-
-// const search = async (request) => {}
-
-const getAll = async (request) => {
-    const page = request.page
-    const size = request.size
-
-    const blogs = await prismaClient.blog.findMany({
-        skip: (page - 1) * size,
-        take: size,
-        select: {
-            id: true,
-            title: true,
-            slug: true,
-            description: true,
-            content: true,
-            createdAt: true,
-            updatedAt: true,
-            user: {
-                select: {
-                    username: true,
-                },
-            },
-            category: {
-                select: {
-                    name: true,
-                },
-            },
-        },
-    })
-
-    return blogs
-}
-
-export default { add, update, remove, get, getAll }
+export default { add }
