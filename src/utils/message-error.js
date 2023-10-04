@@ -205,6 +205,8 @@ const blogErrors = {
     IMAGES: {
         PATH_MUST_STRING: 'images path must be a string',
         MUST_VALID: 'file format must be PNG, JPG, or JPEG',
+        IS_REQUIRED: 'minimum 1 image is required',
+        IMAGE_NOT_VALID: 'image is not valid, please upload image with PNG, JPG, or JPEG format',
     },
     SLUG: {
         IS_REQUIRED: 'slug is required',
@@ -227,6 +229,7 @@ const blogErrors = {
         MUST_MIN: 'content is min 3 characters',
         CANNOT_EMPTY: 'content cannot be empty',
     },
+    FAILED_ADD: 'failed to add blog',
 }
 
 const errors = {
