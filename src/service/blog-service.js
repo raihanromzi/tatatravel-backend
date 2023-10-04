@@ -100,26 +100,67 @@ const add = async (req) => {
 
         await fs.mkdir(`public/images/blog/${id}`, { recursive: true })
 
-        const blogImagesNewPath = blogImages.map((image) => {
-            const oldPath = image
+        const blogImagesNewPath = await Promise.all(
+            blogImages.map(async (image) => {
+                const oldPath = image
 
-            const newPath = `public/images/blog/${id}/${image.split('/')[3]}`
+                const newPath = `public/images/blog/${id}/${image.split('/')[3]}`
 
-            fs.rename(oldPath, newPath)
+                try {
+                    await fs.rename(oldPath, newPath)
+                    return newPath
+                } catch (e) {
+                    const deleteBlogAndImages = async () => {
+                        await fs.rmdir(`public/images/blog/${id}`)
+                        await prisma.blog.delete({
+                            where: {
+                                id: id,
+                            },
+                        })
+                        for (const image of blogImages) {
+                            await fs.unlink(image)
+                        }
+                    }
 
-            return newPath
-        })
+                    return deleteBlogAndImages()
+                        .then(() => {
+                            throw new ResponseError(
+                                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                                errors.BLOG.FAILED_ADD
+                            )
+                        })
+                        .catch((error) => {
+                            throw new ResponseError(
+                                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                                error
+                            )
+                        })
+                }
+            })
+        )
 
         const newImages = await prisma.blogImage.createMany({
-            data: await blogImagesNewPath.map((image) => {
-                return {
-                    blogId: id,
-                    image: image,
-                }
-            }),
+            data: await Promise.all(
+                blogImagesNewPath.map((image) => {
+                    return {
+                        blogId: id,
+                        image: image,
+                    }
+                })
+            ),
         })
 
         if (!newImages) {
+            await prisma.blog.delete({
+                where: {
+                    id: id,
+                },
+            })
+
+            await fs.rmdir(`public/images/blog/${id}`)
+
             throw new ResponseError(
                 errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
                 errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
