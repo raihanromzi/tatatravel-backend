@@ -9,6 +9,7 @@ import { areaRouter } from '../routes/area-route.js'
 import { countryRouter } from '../routes/country-route.js'
 import { roleRouter } from '../routes/role-route.js'
 import { categoryRouter } from '../routes/category-route.js'
+import { blogRouter } from '../routes/blog-route.js'
 
 const web = express()
 
@@ -25,6 +26,7 @@ web.use(areaRouter)
 web.use(countryRouter)
 web.use(roleRouter)
 web.use(categoryRouter)
+web.use(blogRouter)
 
 web.use(errorMiddleware)
 

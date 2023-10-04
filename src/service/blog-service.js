@@ -2,57 +2,115 @@ import { validate } from '../validation/validation.js'
 import {
     addBlogValidationSchema,
     deleteBlogValidationSchema,
+    imagesValidationSchema,
     updateBlogValidationSchema,
 } from '../validation/blog-validation.js'
 import { ResponseError } from '../utils/response-error.js'
 import { prismaClient } from '../application/database.js'
+import { errors } from '../utils/message-error.js'
 
-const add = async (request) => {
-    request = validate(addBlogValidationSchema, request)
+const add = async (req) => {
+    const blog = validate(addBlogValidationSchema, req.body)
 
-    const countTitle = await prismaClient.blog.count({
-        where: {
-            title: request.title,
-        },
-    })
+    const images = validate(imagesValidationSchema, req.files)
 
-    if (countTitle > 0) {
-        throw new ResponseError(400, 'Bad Request', 'title already exist')
-    }
+    const { id: userId } = req.user
 
-    const result = await prismaClient.blog.create({
-        data: {
-            category: {
-                connect: {
-                    id: request.categoryId,
+    const { categoryId, title, slug, description, content } = blog
+
+    const { path } = images
+
+    return prismaClient.$transaction(async (prisma) => {
+        const findUser = await prisma.user.findUnique({
+            where: {
+                id: userId,
+            },
+        })
+
+        if (!findUser) {
+            throw new ResponseError(
+                errors.HTTP.CODE.NOT_FOUND,
+                errors.HTTP.STATUS.NOT_FOUND,
+                errors.USER.NOT_FOUND
+            )
+        }
+
+        const findCategory = await prisma.category.findUnique({
+            where: {
+                id: categoryId,
+            },
+        })
+
+        if (!findCategory) {
+            throw new ResponseError(
+                errors.HTTP.CODE.NOT_FOUND,
+                errors.HTTP.STATUS.NOT_FOUND,
+                errors.CATEGORY.NOT_FOUND
+            )
+        }
+
+        const validSlug = slug.split(' ').join('-')
+
+        const findSlug = await prisma.blog.findUnique({
+            where: {
+                slug: validSlug,
+            },
+        })
+
+        if (findSlug) {
+            throw new ResponseError(
+                errors.HTTP.CODE.BAD_REQUEST,
+                errors.HTTP.STATUS.BAD_REQUEST,
+                errors.BLOG.SLUG.ALREADY_EXISTS
+            )
+        }
+
+        const result = await prisma.blog.create({
+            data: {
+                category: {
+                    connect: {
+                        id: categoryId,
+                    },
+                },
+                user: {
+                    connect: {
+                        id: userId,
+                    },
+                },
+                title: title,
+                slug: validSlug,
+                description: description,
+                content: content,
+            },
+            select: {
+                id: true,
+                title: true,
+                slug: true,
+            },
+            include: {
+                category: {
+                    select: {
+                        name: true,
+                    },
+                },
+                user: {
+                    select: {
+                        username: true,
+                    },
                 },
             },
-            user: {
-                connect: {
-                    id: request.authorId,
-                },
-            },
-            title: request.title,
-            slug: request.slug,
-            description: request.description,
-            content: request.content,
-        },
-        select: {
-            id: true,
-            title: true,
-            slug: true,
-        },
+        })
+
+        if (!result) {
+            throw new ResponseError(500, 'Internal Server Error', 'Failed to add blog')
+        }
+
+        return result
     })
-
-    if (!result) {
-        throw new ResponseError(500, 'Internal Server Error', 'Failed to add blog')
-    }
-
-    return result
 }
 
-const update = async (request) => {
-    const blog = validate(updateBlogValidationSchema, request)
+const update = async (reqm) => {
+    const blog = validate(updateBlogValidationSchema, req)
 
     const blogData = await prismaClient.blog.findUnique({
         where: {

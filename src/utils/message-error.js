@@ -194,6 +194,41 @@ const orderByErrors = {
     MUST_VALID: 'order by must be asc or desc',
 }
 
+const blogErrors = {
+    TITLE: {
+        IS_REQUIRED: 'title is required',
+        MUST_STRING: 'title must be a string',
+        MUST_MIN: 'title is min 3 characters',
+        MUST_MAX: 'title is max 255 characters',
+        CANNOT_EMPTY: 'title cannot be empty',
+    },
+    IMAGES: {
+        PATH_MUST_STRING: 'images path must be a string',
+        MUST_VALID: 'file format must be PNG, JPG, or JPEG',
+    },
+    SLUG: {
+        IS_REQUIRED: 'slug is required',
+        MUST_STRING: 'slug must be a string',
+        MUST_MIN: 'slug is min 3 characters',
+        MUST_MAX: 'slug is max 100 characters',
+        CANNOT_EMPTY: 'slug cannot be empty',
+        ALREADY_EXISTS: 'slug already exists',
+    },
+    DESCRIPTION: {
+        IS_REQUIRED: 'description is required',
+        MUST_STRING: 'description must be a string',
+        MUST_MIN: 'description is min 3 characters',
+        MUST_MAX: 'description is max 255 characters',
+        CANNOT_EMPTY: 'description cannot be empty',
+    },
+    CONTENT: {
+        IS_REQUIRED: 'content is required',
+        MUST_STRING: 'content must be a string',
+        MUST_MIN: 'content is min 3 characters',
+        CANNOT_EMPTY: 'content cannot be empty',
+    },
+}
+
 const errors = {
     HTTP: httpErrors,
     CATEGORY: categoryErrors,
@@ -211,6 +246,7 @@ const errors = {
     SIZE: sizeErrors,
     AREA: areaErrors,
     COUNTRY: countryErrors,
+    BLOG: blogErrors,
     AUTHORIZATION: 'you are not authorized to access this resource',
     AUTHENTICATION: 'username or password is wrong',
     FORBIDDEN: 'you are not allowed to access this resource',

@@ -22,6 +22,19 @@ const fileStorageAvatar = multer.diskStorage({
     },
 })
 
+const fileStorageBlogImages = multer.diskStorage({
+    destination: async (req, file, cb) => {
+        const path = `public/images/blog`
+        await fs.mkdir(path, { recursive: true })
+
+        cb(null, path)
+    },
+    filename: (req, file, cb) => {
+        const id = nanoid(10)
+        cb(null, id + '-' + file.originalname)
+    },
+})
+
 const fileFilterMiddleware = (req, file, cb) => {
     if (
         file.mimetype === 'image/png' ||
@@ -41,4 +54,4 @@ const fileFilterMiddleware = (req, file, cb) => {
     }
 }
 
-export { fileStorageAvatar, fileFilterMiddleware }
+export { fileStorageAvatar, fileStorageBlogImages, fileFilterMiddleware }
