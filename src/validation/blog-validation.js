@@ -55,13 +55,25 @@ const addBlogValidationSchema = Joi.object({
         }),
 }).unknown(true)
 
-const imagesValidationSchema = Joi.object({
-    path: Joi.string()
-        .optional()
-        .messages({
-            'string.base': `${errors.BLOG.IMAGES.PATH_MUST_STRING}`,
-        }),
-}).unknown(true)
+const imagesValidationSchema = Joi.array()
+    .items(
+        Joi.object()
+            .required()
+            .keys({
+                path: Joi.string()
+                    .required()
+                    .messages({
+                        'string.base': `${errors.BLOG.IMAGES.PATH_MUST_STRING}`,
+                        'string.empty': `${errors.BLOG.IMAGES.CANNOT_EMPTY}`,
+                        'any.required': `${errors.BLOG.IMAGES.IS_REQUIRED}`,
+                    }),
+            })
+            .unknown(true)
+            .error(new Error('images must be an array'))
+    )
+    .min(1)
+    .required()
+    .error(new Error('failed to add image, please upload image with PNG, JPG, or JPEG format'))
 
 const updateBlogValidationSchema = Joi.object({
     authorId: Joi.string().min(3).max(50).optional().messages({
