@@ -17,42 +17,4 @@ const add = async (req, res, next) => {
     }
 }
 
-const getById = async (req, res, next) => {
-    try {
-        const result = await blogService.get(req)
-        responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
-    } catch (e) {
-        next(e)
-    }
-}
-
-const get = async (req, res, next) => {
-    try {
-        const result = await blogService.getAll(req)
-        responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
-    } catch (e) {
-        next(e)
-    }
-}
-
-const update = async (req, res, next) => {
-    try {
-        const result = await blogService.update(req)
-        res.status(success.HTTP.CODE.OK).send(
-            responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
-        )
-    } catch (e) {
-        next(e)
-    }
-}
-
-const remove = async (req, res, next) => {
-    try {
-        const result = await blogService.remove(req)
-        responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
-    } catch (e) {
-        next(e)
-    }
-}
-
-export default { add, getById, get, update, remove }
+export default { add }
