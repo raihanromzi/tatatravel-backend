@@ -18,13 +18,9 @@ blogRouter.use(
         },
         storage: fileStorageBlogImages,
         fileFilter: fileFilterMiddleware,
-    }).array('images', 5)
+    }).any('images')
 )
 
 blogRouter.post('/v1/blogs', blogController.add)
-blogRouter.get('/v1/blogs/:blogId', blogController.getById)
-blogRouter.get('/v1/blogs', blogController.get)
-blogRouter.patch('/v1/blogs', blogController.update)
-blogRouter.delete('/v1/blogs/:blogId', blogController.remove)
 
 export { blogRouter }
