@@ -29,6 +29,9 @@ const success = {
     CATEGORY: {
         DELETE: 'success delete category',
     },
+    BLOG: {
+        DELETE: 'success delete blog',
+    },
 }
 
 export { success }

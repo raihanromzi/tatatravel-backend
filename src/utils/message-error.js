@@ -55,6 +55,7 @@ const userErrors = {
     CANNOT_DELETE_YOURSELF: 'cannot delete yourself',
     FAILED_TO_DELETE_DIRECTORY: 'failed to delete user avatar directory',
     CANNOT_UPDATE_YOURSELF: 'cannot update yourself',
+    FAILED_TO_DELETE_IMAGE: 'failed to delete user avatar',
 }
 
 const roleErrors = {
