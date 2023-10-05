@@ -69,11 +69,11 @@ const imagesValidationSchema = Joi.array()
                     }),
             })
             .unknown(true)
-            .error(new Error('images must be an array'))
+            .error(new Error(`${errors.BLOG.IMAGES.IMAGE_ARRAY}`))
     )
     .min(1)
     .required()
-    .error(new Error('failed to add image, please upload image with PNG, JPG, or JPEG format'))
+    .error(new Error(`${errors.BLOG.IMAGES.MUST_VALID}`))
 
 const idBlogValidationSchema = Joi.object({
     id: Joi.number()
