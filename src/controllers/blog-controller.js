@@ -39,4 +39,19 @@ const get = async (req, res, next) => {
     }
 }
 
-export default { add, getById, get }
+const remove = async (req, res, next) => {
+    try {
+        await blogService.remove(req)
+        res.status(success.HTTP.CODE.OK).send(
+            responses.responseSuccess(
+                success.HTTP.CODE.OK,
+                success.HTTP.STATUS.OK,
+                success.BLOG.DELETE
+            )
+        )
+    } catch (e) {
+        next(e)
+    }
+}
+
+export default { add, getById, get, remove }

@@ -340,4 +340,50 @@ const get = async (req) => {
     })
 }
 
-export default { add, getById, get }
+const remove = async (req) => {
+    const params = validate(idBlogValidationSchema, req.params)
+    const { id } = params
+
+    return prismaClient.$transaction(async (prisma) => {
+        const findBlog = await prisma.blog.findUnique({
+            where: {
+                id: parseInt(id),
+            },
+            select: {
+                id: true,
+                BlogImage: {
+                    select: {
+                        id: true,
+                        image: true,
+                    },
+                },
+            },
+        })
+
+        if (!findBlog) {
+            throw new ResponseError(
+                errors.HTTP.CODE.NOT_FOUND,
+                errors.HTTP.STATUS.NOT_FOUND,
+                errors.BLOG.NOT_FOUND
+            )
+        }
+
+        await prisma.blog.delete({
+            where: {
+                id: parseInt(id),
+            },
+        })
+
+        try {
+            await fs.rm(`public/images/blog/${id}`, { recursive: true, force: true })
+        } catch (error) {
+            throw new ResponseError(
+                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                errors.BLOG.FAILED_TO_DELETE_DIRECTORY
+            )
+        }
+    })
+}
+
+export default { add, getById, get, remove }

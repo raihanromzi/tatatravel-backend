@@ -24,5 +24,6 @@ blogRouter.use(
 blogRouter.post('/v1/blogs', blogController.add)
 blogRouter.get('/v1/blogs/:id', blogController.getById)
 blogRouter.get('/v1/blogs', blogController.get)
+blogRouter.delete('/v1/blogs/:id', blogController.remove)
 
 export { blogRouter }
