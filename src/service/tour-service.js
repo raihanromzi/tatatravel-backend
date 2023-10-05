@@ -8,8 +8,8 @@ import {
     updateTourValidationSchema,
 } from '../validation/tour-validation.js'
 
-const add = async (request) => {
-    const tour = validate(addTourValidationSchema, request)
+const add = async (req) => {
+    const tour = validate(addTourValidationSchema, req)
 
     const result = prismaClient.tour.create({
         data: {
@@ -36,8 +36,8 @@ const add = async (request) => {
     return result
 }
 
-const updateTour = async (request) => {
-    const tour = validate(updateTourValidationSchema, request)
+const update = async (req) => {
+    const tour = validate(updateTourValidationSchema, req)
 
     const result = prismaClient.tour.update({
         where: {
@@ -67,8 +67,8 @@ const updateTour = async (request) => {
     return result
 }
 
-const getTour = async (id) => {
-    const tourId = validate(getTourValidationSchema, id)
+const get = async (req) => {
+    const tourId = validate(getTourValidationSchema, req)
 
     const result = prismaClient.tour.findUnique({
         where: {
@@ -91,8 +91,8 @@ const getTour = async (id) => {
     return result
 }
 
-const deleteTour = async (id) => {
-    const tourId = validate(deleteTourValidationSchema, id)
+const remove = async (req) => {
+    const tourId = validate(deleteTourValidationSchema, req)
 
     const result = prismaClient.tour.delete({
         where: {
@@ -107,4 +107,4 @@ const deleteTour = async (id) => {
     return result
 }
 
-export default { add, updateTour, getTour, deleteTour }
+export default { add, update, get, remove }

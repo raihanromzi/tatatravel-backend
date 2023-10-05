@@ -3,37 +3,43 @@ import tourService from '../service/tour-service.js'
 
 const add = async (req, res, next) => {
     try {
-        const result = await tourService.add(req.body)
+        const result = await tourService.add(req)
         res.status(201).send(responses.responseSuccess(201, 'CREATED', result))
     } catch (e) {
         next(e)
     }
 }
 
-const updateTour = async (req, res, next) => {
+const update = async (req, res, next) => {
     try {
-        const request = req.body
-        const result = await tourService.updateTour(request)
+        const result = await tourService.update(req)
         res.status(200).send(responses.responseSuccess(200, 'OK', result))
     } catch (e) {
         next(e)
     }
 }
 
-const getTour = async (req, res, next) => {
+const get = async (req, res, next) => {
     try {
-        const result = await tourService.getTour()
+        const result = await tourService.get()
         res.status(200).send(responses.responseSuccess(200, 'OK', result))
     } catch (e) {
         next(e)
     }
 }
 
-const deleteTour = async (req, res, next) => {
+const remove = async (req, res, next) => {
     try {
-        const result = await tourService.deleteTour(req.params.id)
+        const result = await tourService.remove(req)
         res.status(200).send(responses.responseSuccess(200, 'OK', result))
     } catch (e) {
         next(e)
     }
+}
+
+export default {
+    add,
+    update,
+    get,
+    remove,
 }
