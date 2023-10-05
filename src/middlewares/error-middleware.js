@@ -1,4 +1,4 @@
-import { ResponseError } from '../utils/response-error.js'
+import { MulterError, ResponseError } from '../utils/response-error.js'
 import response from '../utils/response-api.js'
 import { errors } from '../utils/message-error.js'
 
@@ -22,6 +22,12 @@ const errorMiddleware = async (err, req, res, next) => {
                     errors.AVATAR.MUST_LESS_THAN_2MB
                 )
             )
+            .end()
+    } else if (err instanceof MulterError) {
+        // handle multer error
+        await err.deleteImages()
+        res.status(err.code)
+            .send(response.responseError(err.code, err.status, err.message))
             .end()
     } else {
         res.status(errors.HTTP.CODE.INTERNAL_SERVER_ERROR)

@@ -7,9 +7,7 @@ import { nanoid } from 'nanoid'
 const fileStorageAvatar = multer.diskStorage({
     destination: async (req, file, cb) => {
         const path = `public/images/avatar/${req.user.id}`
-
         await fs.mkdir(path, { recursive: true })
-
         const oldAvatar = await fs.readdir(`public/images/avatar/${req.user.id}`)
 
         for (const avatar of oldAvatar) {
@@ -33,6 +31,7 @@ const fileStorageBlogImages = multer.diskStorage({
     },
     filename: (req, file, cb) => {
         const id = nanoid(10)
+
         cb(null, id + '-' + file.originalname)
     },
 })
