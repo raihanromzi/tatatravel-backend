@@ -245,7 +245,7 @@ const getById = async (req) => {
             },
         })
 
-        if (!result) {
+        if (result.length === 0) {
             throw new ResponseError(
                 errors.HTTP.CODE.NOT_FOUND,
                 errors.HTTP.STATUS.NOT_FOUND,
