@@ -206,9 +206,10 @@ const blogErrors = {
     },
     IMAGES: {
         PATH_MUST_STRING: 'images path must be a string',
-        MUST_VALID: 'file format must be PNG, JPG, or JPEG',
+        MUST_VALID: 'failed to add image, please upload image with PNG, JPG, or JPEG format',
         IS_REQUIRED: 'minimum 1 image is required',
         IMAGE_NOT_VALID: 'image is not valid, please upload image with PNG, JPG, or JPEG format',
+        IMAGE_ARRAY: 'images must be an array',
     },
     SLUG: {
         IS_REQUIRED: 'slug is required',
@@ -245,6 +246,59 @@ const blogErrors = {
     FAILED_TO_FIND_DIRECTORY: 'failed to find blog images directory',
 }
 
+const tourErrors = {
+    NAME: {
+        IS_REQUIRED: 'tour name is required',
+        MUST_STRING: 'tour name must be a string',
+        MUST_MIN: 'tour name is min 3 characters',
+        MUST_MAX: 'tour name is max 255 characters',
+        CANNOT_EMPTY: 'tour name cannot be empty',
+    },
+    PRICE: {
+        IS_REQUIRED: 'price is required',
+        MUST_STRING: 'price must be a string',
+        MUST_MIN: 'price is min 3 characters',
+        MUST_MAX: 'price is max 255 characters',
+        CANNOT_EMPTY: 'price cannot be empty',
+    },
+    DATE_START: {
+        IS_REQUIRED: 'date start is required',
+        MUST_NUMBER: 'date start must be a number',
+        MUST_POSITIVE: 'date start must be a positive number',
+        CANNOT_EMPTY: 'date start cannot be empty',
+    },
+    DATE_END: {
+        IS_REQUIRED: 'date end is required',
+        MUST_NUMBER: 'date end must be a number',
+        MUST_POSITIVE: 'date end must be a positive number',
+        CANNOT_EMPTY: 'date end cannot be empty',
+    },
+    DESCRIPTION: {
+        IS_REQUIRED: 'description is required',
+        MUST_STRING: 'description must be a string',
+        MUST_MIN: 'description is min 3 characters',
+        MUST_MAX: 'description is max 255 characters',
+        CANNOT_EMPTY: 'description cannot be empty',
+    },
+    PLACE: {
+        NAME: {
+            IS_REQUIRED: 'place name is required',
+            MUST_STRING: 'place name must be a string',
+            MUST_MIN: 'place name is min 3 characters',
+            MUST_MAX: 'place name is max 100 characters',
+            CANNOT_EMPTY: 'place name cannot be empty',
+        },
+        IS_REQUIRED: 'place is required',
+    },
+    IMAGES: {
+        PATH_MUST_STRING: 'images path must be a string',
+        IMAGE_NOT_VALID: 'image is not valid, please upload image with PNG, JPG, or JPEG format',
+        IMAGE_ARRAY: 'images must be an array',
+        CANNOT_EMPTY: 'minimum 1 image is required',
+        IS_REQUIRED: 'images is required',
+    },
+}
+
 const errors = {
     HTTP: httpErrors,
     CATEGORY: categoryErrors,
@@ -263,6 +317,11 @@ const errors = {
     AREA: areaErrors,
     COUNTRY: countryErrors,
     BLOG: blogErrors,
+    TOUR: tourErrors,
+    IMAGES: {
+        MUST_VALID: 'image must valid, please upload image with PNG, JPG, or JPEG format',
+        ARRAY: 'images must be an array',
+    },
     AUTHORIZATION: 'you are not authorized to access this resource',
     AUTHENTICATION: 'username or password is wrong',
     FORBIDDEN: 'you are not allowed to access this resource',
