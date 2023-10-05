@@ -10,6 +10,7 @@ import { countryRouter } from '../routes/country-route.js'
 import { roleRouter } from '../routes/role-route.js'
 import { categoryRouter } from '../routes/category-route.js'
 import { blogRouter } from '../routes/blog-route.js'
+import { tourRouter } from '../routes/tour-route.js'
 
 const web = express()
 
@@ -19,6 +20,7 @@ web.use(express.static('public', { etag: true }))
 web.use(cookieParser())
 
 web.use(publicRouter)
+web.use(tourRouter)
 web.use(blogRouter)
 web.use(tokenRouter)
 web.use(userRouter)
