@@ -157,6 +157,9 @@ const getById = async (req) => {
             where: {
                 id: areaId,
             },
+            select: {
+                name: true,
+            },
         })
 
         if (!area) {
@@ -167,24 +170,7 @@ const getById = async (req) => {
             )
         }
 
-        const result = await prisma.area.findUnique({
-            where: {
-                id: areaId,
-            },
-            select: {
-                name: true,
-            },
-        })
-
-        if (!result) {
-            throw new ResponseError(
-                errors.HTTP.CODE.NOT_FOUND,
-                errors.HTTP.STATUS.NOT_FOUND,
-                errors.AREA.NOT_FOUND
-            )
-        }
-
-        return result
+        return area
     })
 }
 
