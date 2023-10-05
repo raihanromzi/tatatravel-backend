@@ -17,4 +17,26 @@ const add = async (req, res, next) => {
     }
 }
 
-export default { add }
+const getById = async (req, res, next) => {
+    try {
+        const result = await blogService.getById(req)
+        res.status(success.HTTP.CODE.OK).send(
+            responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
+        )
+    } catch (e) {
+        next(e)
+    }
+}
+
+const get = async (req, res, next) => {
+    try {
+        const result = await blogService.get(req)
+        res.status(success.HTTP.CODE.OK).send(
+            responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
+        )
+    } catch (e) {
+        next(e)
+    }
+}
+
+export default { add, getById, get }
