@@ -1,5 +1,10 @@
 import { validate } from '../validation/validation.js'
-import { addBlogValidationSchema, imagesValidationSchema } from '../validation/blog-validation.js'
+import {
+    addBlogValidationSchema,
+    idBlogValidationSchema,
+    imagesValidationSchema,
+    searchBlogValidationSchema,
+} from '../validation/blog-validation.js'
 import { MulterError, ResponseError } from '../utils/response-error.js'
 import { prismaClient } from '../application/database.js'
 import { errors } from '../utils/message-error.js'
@@ -45,6 +50,17 @@ const add = async (req) => {
                 errors.HTTP.CODE.NOT_FOUND,
                 errors.HTTP.STATUS.NOT_FOUND,
                 errors.CATEGORY.NOT_FOUND,
+                blogImages
+            )
+        }
+
+        const { isActive } = findCategory
+
+        if (isActive === false) {
+            throw new MulterError(
+                errors.HTTP.CODE.BAD_REQUEST,
+                errors.HTTP.STATUS.BAD_REQUEST,
+                errors.CATEGORY.NOT_ACTIVE,
                 blogImages
             )
         }
@@ -189,4 +205,139 @@ const add = async (req) => {
     })
 }
 
-export default { add }
+const getById = async (req) => {
+    const params = validate(idBlogValidationSchema, req.params)
+
+    const { id } = params
+
+    return prismaClient.$transaction(async (prisma) => {
+        const result = await prisma.blog.findMany({
+            where: {
+                id: parseInt(id),
+            },
+            select: {
+                title: true,
+                slug: true,
+                description: true,
+                content: true,
+                BlogImage: {
+                    select: {
+                        image: true,
+                    },
+                },
+                user: {
+                    select: {
+                        fullName: true,
+                        username: true,
+                        avatar: true,
+                    },
+                },
+                category: {
+                    select: {
+                        name: true,
+                    },
+                },
+            },
+        })
+
+        if (!result) {
+            throw new ResponseError(
+                errors.HTTP.CODE.NOT_FOUND,
+                errors.HTTP.STATUS.NOT_FOUND,
+                errors.BLOG.NOT_FOUND
+            )
+        }
+
+        return result
+    })
+}
+
+const get = async (req) => {
+    const query = validate(searchBlogValidationSchema, req.query)
+    const { page, size, sortBy, orderBy, title, description } = query
+    const skip = (page - 1) * size
+    const filters = []
+
+    if (sortBy) {
+        if (
+            sortBy !== 'id' &&
+            sortBy !== 'title' &&
+            sortBy !== 'slug' &&
+            sortBy !== 'description' &&
+            sortBy !== 'content'
+        ) {
+            throw new ResponseError(
+                errors.HTTP.CODE.BAD_REQUEST,
+                errors.HTTP.STATUS.BAD_REQUEST,
+                errors.SORT_BY.MUST_VALID
+            )
+        }
+    }
+
+    if (title) {
+        filters.push({
+            title: {
+                contains: title,
+            },
+        })
+    }
+
+    if (description) {
+        filters.push({
+            description: {
+                contains: description,
+            },
+        })
+    }
+
+    return prismaClient.$transaction(async (prisma) => {
+        const blogs = await prisma.blog.findMany({
+            where: {
+                AND: filters,
+            },
+            select: {
+                title: true,
+                description: true,
+                BlogImage: {
+                    select: {
+                        image: true,
+                    },
+                },
+                user: {
+                    select: {
+                        fullName: true,
+                        username: true,
+                        avatar: true,
+                    },
+                },
+                category: {
+                    select: {
+                        name: true,
+                    },
+                },
+            },
+            take: size,
+            skip: skip,
+            orderBy: {
+                [sortBy]: orderBy,
+            },
+        })
+
+        const totalItems = await prisma.blog.count({
+            where: {
+                AND: filters,
+            },
+        })
+
+        return {
+            data: blogs,
+            pagination: {
+                page: page,
+                total_item: totalItems,
+                total_page: Math.ceil(totalItems / size),
+            },
+        }
+    })
+}
+
+export default { add, getById, get }
