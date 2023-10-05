@@ -75,49 +75,62 @@ const imagesValidationSchema = Joi.array()
     .required()
     .error(new Error('failed to add image, please upload image with PNG, JPG, or JPEG format'))
 
-const updateBlogValidationSchema = Joi.object({
-    authorId: Joi.string().min(3).max(50).optional().messages({
-        'string.base': 'author must be a string',
-        'string.min': 'min 3 characters',
-        'string.max': 'max 50 characters',
-    }),
-    categoryId: Joi.string().min(3).max(50).optional().messages({
-        'string.base': 'category must be a string',
-        'string.min': 'min 3 characters',
-        'string.max': 'max 50 characters',
-    }),
-    title: Joi.string().min(3).max(255).optional().messages({
-        'string.base': 'title must be a string',
-        'string.min': 'min 3 characters',
-        'string.max': 'max 255 characters',
-    }),
-    slug: Joi.string().min(3).max(100).optional().messages({
-        'string.base': 'slug must be a string',
-        'string.min': 'min 3 characters',
-        'string.max': 'max 100 characters',
-    }),
-    description: Joi.string().min(3).max(255).optional().messages({
-        'string.base': 'description must be a string',
-        'string.min': 'min 3 characters',
-        'string.max': 'max 255 characters',
-    }),
-    content: Joi.string().min(3).optional().messages({
-        'string.base': 'content must be a string',
-        'string.min': 'min 3 characters',
-    }),
+const idBlogValidationSchema = Joi.object({
+    id: Joi.number()
+        .positive()
+        .required()
+        .messages({
+            'number.base': `${errors.BLOG.ID.MUST_NUMBER}`,
+            'number.empty': `${errors.BLOG.ID.CANNOT_EMPTY}`,
+            'number.positive': `${errors.BLOG.ID.MUST_POSITIVE}`,
+            'any.required': `${errors.BLOG.ID.IS_REQUIRED}`,
+        }),
 }).unknown(true)
 
-const deleteBlogValidationSchema = Joi.object({
-    id: Joi.number().positive().required().messages({
-        'number.base': 'id must be a number',
-        'number.positive': 'id must be a positive number',
-        'any.required': 'id is required!',
+const searchBlogValidationSchema = Joi.object({
+    page: Joi.number().min(1).positive().default(1).messages({
+        'number.base': errors.PAGE.MUST_NUMBER,
+        'number.empty': errors.PAGE.CANNOT_EMPTY,
+        'number.positive': errors.PAGE.MUST_POSITIVE,
     }),
+    size: Joi.number().min(1).positive().max(100).default(10).messages({
+        'number.base': errors.SIZE.MUST_NUMBER,
+        'number.empty': errors.SIZE.CANNOT_EMPTY,
+        'number.positive': errors.SIZE.MUST_POSITIVE,
+    }),
+    sortBy: Joi.string()
+        .optional()
+        .default('id')
+        .messages({
+            'string.base': `${errors.SORT_BY.MUST_STRING}`,
+        }),
+    orderBy: Joi.string()
+        .valid('asc', 'desc')
+        .optional()
+        .default('asc')
+        .messages({
+            'string.base': `${errors.ORDER_BY.MUST_STRING}`,
+            'any.valid': `${errors.ORDER_BY.MUST_VALID}`,
+        }),
+    title: Joi.string()
+        .max(255)
+        .optional()
+        .messages({
+            'string.base': `${errors.BLOG.TITLE.MUST_STRING}`,
+            'string.max': `${errors.BLOG.TITLE.MUST_MAX}`,
+        }),
+    description: Joi.string()
+        .max(255)
+        .optional()
+        .messages({
+            'string.base': `${errors.BLOG.DESCRIPTION.MUST_STRING}`,
+            'string.max': `${errors.BLOG.DESCRIPTION.MUST_MAX}`,
+        }),
 }).unknown(true)
 
 export {
     addBlogValidationSchema,
     imagesValidationSchema,
-    updateBlogValidationSchema,
-    deleteBlogValidationSchema,
+    idBlogValidationSchema,
+    searchBlogValidationSchema,
 }
