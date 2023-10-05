@@ -9,6 +9,7 @@ import { MulterError, ResponseError } from '../utils/response-error.js'
 import { prismaClient } from '../application/database.js'
 import { errors } from '../utils/message-error.js'
 import fs from 'fs/promises'
+import { logger } from '../application/logging.js'
 
 const add = async (req) => {
     const blog = validate(addBlogValidationSchema, req.body)
@@ -124,10 +125,11 @@ const add = async (req) => {
         })
 
         if (!newBlog) {
-            throw new ResponseError(
+            throw new MulterError(
                 errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
                 errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                errors.BLOG.FAILED_ADD
+                errors.BLOG.FAILED_ADD,
+                blogImages
             )
         }
 
@@ -147,10 +149,11 @@ const add = async (req) => {
         try {
             await fs.mkdir(`public/images/blog/${id}`, { recursive: true })
         } catch (error) {
-            throw new ResponseError(
+            throw new MulterError(
                 errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
                 errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                errors.BLOG.FAILED_TO_CREATE_DIRECTORY
+                errors.BLOG.FAILED_TO_CREATE_DIRECTORY,
+                blogImages
             )
         }
 
@@ -184,17 +187,19 @@ const add = async (req) => {
 
                     return deleteBlogAndImages()
                         .then(() => {
-                            throw new ResponseError(
+                            throw new MulterError(
                                 errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
                                 errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                                errors.BLOG.FAILED_ADD
+                                errors.BLOG.FAILED_ADD,
+                                blogImages
                             )
                         })
                         .catch((error) => {
-                            throw new ResponseError(
+                            throw new MulterError(
                                 errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
                                 errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                                error
+                                error,
+                                blogImages
                             )
                         })
                 }
@@ -386,4 +391,207 @@ const remove = async (req) => {
     })
 }
 
-export default { add, getById, get, remove }
+const update = async (req) => {
+    const params = validate(idBlogValidationSchema, req.params)
+    const blog = validate(addBlogValidationSchema, req.body)
+    const images = validate(imagesValidationSchema, req.files)
+    const blogImages = images.map((image) => {
+        return {
+            id: null,
+            filename: image.filename,
+            path: image.path,
+        }
+    })
+    const { categoryId, title, slug, description, content } = blog
+    const { id: blogId } = params
+    const data = {}
+
+    if (title) {
+        data.title = title
+    }
+
+    if (description) {
+        data.description = description
+    }
+
+    if (content) {
+        data.content = content
+    }
+
+    if (slug) {
+        data.slug = slug
+    }
+
+    if (images) {
+        data.BlogImage = {
+            createMany: {
+                data: blogImages.map((image) => {
+                    const { path } = image
+                    return {
+                        image: path,
+                    }
+                }),
+            },
+        }
+    }
+
+    return prismaClient.$transaction(async (prisma) => {
+        const findBlog = await prisma.blog.findUnique({
+            where: {
+                id: parseInt(blogId),
+            },
+        })
+
+        if (!findBlog) {
+            throw new MulterError(
+                errors.HTTP.CODE.NOT_FOUND,
+                errors.HTTP.STATUS.NOT_FOUND,
+                errors.BLOG.NOT_FOUND,
+                blogImages
+            )
+        }
+
+        const findCategory = await prisma.category.findUnique({
+            where: {
+                id: categoryId,
+            },
+        })
+
+        if (!findCategory) {
+            throw new MulterError(
+                errors.HTTP.CODE.NOT_FOUND,
+                errors.HTTP.STATUS.NOT_FOUND,
+                errors.CATEGORY.NOT_FOUND,
+                blogImages
+            )
+        }
+
+        const { isActive } = findCategory
+
+        if (isActive === false) {
+            throw new MulterError(
+                errors.HTTP.CODE.BAD_REQUEST,
+                errors.HTTP.STATUS.BAD_REQUEST,
+                errors.CATEGORY.NOT_ACTIVE,
+                blogImages
+            )
+        }
+
+        const validSlug = slug.split(' ').join('-')
+
+        const findSlug = await prisma.blog.findUnique({
+            where: {
+                slug: validSlug,
+                NOT: {
+                    id: parseInt(blogId),
+                },
+            },
+        })
+
+        if (findSlug) {
+            throw new MulterError(
+                errors.HTTP.CODE.BAD_REQUEST,
+                errors.HTTP.STATUS.BAD_REQUEST,
+                errors.BLOG.SLUG.ALREADY_EXISTS,
+                blogImages
+            )
+        }
+
+        try {
+            await fs.access(`public/images/blog/${blogId}`)
+        } catch (error) {
+            throw new MulterError(
+                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                errors.BLOG.FAILED_TO_FIND_DIRECTORY,
+                blogImages
+            )
+        }
+
+        const updatedBlog = await prisma.blog.update({
+            where: {
+                id: parseInt(blogId),
+            },
+            data: data,
+            select: {
+                id: true,
+                BlogImage: {
+                    select: {
+                        id: true,
+                        image: true,
+                    },
+                },
+                title: true,
+                slug: true,
+                description: true,
+            },
+        })
+
+        if (!updatedBlog) {
+            throw new MulterError(
+                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                errors.BLOG.FAILED_UPDATE,
+                blogImages
+            )
+        }
+
+        for (const image in updatedBlog.BlogImage) {
+            logger.info(`masuk pak eko 1`)
+            logger.info(updatedBlog.BlogImage[image])
+        }
+
+        for (const image of blogImages) {
+            logger.info(`masuk pak eko 2`)
+            logger.info(image)
+        }
+
+        for (const image in updatedBlog.BlogImage) {
+            const { id, image: path } = updatedBlog.BlogImage[image]
+            for (const image of blogImages) {
+                if (image.id === null) {
+                    if (image.path === path) {
+                        image.id = id
+                    }
+                }
+            }
+        }
+
+        for (const image of blogImages) {
+            logger.info(`masuk pak eko 3`)
+            logger.info(image)
+        }
+
+        await Promise.all(
+            blogImages.map(async (image) => {
+                const { path, filename, id: imageBlogId } = image
+                const oldPath = path
+                const newPath = `public/images/blog/${blogId}/${filename}`
+
+                try {
+                    await fs.rename(oldPath, newPath)
+                    await prisma.blogImage.update({
+                        where: {
+                            id: imageBlogId,
+                        },
+                        data: {
+                            image: newPath,
+                        },
+                    })
+
+                    return newPath
+                } catch (e) {
+                    throw new ResponseError(
+                        errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                        errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                        errors.BLOG.FAILED_UPDATE
+                    )
+                }
+            })
+        )
+
+        return updatedBlog
+    })
+}
+
+export default { add, getById, get, remove, update }

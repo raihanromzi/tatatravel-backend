@@ -242,6 +242,7 @@ const blogErrors = {
     FAILED_DELETE: 'failed to delete blog',
     NOT_FOUND: 'blog is not found',
     FAILED_TO_CREATE_DIRECTORY: 'failed to create blog images directory',
+    FAILED_TO_FIND_DIRECTORY: 'failed to find blog images directory',
 }
 
 const errors = {

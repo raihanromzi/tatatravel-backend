@@ -54,4 +54,15 @@ const remove = async (req, res, next) => {
     }
 }
 
-export default { add, getById, get, remove }
+const update = async (req, res, next) => {
+    try {
+        const result = await blogService.update(req)
+        res.status(success.HTTP.CODE.OK).send(
+            responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
+        )
+    } catch (e) {
+        next(e)
+    }
+}
+
+export default { add, getById, get, remove, update }
