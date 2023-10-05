@@ -97,11 +97,11 @@ model Country {
 
 model Tour {
   id          Int           @id @default(autoincrement())
-  name        String        @db.VarChar(100)
+  name        String        @db.VarChar(255)
   price       String        @db.VarChar(255)
-  dateStart   String        @db.VarChar(255)
-  dateEnd     String        @db.VarChar(255)
-  duration    String        @db.VarChar(255)
+  dateStart   Int           @db.Int
+  dateEnd     Int           @db.Int
+  duration    Int           @db.Int
   description String?       @db.VarChar(255)
   isActive    Boolean       @default(true)
   createdAt   DateTime      @default(now())
