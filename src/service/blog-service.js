@@ -1,6 +1,6 @@
 import { validate } from '../validation/validation.js'
 import { addBlogValidationSchema, imagesValidationSchema } from '../validation/blog-validation.js'
-import { ResponseError } from '../utils/response-error.js'
+import { MulterError, ResponseError } from '../utils/response-error.js'
 import { prismaClient } from '../application/database.js'
 import { errors } from '../utils/message-error.js'
 import fs from 'fs/promises'
@@ -9,7 +9,11 @@ const add = async (req) => {
     const blog = validate(addBlogValidationSchema, req.body)
     const images = validate(imagesValidationSchema, req.files)
     const blogImages = images.map((image) => {
-        return image.path
+        return {
+            id: null,
+            filename: image.filename,
+            path: image.path,
+        }
     })
     const { id: userId } = req.user
     const { categoryId, title, slug, description, content } = blog
@@ -22,10 +26,11 @@ const add = async (req) => {
         })
 
         if (!findUser) {
-            throw new ResponseError(
+            throw new MulterError(
                 errors.HTTP.CODE.NOT_FOUND,
                 errors.HTTP.STATUS.NOT_FOUND,
-                errors.USER.NOT_FOUND
+                errors.USER.NOT_FOUND,
+                blogImages
             )
         }
 
@@ -36,10 +41,11 @@ const add = async (req) => {
         })
 
         if (!findCategory) {
-            throw new ResponseError(
+            throw new MulterError(
                 errors.HTTP.CODE.NOT_FOUND,
                 errors.HTTP.STATUS.NOT_FOUND,
-                errors.CATEGORY.NOT_FOUND
+                errors.CATEGORY.NOT_FOUND,
+                blogImages
             )
         }
 
@@ -52,10 +58,11 @@ const add = async (req) => {
         })
 
         if (findSlug) {
-            throw new ResponseError(
+            throw new MulterError(
                 errors.HTTP.CODE.BAD_REQUEST,
                 errors.HTTP.STATUS.BAD_REQUEST,
-                errors.BLOG.SLUG.ALREADY_EXISTS
+                errors.BLOG.SLUG.ALREADY_EXISTS,
+                blogImages
             )
         }
 
@@ -75,9 +82,25 @@ const add = async (req) => {
                 slug: validSlug,
                 description: description,
                 content: content,
+                BlogImage: {
+                    createMany: {
+                        data: blogImages.map((image) => {
+                            const { path } = image
+                            return {
+                                image: path,
+                            }
+                        }),
+                    },
+                },
             },
             select: {
                 id: true,
+                BlogImage: {
+                    select: {
+                        id: true,
+                        image: true,
+                    },
+                },
                 title: true,
                 slug: true,
                 description: true,
@@ -92,30 +115,55 @@ const add = async (req) => {
             )
         }
 
+        for (const image in newBlog.BlogImage) {
+            const { id, image: path } = newBlog.BlogImage[image]
+            for (const image of blogImages) {
+                if (image.id === null) {
+                    if (image.path === path) {
+                        image.id = id
+                    }
+                }
+            }
+        }
+
         const { id } = newBlog
 
-        await fs.mkdir(`public/images/blog/${id}`, { recursive: true })
+        try {
+            await fs.mkdir(`public/images/blog/${id}`, { recursive: true })
+        } catch (error) {
+            throw new ResponseError(
+                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                errors.BLOG.FAILED_TO_CREATE_DIRECTORY
+            )
+        }
 
-        const blogImagesNewPath = await Promise.all(
+        await Promise.all(
             blogImages.map(async (image) => {
-                const oldPath = image
-
-                const newPath = `public/images/blog/${id}/${image.split('/')[3]}`
+                const { path, filename, id: imageBlogId } = image
+                const oldPath = path
+                const newPath = `public/images/blog/${id}/${filename}`
 
                 try {
                     await fs.rename(oldPath, newPath)
+                    await prisma.blogImage.update({
+                        where: {
+                            id: imageBlogId,
+                        },
+                        data: {
+                            image: newPath,
+                        },
+                    })
                     return newPath
                 } catch (e) {
                     const deleteBlogAndImages = async () => {
-                        await fs.rmdir(`public/images/blog/${id}`)
-                        await prisma.blog.delete({
+                        await fs.rm(`public/images/blog/${id}`, { recursive: true, force: true })
+                        await prisma.blog.deleteMany({
                             where: {
                                 id: id,
                             },
                         })
-                        for (const image of blogImages) {
-                            await fs.unlink(image)
-                        }
+                        await fs.rm(oldPath, { recursive: true, force: true })
                     }
 
                     return deleteBlogAndImages()
@@ -136,33 +184,6 @@ const add = async (req) => {
                 }
             })
         )
-
-        const newImages = await prisma.blogImage.createMany({
-            data: await Promise.all(
-                blogImagesNewPath.map((image) => {
-                    return {
-                        blogId: id,
-                        image: image,
-                    }
-                })
-            ),
-        })
-
-        if (!newImages) {
-            await prisma.blog.delete({
-                where: {
-                    id: id,
-                },
-            })
-
-            await fs.rmdir(`public/images/blog/${id}`)
-
-            throw new ResponseError(
-                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                errors.BLOG.FAILED_ADD
-            )
-        }
 
         return newBlog
     })

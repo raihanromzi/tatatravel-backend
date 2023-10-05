@@ -230,6 +230,10 @@ const blogErrors = {
         CANNOT_EMPTY: 'content cannot be empty',
     },
     FAILED_ADD: 'failed to add blog',
+    FAILED_UPDATE: 'failed to update blog',
+    FAILED_DELETE: 'failed to delete blog',
+    NOT_FOUND: 'blog is not found',
+    FAILED_TO_CREATE_DIRECTORY: 'failed to create blog images directory',
 }
 
 const errors = {
