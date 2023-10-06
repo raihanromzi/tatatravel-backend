@@ -9,7 +9,6 @@ import { MulterError, ResponseError } from '../utils/response-error.js'
 import { prismaClient } from '../application/database.js'
 import { errors } from '../utils/message-error.js'
 import fs from 'fs/promises'
-import { logger } from '../application/logging.js'
 
 const add = async (req) => {
     const blog = validate(addBlogValidationSchema, req.body)
@@ -211,9 +210,7 @@ const add = async (req) => {
 }
 
 const getById = async (req) => {
-    const params = validate(idBlogValidationSchema, req.params)
-
-    const { id } = params
+    const { id } = validate(idBlogValidationSchema, req.params)
 
     return prismaClient.$transaction(async (prisma) => {
         const result = await prisma.blog.findMany({
@@ -346,8 +343,7 @@ const get = async (req) => {
 }
 
 const remove = async (req) => {
-    const params = validate(idBlogValidationSchema, req.params)
-    const { id } = params
+    const { id } = validate(idBlogValidationSchema, req.params)
 
     return prismaClient.$transaction(async (prisma) => {
         const findBlog = await prisma.blog.findUnique({
@@ -537,16 +533,6 @@ const update = async (req) => {
         }
 
         for (const image in updatedBlog.BlogImage) {
-            logger.info(`masuk pak eko 1`)
-            logger.info(updatedBlog.BlogImage[image])
-        }
-
-        for (const image of blogImages) {
-            logger.info(`masuk pak eko 2`)
-            logger.info(image)
-        }
-
-        for (const image in updatedBlog.BlogImage) {
             const { id, image: path } = updatedBlog.BlogImage[image]
             for (const image of blogImages) {
                 if (image.id === null) {
@@ -555,11 +541,6 @@ const update = async (req) => {
                     }
                 }
             }
-        }
-
-        for (const image of blogImages) {
-            logger.info(`masuk pak eko 3`)
-            logger.info(image)
         }
 
         await Promise.all(
