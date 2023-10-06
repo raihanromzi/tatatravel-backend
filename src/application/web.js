@@ -11,13 +11,24 @@ import { roleRouter } from '../routes/role-route.js'
 import { categoryRouter } from '../routes/category-route.js'
 import { blogRouter } from '../routes/blog-route.js'
 import { tourRouter } from '../routes/tour-route.js'
+import multer from 'multer'
+import { fileFilterMiddleware, fileStorageImages } from '../middlewares/multer-middleware.js'
 
 const web = express()
 
 web.use(express.json())
-web.use(express.urlencoded({ extended: true }))
+web.use(express.urlencoded({ extended: false }))
 web.use(express.static('public', { etag: true }))
 web.use(cookieParser())
+web.use(
+    multer({
+        limits: {
+            fileSize: 1024 * 1024 * 5, // 5MB
+        },
+        storage: fileStorageImages,
+        fileFilter: fileFilterMiddleware,
+    }).any('images')
+)
 
 web.use(publicRouter)
 web.use(tourRouter)
