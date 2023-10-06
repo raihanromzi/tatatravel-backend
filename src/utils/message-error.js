@@ -247,6 +247,12 @@ const blogErrors = {
 }
 
 const tourErrors = {
+    ID: {
+        IS_REQUIRED: 'tour id is required',
+        MUST_NUMBER: 'tour id must be a number',
+        MUST_POSITIVE: 'tour id must be a positive number',
+        CANNOT_EMPTY: 'tour id cannot be empty',
+    },
     NAME: {
         IS_REQUIRED: 'tour name is required',
         MUST_STRING: 'tour name must be a string',
@@ -297,6 +303,9 @@ const tourErrors = {
         CANNOT_EMPTY: 'minimum 1 image is required',
         IS_REQUIRED: 'images is required',
     },
+    NOT_FOUND: 'tour is not found',
+    FAILED_TO_DELETE_DIRECTORY: 'failed to delete tour images directory',
+    IS_NOT_ACTIVE: 'tour is not active',
 }
 
 const errors = {

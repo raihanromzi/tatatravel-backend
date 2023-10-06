@@ -32,6 +32,9 @@ const success = {
     BLOG: {
         DELETE: 'success delete blog',
     },
+    TOUR: {
+        DELETE: 'success delete tour',
+    },
 }
 
 export { success }
