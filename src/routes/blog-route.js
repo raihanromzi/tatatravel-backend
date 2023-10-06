@@ -4,20 +4,9 @@ import {
     accessTokenVerifyMiddleware,
     refreshTokenVerifyMiddleware,
 } from '../middlewares/token-middleware.js'
-import multer from 'multer'
-import { fileFilterMiddleware, fileStorageBlogImages } from '../middlewares/multer-middleware.js'
 
 const blogRouter = express.Router()
 
-blogRouter.use(
-    multer({
-        limits: {
-            fileSize: 1024 * 1024 * 5, // 5MB
-        },
-        storage: fileStorageBlogImages,
-        fileFilter: fileFilterMiddleware,
-    }).any('images')
-)
 blogRouter.use(accessTokenVerifyMiddleware)
 blogRouter.use(refreshTokenVerifyMiddleware)
 
