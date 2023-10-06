@@ -4,41 +4,9 @@ import { ResponseError } from '../utils/response-error.js'
 import * as fs from 'fs/promises'
 import { nanoid } from 'nanoid'
 
-const fileStorageAvatar = multer.diskStorage({
+const fileStorageImages = multer.diskStorage({
     destination: async (req, file, cb) => {
-        const path = `public/images/avatar/${req.user.id}`
-        await fs.mkdir(path, { recursive: true })
-        const oldAvatar = await fs.readdir(`public/images/avatar/${req.user.id}`)
-
-        for (const avatar of oldAvatar) {
-            await fs.unlink(`public/images/avatar/${req.user.id}/${avatar}`)
-        }
-
-        cb(null, path)
-    },
-    filename: (req, file, cb) => {
-        const id = nanoid(10)
-        cb(null, id + '-' + req.user.id + '-' + file.originalname)
-    },
-})
-
-const fileStorageBlogImages = multer.diskStorage({
-    destination: async (req, file, cb) => {
-        const path = `public/images/blog`
-        await fs.mkdir(path, { recursive: true })
-
-        cb(null, path)
-    },
-    filename: (req, file, cb) => {
-        const id = nanoid(10)
-
-        cb(null, id + '-' + file.originalname)
-    },
-})
-
-const fileStorageTourImages = multer.diskStorage({
-    destination: async (req, file, cb) => {
-        const path = `public/images/tour`
+        const path = `public/images`
         await fs.mkdir(path, { recursive: true })
 
         cb(null, path)
@@ -69,4 +37,4 @@ const fileFilterMiddleware = (req, file, cb) => {
     }
 }
 
-export { fileStorageAvatar, fileStorageBlogImages, fileStorageTourImages, fileFilterMiddleware }
+export { fileStorageImages, fileFilterMiddleware }
