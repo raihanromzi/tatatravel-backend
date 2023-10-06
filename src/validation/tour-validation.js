@@ -60,17 +60,19 @@ const addTourValidationSchema = Joi.object({
         }),
     place: Joi.array()
         .items(
-            Joi.string()
-                .required()
-                .messages({
-                    'string.base': `${errors.TOUR.PLACE.NAME.MUST_STRING}`,
-                    'string.empty': `${errors.TOUR.PLACE.NAME.CANNOT_EMPTY}`,
-                    'string.min': `${errors.TOUR.PLACE.NAME.MUST_MIN}`,
-                })
+            Joi.string().messages({
+                'string.base': `${errors.TOUR.PLACE.NAME.MUST_STRING}`,
+                'string.empty': `${errors.TOUR.PLACE.NAME.CANNOT_EMPTY}`,
+                'string.min': `${errors.TOUR.PLACE.NAME.MUST_MIN}`,
+            })
         )
         .min(1)
-        .required()
         .error(new Error(`${errors.TOUR.PLACE.IS_REQUIRED}`)),
+    countryId: Joi.number().positive().required().messages({
+        'number.base': errors.COUNTRY.ID.MUST_NUMBER,
+        'number.positive': errors.COUNTRY.ID.MUST_POSITIVE,
+        'any.required': errors.COUNTRY.ID.IS_REQUIRED,
+    }),
 }).unknown(true)
 
 const imagesValidationSchema = Joi.array()
@@ -93,4 +95,56 @@ const imagesValidationSchema = Joi.array()
     .required()
     .error(new Error(`${errors.TOUR.IMAGES.MUST_VALID}`))
 
-export { addTourValidationSchema, imagesValidationSchema }
+const idTourValidationSchema = Joi.object({
+    id: Joi.number()
+        .positive()
+        .required()
+        .messages({
+            'number.base': `${errors.TOUR.ID.MUST_NUMBER}`,
+            'number.empty': `${errors.TOUR.ID.CANNOT_EMPTY}`,
+            'number.positive': `${errors.TOUR.ID.MUST_POSITIVE}`,
+            'any.required': `${errors.TOUR.ID.IS_REQUIRED}`,
+        }),
+}).unknown(true)
+
+const searchTourValidationSchema = Joi.object({
+    page: Joi.number().min(1).positive().default(1).messages({
+        'number.base': errors.PAGE.MUST_NUMBER,
+        'number.empty': errors.PAGE.CANNOT_EMPTY,
+        'number.positive': errors.PAGE.MUST_POSITIVE,
+    }),
+    size: Joi.number().min(1).positive().max(100).default(10).messages({
+        'number.base': errors.SIZE.MUST_NUMBER,
+        'number.empty': errors.SIZE.CANNOT_EMPTY,
+        'number.positive': errors.SIZE.MUST_POSITIVE,
+    }),
+    sortBy: Joi.string()
+        .optional()
+        .default('id')
+        .messages({
+            'string.base': `${errors.SORT_BY.MUST_STRING}`,
+        }),
+    orderBy: Joi.string()
+        .valid('asc', 'desc')
+        .optional()
+        .default('asc')
+        .messages({
+            'string.base': `${errors.ORDER_BY.MUST_STRING}`,
+            'any.valid': `${errors.ORDER_BY.MUST_VALID}`,
+        }),
+    name: Joi.string()
+        .optional()
+        .max(255)
+        .messages({
+            'string.base': `${errors.TOUR.NAME.MUST_STRING}`,
+            'string.empty': `${errors.TOUR.NAME.CANNOT_EMPTY}`,
+            'string.max': `${errors.TOUR.NAME.MUST_MAX}`,
+        }),
+})
+
+export {
+    addTourValidationSchema,
+    imagesValidationSchema,
+    idTourValidationSchema,
+    searchTourValidationSchema,
+}
