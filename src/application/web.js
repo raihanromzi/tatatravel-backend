@@ -1,5 +1,7 @@
 import express from 'express'
 import cookieParser from 'cookie-parser'
+import multer from 'multer'
+import cors from 'cors'
 import { errorMiddleware } from '../middlewares/error-middleware.js'
 import { publicRouter } from '../routes/public-route.js'
 import { userRouter } from '../routes/user-route.js'
@@ -11,7 +13,6 @@ import { roleRouter } from '../routes/role-route.js'
 import { categoryRouter } from '../routes/category-route.js'
 import { blogRouter } from '../routes/blog-route.js'
 import { tourRouter } from '../routes/tour-route.js'
-import multer from 'multer'
 import { fileFilterMiddleware, fileStorageImages } from '../middlewares/multer-middleware.js'
 
 const web = express()
@@ -29,6 +30,7 @@ web.use(
         fileFilter: fileFilterMiddleware,
     }).any('images')
 )
+web.use(cors())
 
 web.use(publicRouter)
 web.use(tourRouter)
