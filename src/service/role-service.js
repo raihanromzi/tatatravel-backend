@@ -173,6 +173,11 @@ const get = async (req) => {
                 id: true,
                 name: true,
                 isActive: true,
+                _count: {
+                    select: {
+                        user: true,
+                    },
+                },
             },
             take: size,
             skip: skip,

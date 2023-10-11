@@ -45,9 +45,14 @@ const remove = async (req, res, next) => {
 
 const get = async (req, res, next) => {
     try {
-        const result = await roleService.get(req)
+        const { data, pagination } = await roleService.get(req)
         res.status(success.HTTP.CODE.OK).send(
-            responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
+            responses.responseSuccess(
+                success.HTTP.CODE.OK,
+                success.HTTP.STATUS.OK,
+                data,
+                pagination
+            )
         )
     } catch (e) {
         next(e)

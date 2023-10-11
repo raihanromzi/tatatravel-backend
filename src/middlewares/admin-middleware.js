@@ -6,7 +6,7 @@ const adminMiddleware = async (req, res, next) => {
     const user = req.user
 
     // find role in database
-    const role = await prismaClient.role.findUniqueOrThrow({
+    const role = await prismaClient.role.findUnique({
         where: {
             id: user.roleId,
         },
