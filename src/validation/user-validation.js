@@ -66,7 +66,7 @@ const addUserValidationSchema = Joi.object({
             'string.max': `${errors.FULL_NAME.MUST_MAX}`,
             'any.required': `${errors.FULL_NAME.IS_REQUIRED}`,
         }),
-    username: Joi.string()
+    userName: Joi.string()
         .min(3)
         .max(30)
         .required()
@@ -99,7 +99,7 @@ const addUserValidationSchema = Joi.object({
             'string.pattern.base': `${errors.PASSWORD.MUST_VALID}`,
             'any.required': `${errors.PASSWORD.IS_REQUIRED}`,
         }),
-    role: Joi.number()
+    roleId: Joi.number()
         .required()
         .positive()
         .messages({
