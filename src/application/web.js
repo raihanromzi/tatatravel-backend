@@ -19,6 +19,8 @@ import {
     refreshTokenVerifyMiddleware,
 } from '../middlewares/token-middleware.js'
 import { adminMiddleware } from '../middlewares/admin-middleware.js'
+import { errors } from '../utils/message-error.js'
+import response from '../utils/response-api.js'
 
 const web = express()
 
@@ -55,5 +57,19 @@ web.use(adminMiddleware)
 web.use(adminRouter)
 
 web.use(errorMiddleware)
+
+// invalid api route
+web.use((req, res) => {
+    return res
+        .status(errors.HTTP.CODE.UNAUTHORIZED)
+        .send(
+            response.responseError(
+                errors.HTTP.CODE.UNAUTHORIZED,
+                errors.HTTP.STATUS.UNAUTHORIZED,
+                errors.AUTHORIZATION
+            )
+        )
+        .end()
+})
 
 export { web }
