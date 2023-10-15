@@ -9,12 +9,14 @@ const errorMiddleware = async (err, req, res, next) => {
     }
 
     if (err instanceof ResponseError) {
-        res.status(err.code)
+        return res
+            .status(err.code)
             .send(response.responseError(err.code, err.status, err.message))
             .end()
     } else if (err.code === 'LIMIT_FILE_SIZE') {
         // handle multer limit file size
-        res.status(errors.HTTP.CODE.BAD_REQUEST)
+        return res
+            .status(errors.HTTP.CODE.BAD_REQUEST)
             .send(
                 response.responseError(
                     errors.HTTP.CODE.BAD_REQUEST,
@@ -26,16 +28,18 @@ const errorMiddleware = async (err, req, res, next) => {
     } else if (err instanceof MulterError) {
         // handle multer error
         await err.deleteImages()
-        res.status(err.code)
+        return res
+            .status(err.code)
             .send(response.responseError(err.code, err.status, err.message))
             .end()
     } else {
-        res.status(errors.HTTP.CODE.INTERNAL_SERVER_ERROR)
+        return res
+            .status(errors.HTTP.CODE.INTERNAL_SERVER_ERROR)
             .send(
                 response.responseError(
                     errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
                     errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                    errors.HTTP.MESSAGE.INTERNAL_SERVER_ERROR
+                    err.message
                 )
             )
             .end()
