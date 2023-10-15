@@ -35,7 +35,7 @@ const errorMiddleware = async (err, req, res, next) => {
                 response.responseError(
                     errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
                     errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                    err.message
+                    errors.HTTP.MESSAGE.INTERNAL_SERVER_ERROR
                 )
             )
             .end()
