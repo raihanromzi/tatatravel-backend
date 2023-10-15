@@ -4,12 +4,12 @@ import { errors } from '../utils/message-error.js'
 import { prismaClient } from '../application/database.js'
 
 const refresh = async (req, res) => {
-    const foundRefreshToken = req.cookies.refreshToken
+    const { refreshToken } = req.cookies
     let validUser = null
 
     res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'None', secure: true })
 
-    if (!foundRefreshToken) {
+    if (!refreshToken) {
         throw new ResponseError(
             errors.HTTP.CODE.UNAUTHORIZED,
             errors.HTTP.STATUS.UNAUTHORIZED,
@@ -19,17 +19,17 @@ const refresh = async (req, res) => {
 
     const foundUserWithRefreshToken = await prismaClient.user.findFirst({
         where: {
-            token: foundRefreshToken,
+            token: refreshToken,
         },
         select: {
-            username: true,
+            userName: true,
         },
     })
 
     // detected refresh token reuse
     if (!foundUserWithRefreshToken) {
         // handle hacked user
-        jwt.verify(foundRefreshToken, process.env.REFRESH_TOKEN_SECRET_KEY, async (err, user) => {
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET_KEY, async (err, user) => {
             if (err) {
                 throw new ResponseError(
                     errors.HTTP.CODE.FORBIDDEN,
@@ -37,10 +37,11 @@ const refresh = async (req, res) => {
                     errors.FORBIDDEN
                 )
             }
+
             // if user not found, but refreshToken is reused and valid -> user hacked
             await prismaClient.user.update({
                 where: {
-                    username: user.username,
+                    userName: user.userName,
                 },
                 data: {
                     token: null,
@@ -54,8 +55,9 @@ const refresh = async (req, res) => {
         )
     }
 
-    jwt.verify(foundRefreshToken, process.env.REFRESH_TOKEN_SECRET_KEY, async (err, user) => {
-        if (err || foundUserWithRefreshToken.username !== user.username) {
+    const { userName: foundUserName } = foundUserWithRefreshToken
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET_KEY, async (err, user) => {
+        if (err || foundUserName !== user.userName) {
             throw new ResponseError(
                 errors.HTTP.CODE.FORBIDDEN,
                 errors.HTTP.STATUS.FORBIDDEN,
@@ -66,7 +68,7 @@ const refresh = async (req, res) => {
         validUser = user
     })
 
-    const { id, roleId, username } = validUser
+    const { id, roleId, userName } = validUser
 
     const userAccessTokenData = {
         id: id,
@@ -75,7 +77,7 @@ const refresh = async (req, res) => {
 
     const userRefreshTokenData = {
         id: id,
-        username: username,
+        userName: userName,
         roleId: roleId,
     }
 
@@ -84,7 +86,7 @@ const refresh = async (req, res) => {
 
     await prismaClient.user.update({
         where: {
-            username: username,
+            userName: userName,
         },
         data: {
             token: newRefreshToken,
