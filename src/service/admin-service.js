@@ -13,13 +13,15 @@ import * as bcrypt from 'bcrypt'
 import fs from 'fs'
 
 const add = async (req) => {
-    const user = validate(addUserValidationSchema, req.body)
-    const { fullName, username, email, password, role } = user
+    const { fullName, userName, email, password, roleId } = validate(
+        addUserValidationSchema,
+        req.body
+    )
 
     return prismaClient.$transaction(async (prisma) => {
         const findRole = await prisma.role.findUnique({
             where: {
-                id: role,
+                id: roleId,
             },
         })
 
@@ -31,20 +33,20 @@ const add = async (req) => {
             )
         }
 
-        const countSameUsernameOrEmail = await prisma.user.count({
+        const findUser = await prisma.user.findMany({
             where: {
                 OR: [
                     {
                         email: email,
                     },
                     {
-                        username: username,
+                        userName: userName,
                     },
                 ],
             },
         })
 
-        if (countSameUsernameOrEmail === 1) {
+        if (findUser.length > 0) {
             throw new ResponseError(
                 errors.HTTP.CODE.BAD_REQUEST,
                 errors.HTTP.STATUS.BAD_REQUEST,
@@ -55,18 +57,23 @@ const add = async (req) => {
         const result = await prisma.user.create({
             data: {
                 fullName: fullName,
-                username: username,
+                userName: userName,
                 email: email,
                 password: await bcrypt.hash(password, 10),
                 role: {
                     connect: {
-                        id: role,
+                        id: roleId,
                     },
                 },
             },
             select: {
-                username: true,
+                userName: true,
                 email: true,
+                role: {
+                    select: {
+                        name: true,
+                    },
+                },
             },
         })
 
@@ -78,7 +85,11 @@ const add = async (req) => {
             )
         }
 
-        return result
+        return {
+            email: result.email,
+            userName: result.userName,
+            roleName: result.role.name,
+        }
     })
 }
 const remove = async (req) => {

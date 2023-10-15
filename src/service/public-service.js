@@ -7,8 +7,7 @@ import * as bcrypt from 'bcrypt'
 import tokenService from './token-service.js'
 
 const login = async (req, res) => {
-    const user = validate(loginValidationSchema, req.body)
-    const { email, password } = user
+    const { email, password } = validate(loginValidationSchema, req.body)
 
     const findUser = await prismaClient.user.findUnique({
         where: {
@@ -16,7 +15,7 @@ const login = async (req, res) => {
         },
         select: {
             id: true,
-            username: true,
+            userName: true,
             password: true,
             roleId: true,
         },
@@ -30,7 +29,7 @@ const login = async (req, res) => {
         )
     }
 
-    const { id, username, password: passwordHash, roleId } = findUser
+    const { id, userName, password: passwordHash, roleId } = findUser
     const isPasswordValid = await bcrypt.compare(password, passwordHash)
 
     if (!isPasswordValid) {
@@ -48,7 +47,7 @@ const login = async (req, res) => {
 
     const userRefreshTokenData = {
         id: id,
-        username: username,
+        userName: userName,
         roleId: roleId,
     }
 
@@ -65,7 +64,7 @@ const login = async (req, res) => {
     await prismaClient.user.update({
         where: {
             id: id,
-            username: username,
+            userName: userName,
         },
         data: {
             token: refreshToken,
