@@ -15,6 +15,7 @@ const httpErrors = {
     },
     MESSAGE: {
         INTERNAL_SERVER_ERROR: 'please try again later, server error',
+        INVALID_API_ROUTE: 'please try again later, invalid api route',
     },
 }
 
@@ -187,6 +188,7 @@ const avatarErrors = {
     MUST_STRING: 'avatar must be a string',
     PATH_MUST_STRING: 'avatar path must be a string',
     MUST_LESS_THAN_2MB: 'avatar must be less than 2MB',
+    CANNOT_EMPTY: 'avatar cannot be empty',
 }
 
 const sortByErrors = {

@@ -13,10 +13,10 @@ const getUserValidationSchema = Joi.object({
 }).unknown(true)
 
 const updateUserValidationSchema = Joi.object({
-    username: Joi.string()
+    userName: Joi.string()
         .min(3)
         .max(30)
-        .required()
+        .optional()
         .messages({
             'string.base': `${errors.USERNAME.MUST_STRING}}`,
             'string.min': `${errors.USERNAME.MUST_MIN}`,
@@ -26,7 +26,7 @@ const updateUserValidationSchema = Joi.object({
     password: Joi.string()
         .min(6)
         .max(255)
-        .required()
+        .optional()
         .messages({
             'string.base': `${errors.PASSWORD.MUST_STRING}`,
             'string.min': `${errors.PASSWORD.MUST_MIN}`,
@@ -36,7 +36,7 @@ const updateUserValidationSchema = Joi.object({
     fullName: Joi.string()
         .min(3)
         .max(255)
-        .required()
+        .optional()
         .messages({
             'string.base': `${errors.FULL_NAME.MUST_STRING}`,
             'string.empty': `${errors.FULL_NAME.CANNOT_EMPTY}`,
@@ -46,13 +46,19 @@ const updateUserValidationSchema = Joi.object({
         }),
 }).unknown(true)
 
-const avatarValidationSchema = Joi.object({
-    path: Joi.string()
-        .optional()
-        .messages({
-            'string.base': `${errors.AVATAR.PATH_MUST_STRING}`,
-        }),
-}).unknown(true)
+const avatarValidationSchema = Joi.array()
+    .items(
+        Joi.object()
+            .keys({
+                path: Joi.string().messages({
+                    'string.base': `${errors.AVATAR.MUST_STRING}`,
+                }),
+            })
+            .unknown(true)
+            .error(new Error(`${errors.AVATAR.MUST_VALID}`))
+    )
+    .max(1)
+    .error(new Error(`${errors.AVATAR.MUST_VALID}`))
 
 const addUserValidationSchema = Joi.object({
     fullName: Joi.string()

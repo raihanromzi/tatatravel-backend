@@ -5,14 +5,14 @@ import {
     updateUserValidationSchema,
 } from '../validation/user-validation.js'
 import { prismaClient } from '../application/database.js'
-import { ResponseError } from '../utils/response-error.js'
+import { MulterError, ResponseError } from '../utils/response-error.js'
 import * as bcrypt from 'bcrypt'
 import { errors } from '../utils/message-error.js'
+import fs from 'fs/promises'
 import { logger } from '../application/logging.js'
 
 const get = async (req) => {
-    logger.info(req.user)
-    const { id: userId } = validate(getUserValidationSchema, req.user)
+    const { id: userId, roleId } = validate(getUserValidationSchema, req.user)
 
     const findUser = await prismaClient.user.findUnique({
         where: {
@@ -25,6 +25,7 @@ const get = async (req) => {
             avatar: true,
             role: {
                 select: {
+                    id: true,
                     name: true,
                 },
             },
@@ -36,6 +37,14 @@ const get = async (req) => {
             errors.HTTP.CODE.NOT_FOUND,
             errors.HTTP.STATUS.NOT_FOUND,
             errors.USER.NOT_FOUND
+        )
+    }
+
+    if (findUser.role.id !== roleId) {
+        throw new ResponseError(
+            errors.HTTP.CODE.FORBIDDEN,
+            errors.HTTP.STATUS.FORBIDDEN,
+            errors.USER.FORBIDDEN
         )
     }
 
@@ -51,11 +60,16 @@ const get = async (req) => {
 }
 
 const update = async (req) => {
-    const user = validate(updateUserValidationSchema, req.body)
-    const avatar = validate(avatarValidationSchema, req.file)
+    const { userName, fullName, password } = validate(updateUserValidationSchema, req.body)
+    const images = validate(avatarValidationSchema, req.files)
+    const avatar = images.map((image) => {
+        return {
+            filename: image.filename,
+            path: image.path,
+        }
+    })
+    logger.info(avatar)
     const { id: userId } = req.user
-    const { username, fullName, password } = user
-    const { path } = avatar
     const data = {}
 
     if (fullName) {
@@ -66,53 +80,151 @@ const update = async (req) => {
         data.password = await bcrypt.hash(password, 10)
     }
 
-    if (avatar) {
-        data.avatar = path
+    if (avatar.length > 0) {
+        data.avatar = avatar[0].filename
     }
 
-    if (username) {
-        data.username = username
+    if (userName) {
+        data.userName = userName
     }
 
     return prismaClient.$transaction(async (prisma) => {
-        const findUser = await prisma.user.findUniqueOrThrow({
+        const findUser = await prisma.user.findUnique({
             where: {
                 id: userId,
             },
         })
 
         if (!findUser) {
-            throw new ResponseError(
+            throw new MulterError(
                 errors.HTTP.CODE.NOT_FOUND,
                 errors.HTTP.STATUS.NOT_FOUND,
-                errors.USER.NOT_FOUND
+                errors.USER.NOT_FOUND,
+                avatar
             )
         }
 
-        const findUserByUsername = await prisma.user.findMany({
+        const findUsersByUsername = await prisma.user.findUnique({
             where: {
-                username: username,
+                userName: userName,
+            },
+            select: {
+                id: true,
             },
         })
 
-        if (findUserByUsername.length === 1) {
-            if (findUserByUsername[0].id !== userId) {
-                throw new ResponseError(
+        if (findUsersByUsername) {
+            const { id } = findUsersByUsername
+            if (id !== userId) {
+                throw new MulterError(
                     errors.HTTP.CODE.BAD_REQUEST,
                     errors.HTTP.STATUS.BAD_REQUEST,
-                    errors.USER.ALREADY_EXISTS
+                    errors.USER.ALREADY_EXISTS,
+                    avatar
                 )
             }
         }
 
-        return prisma.user.update({
+        const updateUser = await prisma.user.update({
             where: {
                 id: userId,
             },
             data: data,
+        })
+
+        if (!updateUser) {
+            throw new MulterError(
+                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                errors.USER.FAILED_TO_UPDATE,
+                avatar
+            )
+        }
+
+        if (avatar.length > 0) {
+            try {
+                await fs.mkdir(`public/images/avatar/${userId}`, { recursive: true })
+                const oldAvatar = await fs.readdir(`public/images/avatar/${userId}`)
+
+                // Delete old avatar
+                for (const avatar of oldAvatar) {
+                    await fs.unlink(`public/images/avatar/${userId}/${avatar}`)
+                }
+            } catch (error) {
+                throw new MulterError(
+                    errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                    errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                    errors.TOUR.FAILED_TO_CREATE_DIRECTORY,
+                    avatar
+                )
+            }
+
+            await Promise.all(
+                avatar.map(async (image) => {
+                    const { path: oldPath, filename } = image
+                    const newPath = `public/images/avatar/${userId}/${filename}`
+
+                    try {
+                        await fs.rename(oldPath, newPath)
+                        await prisma.user.update({
+                            where: {
+                                id: userId,
+                            },
+                            data: {
+                                avatar: newPath,
+                            },
+                            select: {
+                                userName: true,
+                                fullName: true,
+                                avatar: true,
+                            },
+                        })
+                    } catch (error) {
+                        const deleteDirectoryAndEmptyAvatar = async () => {
+                            await fs.rm(`public/images/avatar/${userId}`, {
+                                recursive: true,
+                                force: true,
+                            })
+                            await prisma.user.update({
+                                where: {
+                                    id: userId,
+                                },
+                                data: {
+                                    avatar: null,
+                                },
+                            })
+                            await fs.rm(oldPath, { recursive: true, force: true })
+                        }
+
+                        return deleteDirectoryAndEmptyAvatar()
+                            .then(() => {
+                                throw new MulterError(
+                                    errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                                    errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                                    errors.USER.FAILED_TO_UPDATE,
+                                    avatar
+                                )
+                            })
+                            .catch(() => {
+                                throw new MulterError(
+                                    errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                                    errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                                    errors.USER.FAILED_TO_UPDATE,
+                                    avatar
+                                )
+                            })
+                    }
+                })
+            )
+        }
+
+        return prisma.user.findUnique({
+            where: {
+                id: userId,
+            },
             select: {
-                username: true,
                 fullName: true,
+                userName: true,
                 avatar: true,
             },
         })
