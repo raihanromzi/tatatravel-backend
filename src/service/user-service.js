@@ -232,11 +232,10 @@ const update = async (req) => {
 }
 
 const logout = async (req, res) => {
-    const user = validate(getUserValidationSchema, req.user)
-    const { id: userId } = user
+    const { id: userId } = validate(getUserValidationSchema, req.user)
 
     return prismaClient.$transaction(async (prisma) => {
-        const findUser = await prisma.user.findUniqueOrThrow({
+        const findUser = await prisma.user.findUnique({
             where: {
                 id: userId,
             },
