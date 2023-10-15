@@ -8,10 +8,11 @@ import { prismaClient } from '../application/database.js'
 import { ResponseError } from '../utils/response-error.js'
 import * as bcrypt from 'bcrypt'
 import { errors } from '../utils/message-error.js'
+import { logger } from '../application/logging.js'
 
 const get = async (req) => {
-    const user = validate(getUserValidationSchema, req.user)
-    const { id: userId } = user
+    logger.info(req.user)
+    const { id: userId } = validate(getUserValidationSchema, req.user)
 
     const findUser = await prismaClient.user.findUnique({
         where: {
@@ -19,7 +20,7 @@ const get = async (req) => {
         },
         select: {
             email: true,
-            username: true,
+            userName: true,
             fullName: true,
             avatar: true,
             role: {

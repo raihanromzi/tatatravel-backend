@@ -14,6 +14,11 @@ import { categoryRouter } from '../routes/category-route.js'
 import { blogRouter } from '../routes/blog-route.js'
 import { tourRouter } from '../routes/tour-route.js'
 import { fileFilterMiddleware, fileStorageImages } from '../middlewares/multer-middleware.js'
+import {
+    accessTokenVerifyMiddleware,
+    refreshTokenVerifyMiddleware,
+} from '../middlewares/token-middleware.js'
+import { adminMiddleware } from '../middlewares/admin-middleware.js'
 
 const web = express()
 
@@ -33,15 +38,21 @@ web.use(
 web.use(cors())
 
 web.use(publicRouter)
+
+web.use(refreshTokenVerifyMiddleware)
+web.use(tokenRouter)
+
+web.use(accessTokenVerifyMiddleware)
+web.use(userRouter)
 web.use(tourRouter)
 web.use(blogRouter)
-web.use(tokenRouter)
-web.use(userRouter)
-web.use(adminRouter)
 web.use(areaRouter)
 web.use(countryRouter)
 web.use(roleRouter)
 web.use(categoryRouter)
+
+web.use(adminMiddleware)
+web.use(adminRouter)
 
 web.use(errorMiddleware)
 
