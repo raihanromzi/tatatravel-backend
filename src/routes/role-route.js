@@ -7,8 +7,8 @@ import {
 
 const roleRouter = express.Router()
 
-areaRouter.use(accessTokenVerifyMiddleware)
-areaRouter.use(refreshTokenVerifyMiddleware)
+roleRouter.use(accessTokenVerifyMiddleware)
+roleRouter.use(refreshTokenVerifyMiddleware)
 
 roleRouter.post('/v1/roles', roleController.add)
 roleRouter.get('/v1/roles', roleController.get)
