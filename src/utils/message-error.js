@@ -13,6 +13,9 @@ const httpErrors = {
         NOT_FOUND: 'not found',
         INTERNAL_SERVER_ERROR: 'internal server error',
     },
+    MESSAGE: {
+        INTERNAL_SERVER_ERROR: 'please try again later, server error',
+    },
 }
 
 const categoryErrors = {
