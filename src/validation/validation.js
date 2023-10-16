@@ -1,5 +1,4 @@
 import { errors } from '../utils/message-error.js'
-import { logger } from '../application/logging.js'
 import { JoiError } from '../utils/response-error.js'
 
 const validate = (schema, request) => {
@@ -8,7 +7,6 @@ const validate = (schema, request) => {
         allowUnknown: false,
     })
     if (result.error) {
-        logger.info(result.error.details)
         const arrayOfErrors = result.error.details.map((item) => ({
             key: item.context.key,
             message: item.message,

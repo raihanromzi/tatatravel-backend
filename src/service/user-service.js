@@ -9,7 +9,6 @@ import { MulterError, ResponseError } from '../utils/response-error.js'
 import * as bcrypt from 'bcrypt'
 import { errors } from '../utils/message-error.js'
 import fs from 'fs/promises'
-import { logger } from '../application/logging.js'
 
 const get = async (req) => {
     const { id: userId, roleId } = validate(getUserValidationSchema, req.user)
@@ -68,7 +67,6 @@ const update = async (req) => {
             path: image.path,
         }
     })
-    logger.info(avatar)
     const { id: userId } = req.user
     const data = {}
 
