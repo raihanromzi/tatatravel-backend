@@ -109,8 +109,9 @@ const addUserValidationSchema = Joi.object({
         .required()
         .positive()
         .messages({
-            'number.base': `${errors.ROLE.MUST_NUMBER}`,
-            'number.positive': `${errors.ROLE.MUST_POSITIVE}`,
+            'any.required': `${errors.ROLE.ID.IS_REQUIRED}`,
+            'number.base': `${errors.ROLE.ID.MUST_NUMBER}`,
+            'number.positive': `${errors.ROLE.ID.MUST_POSITIVE}`,
         }),
 }).unknown(true)
 

@@ -1,4 +1,4 @@
-import { MulterError, ResponseError } from '../utils/response-error.js'
+import { JoiError, MulterError, ResponseError } from '../utils/response-error.js'
 import response from '../utils/response-api.js'
 import { errors } from '../utils/message-error.js'
 
@@ -31,6 +31,12 @@ const errorMiddleware = async (err, req, res, next) => {
         return res
             .status(err.code)
             .send(response.responseError(err.code, err.status, err.message))
+            .end()
+    } else if (err instanceof JoiError) {
+        // handle joi error
+        return res
+            .status(err.code)
+            .send(response.responseError(err.code, err.status, err.errors))
             .end()
     } else {
         return res
