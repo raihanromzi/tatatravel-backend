@@ -4,13 +4,13 @@ import { success } from '../utils/message-success.js'
 
 const get = async (req, res, next) => {
     try {
-        const result = await adminService.get(req)
+        const { data, pagination } = await adminService.get(req)
         res.status(success.HTTP.CODE.OK).send(
             responses.responseSuccess(
                 success.HTTP.CODE.OK,
                 success.HTTP.STATUS.OK,
-                result.data,
-                result.pagination
+                data,
+                pagination
             )
         )
     } catch (e) {

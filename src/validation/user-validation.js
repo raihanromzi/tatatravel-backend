@@ -150,15 +150,17 @@ const searchUserValidationSchema = Joi.object({
         'number.empty': errors.SIZE.CANNOT_EMPTY,
         'number.positive': errors.SIZE.MUST_POSITIVE,
     }),
-    username: Joi.string()
+    userName: Joi.string()
         .max(30)
         .optional()
+        .empty('')
         .messages({
             'string.base': `${errors.USERNAME.MUST_STRING}`,
             'string.max': `${errors.USERNAME.MUST_MAX}`,
         }),
     email: Joi.string()
         .optional()
+        .empty('')
         .messages({
             'string.base': `${errors.EMAIL.MUST_STRING}`,
             'string.email': `${errors.EMAIL.MUST_VALID}`,
@@ -166,6 +168,7 @@ const searchUserValidationSchema = Joi.object({
     name: Joi.string()
         .max(50)
         .optional()
+        .empty('')
         .messages({
             'string.base': `${errors.FULL_NAME.MUST_STRING}`,
             'string.max': `${errors.FULL_NAME.MUST_MAX}`,
@@ -173,6 +176,7 @@ const searchUserValidationSchema = Joi.object({
     role: Joi.string()
         .max(30)
         .optional()
+        .empty('')
         .messages({
             'string.base': `${errors.ROLE.MUST_STRING}`,
             'string.max': `${errors.ROLE.MUST_MAX}`,
@@ -180,6 +184,7 @@ const searchUserValidationSchema = Joi.object({
     sortBy: Joi.string()
         .optional()
         .default('id')
+        .empty('')
         .messages({
             'string.base': `${errors.SORT_BY.MUST_STRING}`,
         }),

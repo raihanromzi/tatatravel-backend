@@ -10,7 +10,7 @@ import { prismaClient } from '../application/database.js'
 import { ResponseError } from '../utils/response-error.js'
 import { errors } from '../utils/message-error.js'
 import * as bcrypt from 'bcrypt'
-import fs from 'fs'
+import fs from 'fs/promises'
 
 const add = async (req) => {
     const { fullName, userName, email, password, roleId } = validate(
@@ -84,11 +84,16 @@ const add = async (req) => {
                 errors.USER.FAILED_TO_ADD
             )
         }
+        const {
+            email: userEmail,
+            userName: userUserName,
+            role: { name: userRoleName },
+        } = result
 
         return {
-            email: result.email,
-            userName: result.userName,
-            roleName: result.role.name,
+            email: userEmail,
+            userName: userUserName,
+            roleName: userRoleName,
         }
     })
 }
@@ -119,7 +124,7 @@ const remove = async (req) => {
             )
         }
 
-        fs.rmSync(`public/images/avatar/${paramUserId}`, { recursive: true, force: true })
+        await fs.rm(`public/images/avatar/${paramUserId}`, { recursive: true, force: true })
 
         return prisma.user.delete({
             where: {
@@ -130,9 +135,11 @@ const remove = async (req) => {
 }
 
 const get = async (req) => {
-    const query = validate(searchUserValidationSchema, req.query)
-    const userId = req.user.id
-    const { name, email, username, role, page, size, sortBy, orderBy } = query
+    const { name, email, userName, role, page, size, sortBy, orderBy } = validate(
+        searchUserValidationSchema,
+        req.query
+    )
+    const { id: userId } = req.user
     const skip = (page - 1) * size
     const filters = []
 
@@ -140,7 +147,7 @@ const get = async (req) => {
         if (
             sortBy !== 'id' &&
             sortBy !== 'fullName' &&
-            sortBy !== 'username' &&
+            sortBy !== 'userName' &&
             sortBy !== 'email' &&
             sortBy !== 'role'
         ) {
@@ -168,10 +175,10 @@ const get = async (req) => {
         })
     }
 
-    if (username) {
+    if (userName) {
         filters.push({
-            username: {
-                contains: username,
+            userName: {
+                contains: userName,
             },
         })
     }
@@ -197,7 +204,7 @@ const get = async (req) => {
             select: {
                 id: true,
                 fullName: true,
-                username: true,
+                userName: true,
                 email: true,
                 role: {
                     select: {
@@ -235,8 +242,8 @@ const get = async (req) => {
 }
 
 const update = async (req) => {
-    const paramUserid = validate(getUserValidationSchema, req.params)
-    const currentUserId = req.user.id
+    const { id: paramUserid } = validate(getUserValidationSchema, req.params)
+    const { id: currentUserId } = req.user
 
     if (paramUserid === currentUserId) {
         throw new ResponseError(
@@ -246,8 +253,7 @@ const update = async (req) => {
         )
     }
 
-    const user = validate(updateActiveUserValidationSchema, req.body)
-    const { isActive } = user
+    const { isActive } = validate(updateActiveUserValidationSchema, req.body)
 
     return prismaClient.$transaction(async (prisma) => {
         const findUser = await prisma.user.findUnique({
@@ -270,6 +276,11 @@ const update = async (req) => {
             },
             data: {
                 isActive: isActive,
+            },
+            select: {
+                id: true,
+                userName: true,
+                isActive: true,
             },
         })
 
