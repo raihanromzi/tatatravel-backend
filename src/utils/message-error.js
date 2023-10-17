@@ -14,8 +14,10 @@ const httpErrors = {
         INTERNAL_SERVER_ERROR: 'internal server error',
     },
     MESSAGE: {
-        INTERNAL_SERVER_ERROR: 'please try again later, server error',
-        INVALID_API_ROUTE: 'please try again later, invalid api route',
+        INTERNAL_SERVER_ERROR:
+            "We're sorry, but there was a server error. Please try again later. If the issue persists, please contact support.",
+        INVALID_API_ROUTE:
+            'The requested API route is not valid. Please check your request and try again later.',
     },
 }
 
@@ -121,12 +123,13 @@ const useridErrors = {
 }
 
 const passwordErrors = {
-    IS_REQUIRED: 'password is required',
-    MUST_STRING: 'password must be a string',
-    MUST_MIN: 'password is min 6 characters',
-    MUST_MAX: 'password is max 255 characters',
-    CANNOT_EMPTY: 'password cannot be empty',
-    MUST_VALID: 'password must be a valid password',
+    REQUIRED: 'Please provide a password.',
+    MUST_BE_STRING: 'Password must be a valid string.',
+    MUST_BE_6_CHAR_MIN: 'Password should be at least 6 characters long.',
+    MUST_BE_255_CHAR_MAX: 'Password cannot exceed 255 characters.',
+    CANNOT_BE_EMPTY: 'Password cannot be empty.',
+    MUST_BE_VALID:
+        'Password must contain only letters and numbers and be between 6 and 255 characters long.',
 }
 
 const pageErrors = {
@@ -313,12 +316,13 @@ const tourErrors = {
     IS_NOT_ACTIVE: 'tour is not active',
 }
 
-const loginErrors = {
-    MUST_VALID: 'username or email is required',
-    MUST_STRING: 'username or email must be a string',
-    CANNOT_EMPTY: 'username or email cannot be empty',
-    MUST_MIN: 'username or email is min 3 characters',
-    MUST_MAX: 'username or email is max 255 characters',
+const userNameOrEmailErrors = {
+    REQUIRED: 'Please enter your username or email.',
+    MUST_BE_STRING: 'Username or email must be a valid string.',
+    CANNOT_BE_EMPTY: 'Username or email cannot be empty.',
+    MUST_BE_3_CHAR_MIN: 'Username or email should be at least 3 characters long.',
+    MUST_BE_255_CHAR_MAX: 'Username or email cannot exceed 255 characters.',
+    UNKNOWN_BODY_ERROR: 'An unknown error occurred with the login request. Please try again later.',
 }
 
 const errors = {
@@ -328,6 +332,7 @@ const errors = {
     ROLE: roleErrors,
     FULL_NAME: fullNameErrors,
     USERNAME: usernameErrors,
+    USERNAME_OR_EMAIL: userNameOrEmailErrors,
     AVATAR: avatarErrors,
     EMAIL: emailErrors,
     USERID: useridErrors,
@@ -345,10 +350,8 @@ const errors = {
         ARRAY: 'images must be an array',
     },
     AUTHORIZATION: 'you are not authorized to access this resource',
-    AUTHENTICATION: 'username or password is wrong',
+    AUTHENTICATION: 'Invalid login credentials. Please check your information and try again.',
     FORBIDDEN: 'you are not allowed to access this resource',
-    SERVER_ERROR: 'server error, please try again',
-    LOGIN: loginErrors,
 }
 
 export { errors }

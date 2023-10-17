@@ -121,11 +121,11 @@ const loginValidationSchema = Joi.object({
         .max(255)
         .required()
         .messages({
-            'string.base': `${errors.LOGIN.MUST_STRING}`,
-            'string.empty': `${errors.LOGIN.CANNOT_EMPTY}`,
-            'string.min': `${errors.LOGIN.MUST_MIN}`,
-            'string.max': `${errors.LOGIN.MUST_MAX}`,
-            'any.required': `${errors.LOGIN.MUST_VALID}`,
+            'string.base': `${errors.USERNAME_OR_EMAIL.MUST_BE_STRING}`,
+            'string.empty': `${errors.USERNAME_OR_EMAIL.CANNOT_BE_EMPTY}`,
+            'string.min': `${errors.USERNAME_OR_EMAIL.MUST_BE_3_CHAR_MIN}`,
+            'string.max': `${errors.USERNAME_OR_EMAIL.MUST_BE_255_CHAR_MAX}`,
+            'any.required': `${errors.USERNAME_OR_EMAIL.REQUIRED}`,
         }),
     password: Joi.string()
         .min(6)
@@ -133,15 +133,15 @@ const loginValidationSchema = Joi.object({
         .required()
         .pattern(new RegExp('^[a-zA-Z0-9]{6,255}$'))
         .messages({
-            'string.base': `${errors.PASSWORD.MUST_STRING}`,
-            'string.empty': `${errors.PASSWORD.CANNOT_EMPTY}`,
-            'string.min': `${errors.PASSWORD.MUST_MIN}`,
-            'string.max': `${errors.PASSWORD.MUST_MAX}`,
-            'string.pattern.base': `${errors.PASSWORD.MUST_VALID}`,
-            'any.required': `${errors.PASSWORD.IS_REQUIRED}`,
+            'string.base': `${errors.PASSWORD.MUST_BE_STRING}`,
+            'string.empty': `${errors.PASSWORD.CANNOT_BE_EMPTY}`,
+            'string.min': `${errors.PASSWORD.MUST_BE_6_CHAR_MIN}`,
+            'string.max': `${errors.PASSWORD.MUST_BE_255_CHAR_MAX}`,
+            'string.pattern.base': `${errors.PASSWORD.MUST_BE_VALID}`,
+            'any.required': `${errors.PASSWORD.REQUIRED}`,
         }),
 }).messages({
-    'object.unknown': `${errors.LOGIN.MUST_VALID}`,
+    'object.unknown': `${errors.USERNAME_OR_EMAIL.UNKNOWN_BODY_ERROR}`,
 })
 
 const searchUserValidationSchema = Joi.object({

@@ -5,12 +5,9 @@ import { ResponseError } from '../utils/response-error.js'
 import { errors } from '../utils/message-error.js'
 import * as bcrypt from 'bcrypt'
 import tokenService from './token-service.js'
-import { logger } from '../application/logging.js'
 
 const login = async (req, res) => {
     const { emailOrUserName, password } = validate(loginValidationSchema, req.body)
-
-    logger.info(emailOrUserName)
 
     const findUser = await prismaClient.user.findFirst({
         where: {
@@ -71,7 +68,7 @@ const login = async (req, res) => {
         maxAge: 1000 * 60 * 60 * 24, // 1 day
     })
 
-    await prismaClient.user.update({
+    const updateUserToken = await prismaClient.user.update({
         where: {
             id: id,
             userName: userName,
@@ -80,6 +77,14 @@ const login = async (req, res) => {
             token: refreshToken,
         },
     })
+
+    if (!updateUserToken) {
+        throw new ResponseError(
+            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+            errors.HTTP.MESSAGE.INTERNAL_SERVER_ERROR
+        )
+    }
 
     return {
         accessToken: accessToken,
