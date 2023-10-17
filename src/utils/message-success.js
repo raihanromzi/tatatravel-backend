@@ -12,28 +12,28 @@ const httpSuccess = {
 const success = {
     HTTP: httpSuccess,
     AUTHENTICATION: {
-        LOGOUT: 'logout success',
+        LOGOUT: 'You have successfully logged out.',
     },
     USER: {
-        DELETE: 'success delete user',
+        DELETE: 'The user has been successfully deleted.',
     },
     AREA: {
-        DELETE: 'success delete area',
+        DELETE: 'The area has been successfully deleted.',
     },
     COUNTRY: {
-        DELETE: 'success delete country',
+        DELETE: 'The country has been successfully deleted.',
     },
     ROLE: {
-        DELETE: 'success delete role',
+        DELETE: 'The role has been successfully deleted.',
     },
     CATEGORY: {
-        DELETE: 'success delete category',
+        DELETE: 'The category has been successfully deleted.',
     },
     BLOG: {
-        DELETE: 'success delete blog',
+        DELETE: 'The blog has been successfully deleted.',
     },
     TOUR: {
-        DELETE: 'success delete tour',
+        DELETE: 'The tour has been successfully deleted.',
     },
 }
 
