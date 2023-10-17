@@ -29,24 +29,31 @@ const add = async (req) => {
             )
         }
 
-        const findUser = await prisma.user.findMany({
+        const findUserUserName = await prisma.user.findUnique({
             where: {
-                OR: [
-                    {
-                        email: email,
-                    },
-                    {
-                        userName: userName,
-                    },
-                ],
+                userName: userName,
             },
         })
 
-        if (findUser.length > 0) {
+        if (findUserUserName) {
             throw new ResponseError(
                 errors.HTTP.CODE.BAD_REQUEST,
                 errors.HTTP.STATUS.BAD_REQUEST,
-                errors.USER.ALREADY_EXISTS
+                errors.USER.USERNAME_ALREADY_EXIST
+            )
+        }
+
+        const findUserEmail = await prisma.user.findUnique({
+            where: {
+                email: email,
+            },
+        })
+
+        if (findUserEmail) {
+            throw new ResponseError(
+                errors.HTTP.CODE.BAD_REQUEST,
+                errors.HTTP.STATUS.BAD_REQUEST,
+                errors.USER.EMAIL_ALREADY_EXIST
             )
         }
 
