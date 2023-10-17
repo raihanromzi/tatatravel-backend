@@ -69,8 +69,8 @@ const addTourValidationSchema = Joi.object({
         .min(1)
         .error(new Error(`${errors.TOUR.PLACE.IS_REQUIRED}`)),
     countryId: Joi.number().positive().required().messages({
-        'number.base': errors.COUNTRY.ID.MUST_NUMBER,
-        'number.positive': errors.COUNTRY.ID.MUST_POSITIVE,
+        'number.base': errors.COUNTRY.ID.MUST_BE_NUMBER,
+        'number.positive': errors.COUNTRY.ID.MUST_BE_POSITIVE,
         'any.required': errors.COUNTRY.ID.IS_REQUIRED,
     }),
 }).unknown(true)

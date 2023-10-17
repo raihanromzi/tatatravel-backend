@@ -48,7 +48,7 @@ const add = async (req) => {
 }
 
 const get = async (req) => {
-    const { name, page, size, sortBy } = validate(getAreaValidationSchema, req.query)
+    const { name, page, size, sortBy, orderBy } = validate(getAreaValidationSchema, req.query)
     const skip = (page - 1) * size
     const filters = []
 
@@ -81,6 +81,9 @@ const get = async (req) => {
             },
             take: size,
             skip: skip,
+            orderBy: {
+                [sortBy]: orderBy,
+            },
         })
 
         const totalItems = await prisma.area.count({

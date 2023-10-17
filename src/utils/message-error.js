@@ -46,9 +46,12 @@ const categoryErrors = {
     ALREADY_EXISTS: 'category already exists',
     NOT_FOUND: 'category is not found',
     NOT_ACTIVE: 'category is not active',
-    FAILED_TO_ADD: 'failed to add category',
-    FAILED_TO_UPDATE: 'failed to update category',
-    FAILED_TO_DELETE: 'failed to delete category',
+    FAILED_TO_ADD:
+        'Sorry, we encountered an issue while adding the category. Please try again later.',
+    FAILED_TO_UPDATE:
+        'Sorry, we encountered an issue while updating the category. Please try again later.',
+    FAILED_TO_DELETE:
+        'Sorry, we encountered an issue while deleting the category. Please try again later.',
 }
 
 const userErrors = {
@@ -91,9 +94,11 @@ const roleErrors = {
     IS_NOT_SUPER_ADMIN: 'This role is not a super admin role.',
     NOT_FOUND: 'Role not found.',
     ALREADY_EXISTS: 'This role already exists.',
-    FAILED_TO_ADD: 'Failed to add the role.',
-    FAILED_TO_UPDATE: 'Failed to update the role.',
-    FAILED_TO_DELETE: 'Failed to delete the role.',
+    FAILED_TO_ADD: 'Sorry, we encountered an issue while adding the role. Please try again later.',
+    FAILED_TO_UPDATE:
+        'Sorry, we encountered an issue while updating the role. Please try again later.',
+    FAILED_TO_DELETE:
+        'Sorry, we encountered an issue while deleting the role. Please try again later.',
 }
 
 const fullNameErrors = {
@@ -166,30 +171,36 @@ const areaErrors = {
     },
     NOT_FOUND: 'Area not found.',
     ALREADY_EXISTS: 'The area already exists.',
-    FAILED_TO_ADD: 'Failed to add the area.',
-    FAILED_TO_UPDATE: 'Failed to update the area.',
-    FAILED_TO_DELETE: 'Failed to delete the area.',
+    FAILED_TO_ADD: 'Sorry, we encountered an issue while adding the area. Please try again later.',
+    FAILED_TO_UPDATE:
+        'Sorry, we encountered an issue while updating the area. Please try again later.',
+    FAILED_TO_DELETE:
+        'Sorry, we encountered an issue while deleting the area. Please try again later.',
 }
 
 const countryErrors = {
     ID: {
-        IS_REQUIRED: 'country id is required',
-        MUST_NUMBER: 'country id must be a number',
-        MUST_POSITIVE: 'country id must be a positive number',
-        CANNOT_EMPTY: 'country id cannot be empty',
+        IS_REQUIRED: 'Please provide the country ID.',
+        MUST_BE_NUMBER: 'Country ID must be a valid number.',
+        MUST_BE_POSITIVE: 'Country ID must be a positive number.',
+        CANNOT_BE_EMPTY: 'Country ID cannot be left empty.',
     },
     NAME: {
-        IS_REQUIRED: 'country name is required',
-        MUST_STRING: 'country name must be a string',
-        MUST_MIN: 'country name is min 3 characters',
-        MUST_MAX: 'country name is max 100 characters',
-        CANNOT_EMPTY: 'country name cannot be empty',
+        IS_REQUIRED: 'Please provide the country name.',
+        MUST_BE_STRING: 'Country name must be a string of 3 to 100 characters.',
+        CANNOT_BE_EMPTY: 'Country name cannot be left empty.',
+        MUST_BE_3_CHAR_MIN: 'Country name should be at least 3 characters long.',
+        MUST_BE_50_CHAR_MAX: 'Country name cannot exceed 50 characters.',
+        MUST_BE_100_CHAR_MAX: 'Country name cannot exceed 100 characters.',
     },
-    NOT_FOUND: 'country is not found',
-    ALREADY_EXISTS: 'country already exists',
-    FAILED_TO_ADD: 'failed to add country',
-    FAILED_TO_UPDATE: 'failed to update country',
-    FAILED_TO_DELETE: 'failed to delete country',
+    NOT_FOUND: 'The specified country was not found.',
+    ALREADY_EXISTS: 'This country already exists.',
+    FAILED_TO_ADD:
+        'Sorry, we encountered an issue while adding the country. Please try again later.',
+    FAILED_TO_UPDATE:
+        'Sorry, we encountered an issue while updating the country. Please try again later.',
+    FAILED_TO_DELETE:
+        'Sorry, we encountered an issue while deleting the country. Please try again later.',
 }
 
 const avatarErrors = {
