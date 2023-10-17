@@ -34,7 +34,7 @@ const refresh = async (req, res) => {
                 throw new ResponseError(
                     errors.HTTP.CODE.FORBIDDEN,
                     errors.HTTP.STATUS.FORBIDDEN,
-                    errors.FORBIDDEN
+                    errors.HTTP.MESSAGE.FORBIDDEN
                 )
             }
 
@@ -61,7 +61,7 @@ const refresh = async (req, res) => {
             throw new ResponseError(
                 errors.HTTP.CODE.FORBIDDEN,
                 errors.HTTP.STATUS.FORBIDDEN,
-                errors.FORBIDDEN
+                errors.HTTP.MESSAGE.FORBIDDEN
             )
         }
 
