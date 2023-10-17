@@ -313,6 +313,14 @@ const tourErrors = {
     IS_NOT_ACTIVE: 'tour is not active',
 }
 
+const loginErrors = {
+    MUST_VALID: 'username or email is required',
+    MUST_STRING: 'username or email must be a string',
+    CANNOT_EMPTY: 'username or email cannot be empty',
+    MUST_MIN: 'username or email is min 3 characters',
+    MUST_MAX: 'username or email is max 255 characters',
+}
+
 const errors = {
     HTTP: httpErrors,
     CATEGORY: categoryErrors,
@@ -340,10 +348,7 @@ const errors = {
     AUTHENTICATION: 'username or password is wrong',
     FORBIDDEN: 'you are not allowed to access this resource',
     SERVER_ERROR: 'server error, please try again',
-    LOGIN: {
-        MUST_VALID: 'username or email is required',
-        CANNOT_DOUBLE: 'cannot login with both username and email',
-    },
+    LOGIN: loginErrors,
 }
 
 export { errors }

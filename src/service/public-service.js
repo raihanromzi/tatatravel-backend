@@ -5,14 +5,23 @@ import { ResponseError } from '../utils/response-error.js'
 import { errors } from '../utils/message-error.js'
 import * as bcrypt from 'bcrypt'
 import tokenService from './token-service.js'
+import { logger } from '../application/logging.js'
 
 const login = async (req, res) => {
-    const { email, userName, password } = validate(loginValidationSchema, req.body)
+    const { emailOrUserName, password } = validate(loginValidationSchema, req.body)
 
-    const findUser = await prismaClient.user.findUnique({
+    logger.info(emailOrUserName)
+
+    const findUser = await prismaClient.user.findFirst({
         where: {
-            ...(email && { email: email }),
-            ...(userName && { userName: userName }),
+            OR: [
+                {
+                    email: emailOrUserName,
+                },
+                {
+                    userName: emailOrUserName,
+                },
+            ],
         },
         select: {
             id: true,
@@ -30,7 +39,7 @@ const login = async (req, res) => {
         )
     }
 
-    const { id, userName: foundUserName, password: passwordHash, roleId } = findUser
+    const { id, userName, password: passwordHash, roleId } = findUser
     const isPasswordValid = await bcrypt.compare(password, passwordHash)
 
     if (!isPasswordValid) {
@@ -48,7 +57,7 @@ const login = async (req, res) => {
 
     const userRefreshTokenData = {
         id: id,
-        userName: foundUserName,
+        userName: userName,
         roleId: roleId,
     }
 
@@ -65,7 +74,7 @@ const login = async (req, res) => {
     await prismaClient.user.update({
         where: {
             id: id,
-            userName: foundUserName,
+            userName: userName,
         },
         data: {
             token: refreshToken,

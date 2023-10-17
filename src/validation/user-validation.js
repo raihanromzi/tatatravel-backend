@@ -116,20 +116,16 @@ const addUserValidationSchema = Joi.object({
 }).unknown(true)
 
 const loginValidationSchema = Joi.object({
-    email: Joi.string()
-        .email()
-        .messages({
-            'string.base': `${errors.EMAIL.MUST_STRING}`,
-            'string.email': `${errors.EMAIL.MUST_VALID}`,
-        }),
-    userName: Joi.string()
-        .alphanum()
+    emailOrUserName: Joi.string()
         .min(3)
-        .max(30)
+        .max(255)
+        .required()
         .messages({
-            'string.base': `${errors.USERNAME.MUST_STRING}`,
-            'string.min': `${errors.USERNAME.MUST_MIN}`,
-            'string.max': `${errors.USERNAME.MUST_MAX}`,
+            'string.base': `${errors.LOGIN.MUST_STRING}`,
+            'string.empty': `${errors.LOGIN.CANNOT_EMPTY}`,
+            'string.min': `${errors.LOGIN.MUST_MIN}`,
+            'string.max': `${errors.LOGIN.MUST_MAX}`,
+            'any.required': `${errors.LOGIN.MUST_VALID}`,
         }),
     password: Joi.string()
         .min(6)
@@ -144,14 +140,9 @@ const loginValidationSchema = Joi.object({
             'string.pattern.base': `${errors.PASSWORD.MUST_VALID}`,
             'any.required': `${errors.PASSWORD.IS_REQUIRED}`,
         }),
+}).messages({
+    'object.unknown': `${errors.LOGIN.MUST_VALID}`,
 })
-    .xor('email', 'userName')
-
-    .messages({
-        'object.missing': `${errors.LOGIN.MUST_VALID}`,
-        'object.xor': `${errors.LOGIN.CANNOT_DOUBLE}`,
-    })
-    .unknown(true)
 
 const searchUserValidationSchema = Joi.object({
     page: Joi.number().min(1).positive().default(1).messages({
