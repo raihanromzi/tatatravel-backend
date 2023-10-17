@@ -340,6 +340,10 @@ const errors = {
     AUTHENTICATION: 'username or password is wrong',
     FORBIDDEN: 'you are not allowed to access this resource',
     SERVER_ERROR: 'server error, please try again',
+    LOGIN: {
+        MUST_VALID: 'username or email is required',
+        CANNOT_DOUBLE: 'cannot login with both username and email',
+    },
 }
 
 export { errors }
