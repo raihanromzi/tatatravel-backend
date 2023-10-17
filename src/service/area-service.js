@@ -4,7 +4,7 @@ import { ResponseError } from '../utils/response-error.js'
 import {
     areaIdValidationSchema,
     areaNameValidationSchema,
-    areaValidationSchema,
+    getAreaValidationSchema,
 } from '../validation/area-validation.js'
 import { errors } from '../utils/message-error.js'
 
@@ -48,7 +48,7 @@ const add = async (req) => {
 }
 
 const get = async (req) => {
-    const { name, page, size, sortBy } = validate(areaValidationSchema, req.query)
+    const { name, page, size, sortBy } = validate(getAreaValidationSchema, req.query)
     const skip = (page - 1) * size
     const filters = []
 

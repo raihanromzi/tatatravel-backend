@@ -1,9 +1,9 @@
 import { validate } from '../validation/validation.js'
 import {
-    addUserValidationSchema,
+    activeUserValidationSchema,
     getUserValidationSchema,
-    searchUserValidationSchema,
-    updateActiveUserValidationSchema,
+    userIdValidationSchema,
+    userValidationSchema,
 } from '../validation/user-validation.js'
 import { prismaClient } from '../application/database.js'
 import { ResponseError } from '../utils/response-error.js'
@@ -12,10 +12,7 @@ import * as bcrypt from 'bcrypt'
 import fs from 'fs/promises'
 
 const add = async (req) => {
-    const { fullName, userName, email, password, roleId } = validate(
-        addUserValidationSchema,
-        req.body
-    )
+    const { fullName, userName, email, password, roleId } = validate(userValidationSchema, req.body)
 
     return prismaClient.$transaction(async (prisma) => {
         const findRole = await prisma.role.findUnique({
@@ -98,7 +95,7 @@ const add = async (req) => {
 }
 const get = async (req) => {
     const { name, email, userName, role, page, size, sortBy, orderBy } = validate(
-        searchUserValidationSchema,
+        getUserValidationSchema,
         req.query
     )
     const { id: userId } = req.user
@@ -204,7 +201,7 @@ const get = async (req) => {
 }
 
 const update = async (req) => {
-    const { id: paramUserid } = validate(getUserValidationSchema, req.params)
+    const { id: paramUserid } = validate(userIdValidationSchema, req.params)
     const { id: currentUserId } = req.user
 
     if (paramUserid === currentUserId) {
@@ -215,7 +212,7 @@ const update = async (req) => {
         )
     }
 
-    const { isActive } = validate(updateActiveUserValidationSchema, req.body)
+    const { isActive } = validate(activeUserValidationSchema, req.body)
 
     return prismaClient.$transaction(async (prisma) => {
         const findUser = await prisma.user.findUnique({
@@ -259,7 +256,7 @@ const update = async (req) => {
 }
 
 const remove = async (req) => {
-    const { id: paramUserId } = validate(getUserValidationSchema, req.params)
+    const { id: paramUserId } = validate(userIdValidationSchema, req.params)
     const { id: currentUserId } = req.user
 
     if (paramUserId === currentUserId) {

@@ -1,8 +1,8 @@
 import { validate } from '../validation/validation.js'
 import {
     avatarValidationSchema,
-    getUserValidationSchema,
     updateUserValidationSchema,
+    userIdValidationSchema,
 } from '../validation/user-validation.js'
 import { prismaClient } from '../application/database.js'
 import { MulterError, ResponseError } from '../utils/response-error.js'
@@ -11,7 +11,7 @@ import { errors } from '../utils/message-error.js'
 import fs from 'fs/promises'
 
 const get = async (req) => {
-    const { id: userId } = validate(getUserValidationSchema, { id: req.user.id })
+    const { id: userId } = validate(userIdValidationSchema, { id: req.user.id })
     const { roleId } = req.user
 
     const findUser = await prismaClient.user.findUnique({
@@ -61,7 +61,7 @@ const get = async (req) => {
 
 const update = async (req) => {
     const { userName, fullName, password } = validate(updateUserValidationSchema, req.body)
-    const { id: userId } = validate(getUserValidationSchema, { id: req.user.id })
+    const { id: userId } = validate(userIdValidationSchema, { id: req.user.id })
     const { avatar: images } = validate(avatarValidationSchema, { avatar: req.files })
     let avatar = []
     if (images && images.length > 0) {
@@ -235,7 +235,7 @@ const update = async (req) => {
 }
 
 const logout = async (req, res) => {
-    const { id: userId } = validate(getUserValidationSchema, { id: req.user.id })
+    const { id: userId } = validate(userIdValidationSchema, { id: req.user.id })
 
     return prismaClient.$transaction(async (prisma) => {
         const findUser = await prisma.user.findUnique({

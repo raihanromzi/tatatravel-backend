@@ -13,7 +13,7 @@ const areaNameValidationSchema = Joi.object({
     'object.unknown': errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR,
 })
 
-const areaValidationSchema = Joi.object({
+const getAreaValidationSchema = Joi.object({
     page: Joi.number().min(1).positive().default(1).messages({
         'number.base': errors.PAGE.MUST_BE_NUMBER,
         'number.empty': errors.PAGE.CANNOT_BE_EMPTY,
@@ -63,4 +63,4 @@ const areaIdValidationSchema = Joi.object({
     'object.unknown': errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR,
 })
 
-export { areaNameValidationSchema, areaValidationSchema, areaIdValidationSchema }
+export { areaNameValidationSchema, getAreaValidationSchema, areaIdValidationSchema }

@@ -26,7 +26,7 @@ const loginValidationSchema = Joi.object({
     'object.unknown': `${errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR}`,
 })
 
-const addUserValidationSchema = Joi.object({
+const userValidationSchema = Joi.object({
     fullName: Joi.string()
         .min(3)
         .max(255)
@@ -81,7 +81,7 @@ const addUserValidationSchema = Joi.object({
     'object.unknown': `${errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR}`,
 })
 
-const getUserValidationSchema = Joi.object({
+const userIdValidationSchema = Joi.object({
     id: Joi.number()
         .required()
         .positive()
@@ -90,6 +90,81 @@ const getUserValidationSchema = Joi.object({
             'number.positive': `${errors.USERID.MUST_BE_POSITIVE}`,
             'number.empty': `${errors.USERID.CANNOT_BE_EMPTY}`,
             'any.required': `${errors.USERID.IS_REQUIRED}`,
+        }),
+}).messages({
+    'object.unknown': `${errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR}`,
+})
+
+const activeUserValidationSchema = Joi.object({
+    isActive: Joi.boolean()
+        .required()
+        .messages({
+            'boolean.base': `${errors.USER.IS_ACTIVE.MUST_BE_BOOLEAN}`,
+            'boolean.empty': `${errors.USER.IS_ACTIVE.CANNOT_BE_EMPTY}`,
+            'any.required': `${errors.USER.IS_ACTIVE.IS_REQUIRED}`,
+        }),
+}).messages({
+    'object.unknown': `${errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR}`,
+})
+
+const getUserValidationSchema = Joi.object({
+    page: Joi.number().min(1).positive().default(1).messages({
+        'number.base': errors.PAGE.MUST_BE_NUMBER,
+        'number.empty': errors.PAGE.CANNOT_BE_EMPTY,
+        'number.positive': errors.PAGE.MUST_BE_POSITIVE,
+    }),
+    size: Joi.number().min(1).positive().max(100).default(10).messages({
+        'number.base': errors.SIZE.MUST_BE_NUMBER,
+        'number.empty': errors.SIZE.CANNOT_BE_EMPTY,
+        'number.positive': errors.SIZE.MUST_BE_POSITIVE,
+    }),
+    userName: Joi.string()
+        .max(30)
+        .optional()
+        .empty('')
+        .messages({
+            'string.base': `${errors.USERNAME.MUST_BE_STRING}`,
+            'string.max': `${errors.USERNAME.MUST_BE_30_CHAR_MAX}`,
+        }),
+    email: Joi.string()
+        .optional()
+        .empty('')
+        .messages({
+            'string.base': `${errors.EMAIL.MUST_BE_STRING}`,
+        }),
+    name: Joi.string()
+        .max(50)
+        .optional()
+        .empty('')
+        .messages({
+            'string.base': `${errors.FULL_NAME.MUST_BE_STRING}`,
+            'string.max': `${errors.FULL_NAME.MUST_BE_50_CHAR_MAX}`,
+        }),
+    role: Joi.string()
+        .max(30)
+        .optional()
+        .empty('')
+        .messages({
+            'string.base': `${errors.ROLE.NAME.MUST_BE_STRING}`,
+            'string.max': `${errors.ROLE.NAME.MUST_BE_30_CHAR_MAX}`,
+        }),
+    sortBy: Joi.string()
+        .optional()
+        .default('id')
+        .empty('')
+        .messages({
+            'string.base': `${errors.SORT_BY.MUST_BE_STRING}`,
+            'any.only': `${errors.SORT_BY.MUST_BE_VALID}`,
+        }),
+    orderBy: Joi.string()
+        .valid('asc', 'desc')
+        .optional()
+        .default('asc')
+        .messages({
+            'string.base': `${errors.ORDER_BY.MUST_BE_STRING}`,
+            'any.valid': `${errors.ORDER_BY.MUST_BE_VALID}`,
+            'string.empty': `${errors.ORDER_BY.CANNOT_BE_EMPTY}`,
+            'any.only': `${errors.ORDER_BY.MUST_BE_VALID}`,
         }),
 }).messages({
     'object.unknown': `${errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR}`,
@@ -153,87 +228,12 @@ const avatarValidationSchema = Joi.object({
     'object.unknown': `${errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR}`,
 })
 
-const searchUserValidationSchema = Joi.object({
-    page: Joi.number().min(1).positive().default(1).messages({
-        'number.base': errors.PAGE.MUST_BE_NUMBER,
-        'number.empty': errors.PAGE.CANNOT_BE_EMPTY,
-        'number.positive': errors.PAGE.MUST_BE_POSITIVE,
-    }),
-    size: Joi.number().min(1).positive().max(100).default(10).messages({
-        'number.base': errors.SIZE.MUST_BE_NUMBER,
-        'number.empty': errors.SIZE.CANNOT_BE_EMPTY,
-        'number.positive': errors.SIZE.MUST_BE_POSITIVE,
-    }),
-    userName: Joi.string()
-        .max(30)
-        .optional()
-        .empty('')
-        .messages({
-            'string.base': `${errors.USERNAME.MUST_BE_STRING}`,
-            'string.max': `${errors.USERNAME.MUST_BE_30_CHAR_MAX}`,
-        }),
-    email: Joi.string()
-        .optional()
-        .empty('')
-        .messages({
-            'string.base': `${errors.EMAIL.MUST_BE_STRING}`,
-        }),
-    name: Joi.string()
-        .max(50)
-        .optional()
-        .empty('')
-        .messages({
-            'string.base': `${errors.FULL_NAME.MUST_BE_STRING}`,
-            'string.max': `${errors.FULL_NAME.MUST_BE_50_CHAR_MAX}`,
-        }),
-    role: Joi.string()
-        .max(30)
-        .optional()
-        .empty('')
-        .messages({
-            'string.base': `${errors.ROLE.NAME.MUST_BE_STRING}`,
-            'string.max': `${errors.ROLE.NAME.MUST_BE_30_CHAR_MAX}`,
-        }),
-    sortBy: Joi.string()
-        .optional()
-        .default('id')
-        .empty('')
-        .messages({
-            'string.base': `${errors.SORT_BY.MUST_BE_STRING}`,
-            'any.only': `${errors.SORT_BY.MUST_BE_VALID}`,
-        }),
-    orderBy: Joi.string()
-        .valid('asc', 'desc')
-        .optional()
-        .default('asc')
-        .messages({
-            'string.base': `${errors.ORDER_BY.MUST_BE_STRING}`,
-            'any.valid': `${errors.ORDER_BY.MUST_BE_VALID}`,
-            'string.empty': `${errors.ORDER_BY.CANNOT_BE_EMPTY}`,
-            'any.only': `${errors.ORDER_BY.MUST_BE_VALID}`,
-        }),
-}).messages({
-    'object.unknown': `${errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR}`,
-})
-
-const updateActiveUserValidationSchema = Joi.object({
-    isActive: Joi.boolean()
-        .required()
-        .messages({
-            'boolean.base': `${errors.USER.IS_ACTIVE.MUST_BE_BOOLEAN}`,
-            'boolean.empty': `${errors.USER.IS_ACTIVE.CANNOT_BE_EMPTY}`,
-            'any.required': `${errors.USER.IS_ACTIVE.IS_REQUIRED}`,
-        }),
-}).messages({
-    'object.unknown': `${errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR}`,
-})
-
 export {
-    addUserValidationSchema,
+    userValidationSchema,
     loginValidationSchema,
-    getUserValidationSchema,
+    userIdValidationSchema,
     updateUserValidationSchema,
-    updateActiveUserValidationSchema,
+    activeUserValidationSchema,
     avatarValidationSchema,
-    searchUserValidationSchema,
+    getUserValidationSchema,
 }
