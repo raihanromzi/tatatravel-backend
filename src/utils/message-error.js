@@ -61,6 +61,8 @@ const userErrors = {
         CANNOT_BE_EMPTY: 'The is active field cannot be left empty.',
     },
     ALREADY_EXISTS: 'This user already exists.',
+    USERNAME_ALREADY_EXIST: 'This username already exists.',
+    EMAIL_ALREADY_EXIST: 'This email already exists.',
     NOT_FOUND: 'User not found.',
     FAILED_TO_ADD: 'Sorry, we encountered a problem while adding the user. Please try again later.',
     FAILED_TO_UPDATE:
@@ -87,8 +89,8 @@ const roleErrors = {
     },
     IS_ACTIVE: {
         IS_REQUIRED: 'Please specify if the role is active.',
-        MUST_BE_BOOLEAN: 'The "is active" value must be a valid boolean.',
-        CANNOT_BE_EMPTY: 'The "is active" field cannot be left empty.',
+        MUST_BE_BOOLEAN: 'The is active value must be a valid boolean.',
+        CANNOT_BE_EMPTY: 'The is active field cannot be left empty.',
     },
     IS_UNKNOWN: 'Role is unknown.',
     IS_NOT_SUPER_ADMIN: 'This role is not a super admin role.',
