@@ -18,6 +18,9 @@ const httpErrors = {
             "We're sorry, but there was a server error. Please try again later. If the issue persists, please contact support.",
         INVALID_API_ROUTE:
             'The requested API route is not valid. Please check your request and try again later.',
+        FORBIDDEN: 'you are not allowed to access this resource',
+        NOT_FOUND: 'the requested resource is not found',
+        UNKNOWN_BODY_ERROR: 'an unknown error occurred with the request. please try again later.',
     },
 }
 
@@ -190,11 +193,12 @@ const countryErrors = {
 }
 
 const avatarErrors = {
-    MUST_VALID: 'file format must be PNG, JPG, or JPEG',
-    MUST_STRING: 'avatar must be a string',
-    PATH_MUST_STRING: 'avatar path must be a string',
-    MUST_LESS_THAN_2MB: 'avatar must be less than 2MB',
-    CANNOT_EMPTY: 'avatar cannot be empty',
+    MUST_BE_VALID_FORMAT: 'The avatar file must be in PNG, JPG, or JPEG format.',
+    MUST_BE_STRING: 'Avatar path must be a valid string.',
+    PATH_MUST_BE_STRING: 'Avatar path must be a valid string.',
+    MUST_BE_LESS_THAN_2MB: 'The avatar file size must be less than 2MB.',
+    CANNOT_BE_EMPTY: 'The avatar cannot be left empty.',
+    FAILED_TO_CREATE_DIRECTORY: 'Failed to create the user avatar directory.',
 }
 
 const sortByErrors = {
@@ -359,8 +363,6 @@ const errors = {
             'Your username or email is incorrect. Please double-check and try again.',
         PASSWORD: 'Your password is incorrect. Please verify and retry.',
     },
-    FORBIDDEN: 'you are not allowed to access this resource',
-    UNKNOWN_BODY_ERROR: 'an unknown error occurred with the request. please try again later.',
 }
 
 export { errors }

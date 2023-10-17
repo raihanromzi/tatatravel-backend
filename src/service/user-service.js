@@ -11,7 +11,8 @@ import { errors } from '../utils/message-error.js'
 import fs from 'fs/promises'
 
 const get = async (req) => {
-    const { id: userId, roleId } = validate(getUserValidationSchema, req.user)
+    const { id: userId } = validate(getUserValidationSchema, { id: req.user.id })
+    const { roleId } = req.user
 
     const findUser = await prismaClient.user.findUnique({
         where: {
@@ -43,7 +44,7 @@ const get = async (req) => {
         throw new ResponseError(
             errors.HTTP.CODE.FORBIDDEN,
             errors.HTTP.STATUS.FORBIDDEN,
-            errors.USER.FORBIDDEN
+            errors.HTTP.MESSAGE.FORBIDDEN
         )
     }
 
@@ -60,14 +61,18 @@ const get = async (req) => {
 
 const update = async (req) => {
     const { userName, fullName, password } = validate(updateUserValidationSchema, req.body)
-    const images = validate(avatarValidationSchema, req.files)
-    const avatar = images.map((image) => {
-        return {
-            filename: image.filename,
-            path: image.path,
-        }
-    })
-    const { id: userId } = req.user
+    const { id: userId } = validate(getUserValidationSchema, { id: req.user.id })
+    const { avatar: images } = validate(avatarValidationSchema, { avatar: req.files })
+    let avatar = []
+    if (images && images.length > 0) {
+        avatar = images.map((image) => {
+            return {
+                filename: image.filename,
+                path: image.path,
+            }
+        })
+    }
+
     const data = {}
 
     if (fullName) {
@@ -78,7 +83,7 @@ const update = async (req) => {
         data.password = await bcrypt.hash(password, 10)
     }
 
-    if (avatar.length > 0) {
+    if (avatar && avatar.length > 0) {
         data.avatar = avatar[0].filename
     }
 
@@ -104,7 +109,7 @@ const update = async (req) => {
 
         const findUsersByUsername = await prisma.user.findUnique({
             where: {
-                userName: userName,
+                userName: userName || '',
             },
             select: {
                 id: true,
@@ -152,7 +157,7 @@ const update = async (req) => {
                 throw new MulterError(
                     errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
                     errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                    errors.TOUR.FAILED_TO_CREATE_DIRECTORY,
+                    errors.AVATAR.FAILED_TO_CREATE_DIRECTORY,
                     avatar
                 )
             }
@@ -230,7 +235,7 @@ const update = async (req) => {
 }
 
 const logout = async (req, res) => {
-    const { id: userId } = validate(getUserValidationSchema, req.user)
+    const { id: userId } = validate(getUserValidationSchema, { id: req.user.id })
 
     return prismaClient.$transaction(async (prisma) => {
         const findUser = await prisma.user.findUnique({

@@ -23,7 +23,7 @@ const loginValidationSchema = Joi.object({
             'any.required': `${errors.PASSWORD.REQUIRED}`,
         }),
 }).messages({
-    'object.unknown': `${errors.UNKNOWN_BODY_ERROR}`,
+    'object.unknown': `${errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR}`,
 })
 
 const addUserValidationSchema = Joi.object({
@@ -78,7 +78,7 @@ const addUserValidationSchema = Joi.object({
             'number.positive': `${errors.ROLE.ID.MUST_BE_POSITIVE}`,
         }),
 }).messages({
-    'object.unknown': `${errors.UNKNOWN_BODY_ERROR}`,
+    'object.unknown': `${errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR}`,
 })
 
 const getUserValidationSchema = Joi.object({
@@ -92,56 +92,66 @@ const getUserValidationSchema = Joi.object({
             'any.required': `${errors.USERID.IS_REQUIRED}`,
         }),
 }).messages({
-    'object.unknown': `${errors.UNKNOWN_BODY_ERROR}`,
+    'object.unknown': `${errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR}`,
 })
 
 const updateUserValidationSchema = Joi.object({
     userName: Joi.string()
         .min(3)
         .max(30)
+        .alphanum()
         .optional()
         .messages({
-            'string.base': `${errors.USERNAME.MUST_STRING}}`,
-            'string.min': `${errors.USERNAME.MUST_MIN}`,
-            'string.max': `${errors.USERNAME.MUST_MAX}`,
-            'any.required': `${errors.USERNAME.IS_REQUIRED}`,
+            'string.base': `${errors.USERNAME.MUST_BE_STRING}}`,
+            'string.min': `${errors.USERNAME.MUST_BE_3_CHAR_MIN}`,
+            'string.max': `${errors.USERNAME.MUST_BE_30_CHAR_MAX}`,
+            'string.alphanum': `${errors.USERNAME.MUST_BE_ALPHA_NUM}`,
         }),
-    password: Joi.string()
-        .min(6)
-        .max(255)
-        .optional()
-        .messages({
-            'string.base': `${errors.PASSWORD.MUST_STRING}`,
-            'string.min': `${errors.PASSWORD.MUST_MIN}`,
-            'string.max': `${errors.PASSWORD.MUST_MAX}`,
-            'any.required': `${errors.PASSWORD.IS_REQUIRED}`,
-        }),
+
     fullName: Joi.string()
         .min(3)
         .max(255)
         .optional()
         .messages({
-            'string.base': `${errors.FULL_NAME.MUST_STRING}`,
-            'string.empty': `${errors.FULL_NAME.CANNOT_EMPTY}`,
-            'string.min': `${errors.FULL_NAME.MUST_MIN}`,
-            'string.max': `${errors.FULL_NAME.MUST_MAX}`,
-            'any.required': `${errors.FULL_NAME.IS_REQUIRED}`,
+            'string.base': `${errors.FULL_NAME.MUST_BE_STRING}`,
+            'string.empty': `${errors.FULL_NAME.CANNOT_BE_EMPTY}`,
+            'string.min': `${errors.FULL_NAME.MUST_BE_3_CHAR_MIN}`,
+            'string.max': `${errors.FULL_NAME.MUST_BE_255_CHAR_MAX}`,
         }),
-}).unknown(true)
+    password: Joi.string()
+        .pattern(new RegExp('^(?=.*[A-Z])[A-Za-z0-9]{8,16}$'))
+        .optional()
+        .messages({
+            'string.pattern.base': `${errors.PASSWORD.MUST_BE_VALID}`,
+            'string.base': `${errors.PASSWORD.MUST_BE_STRING}`,
+        }),
+    avatar: Joi.array()
+        .optional()
+        .messages({
+            'array.base': `${errors.AVATAR.MUST_BE_VALID_FORMAT}`,
+            'array.empty': `${errors.AVATAR.CANNOT_BE_EMPTY}`,
+        }),
+}).messages({
+    'object.unknown': `${errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR}`,
+})
 
-const avatarValidationSchema = Joi.array()
-    .items(
-        Joi.object()
-            .keys({
-                path: Joi.string().messages({
-                    'string.base': `${errors.AVATAR.MUST_STRING}`,
-                }),
-            })
-            .unknown(true)
-            .error(new Error(`${errors.AVATAR.MUST_VALID}`))
-    )
-    .max(1)
-    .error(new Error(`${errors.AVATAR.MUST_VALID}`))
+const avatarValidationSchema = Joi.object({
+    avatar: Joi.array()
+        .items(
+            Joi.object()
+                .keys({
+                    path: Joi.string().messages({
+                        'string.base': `${errors.AVATAR.MUST_BE_STRING}`,
+                    }),
+                })
+                .unknown(true)
+                .error(new Error(`${errors.AVATAR.MUST_BE_VALID_FORMAT}`))
+        )
+        .max(1)
+        .error(new Error(`${errors.AVATAR.MUST_BE_VALID_FORMAT}`)),
+}).messages({
+    'object.unknown': `${errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR}`,
+})
 
 const searchUserValidationSchema = Joi.object({
     page: Joi.number().min(1).positive().default(1).messages({
@@ -203,7 +213,7 @@ const searchUserValidationSchema = Joi.object({
             'any.only': `${errors.ORDER_BY.MUST_BE_VALID}`,
         }),
 }).messages({
-    'object.unknown': `${errors.UNKNOWN_BODY_ERROR}`,
+    'object.unknown': `${errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR}`,
 })
 
 const updateActiveUserValidationSchema = Joi.object({
@@ -215,7 +225,7 @@ const updateActiveUserValidationSchema = Joi.object({
             'any.required': `${errors.USER.IS_ACTIVE.IS_REQUIRED}`,
         }),
 }).messages({
-    'object.unknown': `${errors.UNKNOWN_BODY_ERROR}`,
+    'object.unknown': `${errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR}`,
 })
 
 export {
