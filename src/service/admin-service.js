@@ -1,7 +1,6 @@
 import { validate } from '../validation/validation.js'
 import {
     addUserValidationSchema,
-    deleteUserValidationSchema,
     getUserValidationSchema,
     searchUserValidationSchema,
     updateActiveUserValidationSchema,
@@ -97,43 +96,6 @@ const add = async (req) => {
         }
     })
 }
-const remove = async (req) => {
-    const paramUserId = validate(deleteUserValidationSchema, req.params.id)
-    const { id: currentUserId } = req.user
-
-    if (paramUserId === currentUserId) {
-        throw new ResponseError(
-            errors.HTTP.CODE.FORBIDDEN,
-            errors.HTTP.STATUS.FORBIDDEN,
-            errors.USER.CANNOT_DELETE_YOURSELF
-        )
-    }
-
-    return prismaClient.$transaction(async (prisma) => {
-        const findUser = await prisma.user.findUnique({
-            where: {
-                id: paramUserId,
-            },
-        })
-
-        if (!findUser) {
-            throw new ResponseError(
-                errors.HTTP.CODE.NOT_FOUND,
-                errors.HTTP.STATUS.NOT_FOUND,
-                errors.USER.NOT_FOUND
-            )
-        }
-
-        await fs.rm(`public/images/avatar/${paramUserId}`, { recursive: true, force: true })
-
-        return prisma.user.delete({
-            where: {
-                id: paramUserId,
-            },
-        })
-    })
-}
-
 const get = async (req) => {
     const { name, email, userName, role, page, size, sortBy, orderBy } = validate(
         searchUserValidationSchema,
@@ -154,7 +116,7 @@ const get = async (req) => {
             throw new ResponseError(
                 errors.HTTP.CODE.BAD_REQUEST,
                 errors.HTTP.STATUS.BAD_REQUEST,
-                errors.SORT_BY.MUST_VALID
+                errors.SORT_BY.MUST_BE_VALID
             )
         }
     }
@@ -293,6 +255,43 @@ const update = async (req) => {
         }
 
         return result
+    })
+}
+
+const remove = async (req) => {
+    const { id: paramUserId } = validate(getUserValidationSchema, req.params)
+    const { id: currentUserId } = req.user
+
+    if (paramUserId === currentUserId) {
+        throw new ResponseError(
+            errors.HTTP.CODE.FORBIDDEN,
+            errors.HTTP.STATUS.FORBIDDEN,
+            errors.USER.CANNOT_DELETE_YOURSELF
+        )
+    }
+
+    return prismaClient.$transaction(async (prisma) => {
+        const findUser = await prisma.user.findUnique({
+            where: {
+                id: paramUserId,
+            },
+        })
+
+        if (!findUser) {
+            throw new ResponseError(
+                errors.HTTP.CODE.NOT_FOUND,
+                errors.HTTP.STATUS.NOT_FOUND,
+                errors.USER.NOT_FOUND
+            )
+        }
+
+        await fs.rm(`public/images/avatar/${paramUserId}`, { recursive: true, force: true })
+
+        return prisma.user.delete({
+            where: {
+                id: paramUserId,
+            },
+        })
     })
 }
 

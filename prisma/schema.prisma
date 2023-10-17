@@ -14,7 +14,7 @@ model User {
   userName  String   @unique @db.VarChar(30)
   avatar    String?  @db.VarChar(255)
   email     String   @unique @db.VarChar(255)
-  password  String   @db.VarChar(16)
+  password  String   @db.VarChar(255)
   isActive  Boolean  @default(true)
   token     String?  @db.Text
   createdAt DateTime @default(now())

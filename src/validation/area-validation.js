@@ -23,14 +23,14 @@ const updateAreaValidationSchema = Joi.object({
 
 const getAreaValidationSchema = Joi.object({
     page: Joi.number().min(1).positive().default(1).messages({
-        'number.base': errors.PAGE.MUST_NUMBER,
-        'number.empty': errors.PAGE.CANNOT_EMPTY,
-        'number.positive': errors.PAGE.MUST_POSITIVE,
+        'number.base': errors.PAGE.MUST_BE_NUMBER,
+        'number.empty': errors.PAGE.CANNOT_BE_EMPTY,
+        'number.positive': errors.PAGE.MUST_BE_POSITIVE,
     }),
     size: Joi.number().min(1).positive().max(100).default(10).messages({
-        'number.base': errors.SIZE.MUST_NUMBER,
-        'number.empty': errors.SIZE.CANNOT_EMPTY,
-        'number.positive': errors.SIZE.MUST_POSITIVE,
+        'number.base': errors.SIZE.MUST_BE_NUMBER,
+        'number.empty': errors.SIZE.CANNOT_BE_EMPTY,
+        'number.positive': errors.SIZE.MUST_BE_POSITIVE,
     }),
     name: Joi.string().max(100).optional().default('').messages({
         'string.base': errors.AREA.NAME.MUST_STRING,

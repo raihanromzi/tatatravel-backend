@@ -50,76 +50,79 @@ const categoryErrors = {
 
 const userErrors = {
     IS_ACTIVE: {
-        IS_REQUIRED: 'is active is required',
-        MUST_BOOLEAN: 'is active must be a boolean',
-        CANNOT_EMPTY: 'is active cannot be empty',
+        IS_REQUIRED: 'Please specify if the user is active.',
+        MUST_BE_BOOLEAN: 'The is active value must be either true or false.',
+        CANNOT_BE_EMPTY: 'The is active field cannot be left empty.',
     },
-    ALREADY_EXISTS: 'user already exists',
-    NOT_FOUND: 'user is not found',
-    FAILED_TO_ADD: 'failed to add user',
-    FAILED_TO_UPDATE: 'failed to update user',
-    CANNOT_DELETE_YOURSELF: 'cannot delete yourself',
-    FAILED_TO_DELETE_DIRECTORY: 'failed to delete user avatar directory',
-    CANNOT_UPDATE_YOURSELF: 'cannot update yourself',
-    FAILED_TO_DELETE_IMAGE: 'failed to delete user avatar',
+    ALREADY_EXISTS: 'This user already exists.',
+    NOT_FOUND: 'User not found.',
+    FAILED_TO_ADD: 'Sorry, we encountered a problem while adding the user. Please try again later.',
+    FAILED_TO_UPDATE:
+        'Sorry, we encountered an issue while updating the user. Please try again later.',
+    CANNOT_DELETE_YOURSELF: 'You cannot delete your own account.',
+    FAILED_TO_DELETE_DIRECTORY: 'Failed to delete the user avatar directory.',
+    CANNOT_UPDATE_YOURSELF: 'You cannot update your own account.',
+    FAILED_TO_DELETE_IMAGE: 'Failed to delete the user avatar.',
 }
 
 const roleErrors = {
     NAME: {
-        IS_REQUIRED: 'role name is required',
-        MUST_STRING: 'role name must be a string',
-        MUST_MIN: 'role name is min 3 characters',
-        MUST_MAX: 'role name is max 30 characters',
-        CANNOT_EMPTY: 'role name cannot be empty',
+        IS_REQUIRED: 'Please provide a role name.',
+        MUST_BE_STRING: 'Role name must be a valid string.',
+        MUST_BE_3_CHAR_MIN: 'Role name should be at least 3 characters long.',
+        MUST_BE_30_CHAR_MAX: 'Role name cannot exceed 30 characters.',
+        CANNOT_BE_EMPTY: 'Role name cannot be left empty.',
     },
     ID: {
-        IS_REQUIRED: 'role id is required',
-        MUST_NUMBER: 'role id must be a number',
-        MUST_POSITIVE: 'role id must be a positive number',
-        CANNOT_EMPTY: 'role id cannot be empty',
+        IS_REQUIRED: 'Role is required.',
+        MUST_BE_NUMBER: 'Role must be a valid number.',
+        MUST_BE_POSITIVE: 'Role must be a positive number.',
+        CANNOT_BE_EMPTY: 'Role cannot be empty.',
     },
     IS_ACTIVE: {
-        IS_REQUIRED: 'is active is required',
-        MUST_BOOLEAN: 'is active must be a boolean',
-        CANNOT_EMPTY: 'is active cannot be empty',
+        IS_REQUIRED: 'Please specify if the role is active.',
+        MUST_BE_BOOLEAN: 'The "is active" value must be a valid boolean.',
+        CANNOT_BE_EMPTY: 'The "is active" field cannot be left empty.',
     },
-    IS_UNKNOWN: 'role is unknown',
-    IS_NOT_SUPER_ADMIN: 'role is not super admin',
-    NOT_FOUND: 'role is not found',
-    ALREADY_EXISTS: 'role already exists',
-    FAILED_TO_ADD: 'failed to add role',
-    FAILED_TO_UPDATE: 'failed to update role',
-    FAILED_TO_DELETE: 'failed to delete role',
+    IS_UNKNOWN: 'Role is unknown.',
+    IS_NOT_SUPER_ADMIN: 'This role is not a super admin role.',
+    NOT_FOUND: 'Role not found.',
+    ALREADY_EXISTS: 'This role already exists.',
+    FAILED_TO_ADD: 'Failed to add the role.',
+    FAILED_TO_UPDATE: 'Failed to update the role.',
+    FAILED_TO_DELETE: 'Failed to delete the role.',
 }
 
 const fullNameErrors = {
-    IS_REQUIRED: 'full name is required',
-    MUST_STRING: 'full name must be a string',
-    MUST_MIN: 'full name is min 3 characters',
-    MUST_MAX: 'full name is max 255 characters',
-    CANNOT_EMPTY: 'full name cannot be empty',
+    IS_REQUIRED: 'Please enter your full name.',
+    MUST_BE_STRING: 'Full name must be a valid string.',
+    MUST_BE_3_CHAR_MIN: 'Full name should be at least 3 characters long.',
+    MUST_BE_50_CHAR_MAX: 'Full name cannot exceed 50 characters.',
+    MUST_BE_255_CHAR_MAX: 'Full name cannot exceed 255 characters.',
+    CANNOT_BE_EMPTY: 'Full name cannot be left empty.',
 }
 
 const usernameErrors = {
-    IS_REQUIRED: 'username is required',
-    MUST_STRING: 'username must be a string',
-    MUST_MIN: 'username is min 3 characters',
-    MUST_MAX: 'username is max 30 characters',
-    CANNOT_EMPTY: 'username cannot be empty',
+    IS_REQUIRED: 'Please provide a username.',
+    MUST_BE_STRING: 'Username must be a valid string.',
+    MUST_BE_3_CHAR_MIN: 'Username should be at least 3 characters long.',
+    MUST_BE_30_CHAR_MAX: 'Username cannot exceed 30 characters.',
+    MUST_BE_ALPHA_NUM: 'Username must contain only letters and numbers.',
+    CANNOT_BE_EMPTY: 'Username cannot be left empty.',
 }
 
 const emailErrors = {
-    IS_REQUIRED: 'email is required',
-    MUST_STRING: 'email must be a string',
-    MUST_VALID: 'email must be a valid email',
-    CANNOT_EMPTY: 'email cannot be empty',
+    IS_REQUIRED: 'Please enter your email address.',
+    MUST_BE_STRING: 'Email must be a valid string.',
+    MUST_BE_VALID: 'Please use a valid email address format.',
+    CANNOT_BE_EMPTY: 'Email cannot be left empty.',
 }
 
 const useridErrors = {
-    IS_REQUIRED: 'user id is required',
-    MUST_NUMBER: 'user id must be a number',
-    MUST_POSITIVE: 'user id must be a positive number',
-    CANNOT_EMPTY: 'user id cannot be empty',
+    IS_REQUIRED: 'Please provide a user ID.',
+    MUST_BE_NUMBER: 'User ID must be a valid number.',
+    MUST_BE_POSITIVE: 'User ID must be a positive number.',
+    CANNOT_BE_EMPTY: 'User ID cannot be left empty.',
 }
 
 const passwordErrors = {
@@ -129,19 +132,19 @@ const passwordErrors = {
     MUST_BE_16_CHAR_MAX: 'Password cannot exceed 16 characters.',
     CANNOT_BE_EMPTY: 'Password cannot be empty.',
     MUST_BE_VALID:
-        'Password must contain at least 1 uppercase letter and consist of only letters and numbers.',
+        'Password must be 8 to 16 characters long and contain at least 1 uppercase letter and only letters and numbers.',
 }
 
 const pageErrors = {
-    MUST_NUMBER: 'page must be a number',
-    CANNOT_EMPTY: 'page cannot be empty',
-    MUST_POSITIVE: 'page must be a positive number',
+    MUST_BE_NUMBER: 'Please provide a valid page number.',
+    CANNOT_BE_EMPTY: 'Page number cannot be left empty.',
+    MUST_BE_POSITIVE: 'Page number must be a positive integer.',
 }
 
 const sizeErrors = {
-    MUST_NUMBER: 'size must be a number',
-    CANNOT_EMPTY: 'size cannot be empty',
-    MUST_POSITIVE: 'size must be a positive number',
+    MUST_BE_NUMBER: 'Please provide a valid value for the size.',
+    CANNOT_BE_EMPTY: 'Size value cannot be left empty.',
+    MUST_BE_POSITIVE: 'Size must be a positive integer.',
 }
 
 const areaErrors = {
@@ -195,13 +198,14 @@ const avatarErrors = {
 }
 
 const sortByErrors = {
-    MUST_STRING: 'sort by must be a string',
-    MUST_VALID: 'column sort by must be valid',
+    MUST_BE_STRING: 'Please specify a valid sorting criteria.',
+    MUST_BE_VALID: 'Sorting criteria must be a valid column.',
 }
 
 const orderByErrors = {
-    MUST_STRING: 'order by must be a string',
-    MUST_VALID: 'order by must be asc or desc',
+    MUST_BE_STRING: 'Please specify a valid sorting order (asc or desc).',
+    MUST_BE_VALID: 'Sorting order must be either asc or desc.',
+    CANNOT_BE_EMPTY: 'Sorting order cannot be left empty.',
 }
 
 const blogErrors = {
@@ -356,6 +360,7 @@ const errors = {
         PASSWORD: 'Your password is incorrect. Please verify and retry.',
     },
     FORBIDDEN: 'you are not allowed to access this resource',
+    UNKNOWN_BODY_ERROR: 'an unknown error occurred with the request. please try again later.',
 }
 
 export { errors }
