@@ -152,23 +152,23 @@ const sizeErrors = {
 
 const areaErrors = {
     NAME: {
-        IS_REQUIRED: 'area name is required',
-        MUST_STRING: 'area name must be a string',
-        MUST_MIN: 'area name is min 3 characters',
-        MUST_MAX: 'area name is max 100 characters',
-        CANNOT_EMPTY: 'area name cannot be empty',
+        IS_REQUIRED: 'Please provide the area name.',
+        MUST_BE_STRING: 'The area name must be a string of 3 to 100 characters.',
+        CANNOT_BE_EMPTY: 'Area name cannot be left empty.',
+        MUST_BE_3_CHAR_MIN: 'Area name should be at least 3 characters long.',
+        MUST_BE_50_CHAR_MAX: 'Area name cannot exceed 50 characters.',
     },
     ID: {
-        IS_REQUIRED: 'area id is required',
-        MUST_NUMBER: 'area id must be a number',
-        MUST_POSITIVE: 'area id must be a positive number',
-        CANNOT_EMPTY: 'area id cannot be empty',
+        IS_REQUIRED: 'Please provide the area ID.',
+        MUST_BE_NUMBER: 'Area ID must be a valid number.',
+        MUST_BE_POSITIVE: 'Area ID must be a positive number.',
+        CANNOT_BE_EMPTY: 'Area ID cannot be left empty.',
     },
-    NOT_FOUND: 'area is not found',
-    ALREADY_EXISTS: 'area already exists',
-    FAILED_TO_ADD: 'failed to add area',
-    FAILED_TO_UPDATE: 'failed to update area',
-    FAILED_TO_DELETE: 'failed to delete area',
+    NOT_FOUND: 'Area not found.',
+    ALREADY_EXISTS: 'The area already exists.',
+    FAILED_TO_ADD: 'Failed to add the area.',
+    FAILED_TO_UPDATE: 'Failed to update the area.',
+    FAILED_TO_DELETE: 'Failed to delete the area.',
 }
 
 const countryErrors = {

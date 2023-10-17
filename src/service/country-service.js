@@ -7,7 +7,7 @@ import {
     getCountryByIdValidationSchema,
     updateCountryValidationSchema,
 } from '../validation/country-validation.js'
-import { getAreaValidationSchema } from '../validation/area-validation.js'
+import { areaValidationSchema } from '../validation/area-validation.js'
 import { errors } from '../utils/message-error.js'
 
 const add = async (req) => {
@@ -156,7 +156,7 @@ const remove = async (req) => {
 }
 
 const get = async (req) => {
-    const query = validate(getAreaValidationSchema, req.query)
+    const query = validate(areaValidationSchema, req.query)
     const { name, page, size } = query
     const skip = (page - 1) * size
     const filters = []

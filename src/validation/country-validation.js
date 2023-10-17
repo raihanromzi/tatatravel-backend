@@ -9,8 +9,8 @@ const addCountryValidationSchema = Joi.object({
         'any.required': errors.COUNTRY.NAME.IS_REQUIRED,
     }),
     areaId: Joi.number().positive().required().messages({
-        'number.base': errors.AREA.ID.MUST_NUMBER,
-        'number.positive': errors.AREA.ID.MUST_POSITIVE,
+        'number.base': errors.AREA.ID.MUST_BE_NUMBER,
+        'number.positive': errors.AREA.ID.MUST_BE_POSITIVE,
         'any.required': errors.AREA.ID.IS_REQUIRED,
     }),
 }).unknown(true)
@@ -22,8 +22,8 @@ const updateCountryValidationSchema = Joi.object({
         'string.min': errors.COUNTRY.NAME.MUST_MIN,
     }),
     areaId: Joi.number().positive().optional().messages({
-        'number.base': errors.AREA.ID.MUST_NUMBER,
-        'number.positive': errors.AREA.ID.MUST_POSITIVE,
+        'number.base': errors.AREA.ID.MUST_BE_NUMBER,
+        'number.positive': errors.AREA.ID.MUST_BE_POSITIVE,
     }),
 }).unknown(true)
 

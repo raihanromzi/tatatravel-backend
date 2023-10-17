@@ -19,13 +19,13 @@ const add = async (req, res, next) => {
 
 const get = async (req, res, next) => {
     try {
-        const result = await areaService.get(req)
+        const { data, pagination } = await areaService.get(req)
         res.status(success.HTTP.CODE.OK).send(
             responses.responseSuccess(
                 success.HTTP.CODE.OK,
                 success.HTTP.STATUS.OK,
-                result.data,
-                result.pagination
+                data,
+                pagination
             )
         )
     } catch (e) {
