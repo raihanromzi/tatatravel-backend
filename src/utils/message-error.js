@@ -125,11 +125,11 @@ const useridErrors = {
 const passwordErrors = {
     REQUIRED: 'Please provide a password.',
     MUST_BE_STRING: 'Password must be a valid string.',
-    MUST_BE_6_CHAR_MIN: 'Password should be at least 6 characters long.',
-    MUST_BE_255_CHAR_MAX: 'Password cannot exceed 255 characters.',
+    MUST_BE_8_CHAR_MIN: 'Password should be at least 8 characters long.',
+    MUST_BE_16_CHAR_MAX: 'Password cannot exceed 16 characters.',
     CANNOT_BE_EMPTY: 'Password cannot be empty.',
     MUST_BE_VALID:
-        'Password must contain only letters and numbers and be between 6 and 255 characters long.',
+        'Password must contain at least 1 uppercase letter and consist of only letters and numbers.',
 }
 
 const pageErrors = {
@@ -350,7 +350,11 @@ const errors = {
         ARRAY: 'images must be an array',
     },
     AUTHORIZATION: 'you are not authorized to access this resource',
-    AUTHENTICATION: 'Invalid login credentials. Please check your information and try again.',
+    AUTHENTICATION: {
+        USERNAME_OR_EMAIL:
+            'Your username or email is incorrect. Please double-check and try again.',
+        PASSWORD: 'Your password is incorrect. Please verify and retry.',
+    },
     FORBIDDEN: 'you are not allowed to access this resource',
 }
 

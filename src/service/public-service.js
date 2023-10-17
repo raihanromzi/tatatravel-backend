@@ -32,7 +32,7 @@ const login = async (req, res) => {
         throw new ResponseError(
             errors.HTTP.CODE.UNAUTHORIZED,
             errors.HTTP.STATUS.UNAUTHORIZED,
-            errors.AUTHENTICATION
+            errors.AUTHENTICATION.USERNAME_OR_EMAIL
         )
     }
 
@@ -43,7 +43,7 @@ const login = async (req, res) => {
         throw new ResponseError(
             errors.HTTP.CODE.UNAUTHORIZED,
             errors.HTTP.STATUS.UNAUTHORIZED,
-            errors.AUTHENTICATION
+            errors.AUTHENTICATION.PASSWORD
         )
     }
 

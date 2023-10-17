@@ -128,16 +128,12 @@ const loginValidationSchema = Joi.object({
             'any.required': `${errors.USERNAME_OR_EMAIL.REQUIRED}`,
         }),
     password: Joi.string()
-        .min(6)
-        .max(255)
         .required()
-        .pattern(new RegExp('^[a-zA-Z0-9]{6,255}$'))
+        .pattern(new RegExp('^(?=.*[A-Z])[A-Za-z0-9]{8,16}$'))
         .messages({
+            'string.pattern.base': `${errors.PASSWORD.MUST_BE_VALID}`,
             'string.base': `${errors.PASSWORD.MUST_BE_STRING}`,
             'string.empty': `${errors.PASSWORD.CANNOT_BE_EMPTY}`,
-            'string.min': `${errors.PASSWORD.MUST_BE_6_CHAR_MIN}`,
-            'string.max': `${errors.PASSWORD.MUST_BE_255_CHAR_MAX}`,
-            'string.pattern.base': `${errors.PASSWORD.MUST_BE_VALID}`,
             'any.required': `${errors.PASSWORD.REQUIRED}`,
         }),
 }).messages({
