@@ -5,6 +5,30 @@ import { errors } from '../utils/message-error.js'
 const adminMiddleware = async (req, res, next) => {
     const user = req.user
 
+    const findUser = await prismaClient.user.findUnique({
+        where: {
+            id: user.id,
+        },
+        select: {
+            isActive: true,
+        },
+    })
+
+    const { isActive } = findUser
+
+    if (!isActive) {
+        res.status(errors.HTTP.CODE.UNAUTHORIZED)
+            .send(
+                response.responseError(
+                    errors.HTTP.CODE.UNAUTHORIZED,
+                    errors.HTTP.STATUS.UNAUTHORIZED,
+                    errors.USER.IS_NOT_ACTIVE
+                )
+            )
+            .end()
+        return
+    }
+
     // find role in database
     const role = await prismaClient.role.findUnique({
         where: {
@@ -12,16 +36,32 @@ const adminMiddleware = async (req, res, next) => {
         },
         select: {
             name: true,
+            isActive: true,
         },
     })
 
-    if (role.name !== 'super admin') {
+    const { name, isActive: roleIsActive } = role
+
+    if (name !== 'super admin') {
         res.status(errors.HTTP.CODE.UNAUTHORIZED)
             .send(
                 response.responseError(
                     errors.HTTP.CODE.UNAUTHORIZED,
                     errors.HTTP.STATUS.UNAUTHORIZED,
                     errors.ROLE.IS_NOT_SUPER_ADMIN
+                )
+            )
+            .end()
+        return
+    }
+
+    if (!roleIsActive) {
+        res.status(errors.HTTP.CODE.UNAUTHORIZED)
+            .send(
+                response.responseError(
+                    errors.HTTP.CODE.UNAUTHORIZED,
+                    errors.HTTP.STATUS.UNAUTHORIZED,
+                    errors.ROLE.IS_NOT_ACTIVE
                 )
             )
             .end()

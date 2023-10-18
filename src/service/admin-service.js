@@ -177,6 +177,7 @@ const get = async (req) => {
                         name: true,
                     },
                 },
+                isActive: true,
             },
             take: size,
             skip: skip,

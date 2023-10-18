@@ -71,6 +71,7 @@ const userErrors = {
     FAILED_TO_DELETE_DIRECTORY: 'Failed to delete the user avatar directory.',
     CANNOT_UPDATE_YOURSELF: 'You cannot update your own account.',
     FAILED_TO_DELETE_IMAGE: 'Failed to delete the user avatar.',
+    IS_NOT_ACTIVE: 'This user is currently not active.',
 }
 
 const roleErrors = {
@@ -93,6 +94,7 @@ const roleErrors = {
         CANNOT_BE_EMPTY: 'The is active field cannot be left empty.',
     },
     IS_UNKNOWN: 'Role is unknown.',
+    IS_NOT_ACTIVE: 'This role is currently not active.',
     IS_NOT_SUPER_ADMIN: 'This role is not a super admin role.',
     NOT_FOUND: 'Role not found.',
     ALREADY_EXISTS: 'This role already exists.',

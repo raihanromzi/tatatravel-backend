@@ -41,7 +41,7 @@ const accessTokenVerifyMiddleware = async (req, res, next) => {
                     response.responseError(
                         errors.HTTP.CODE.FORBIDDEN,
                         errors.HTTP.STATUS.FORBIDDEN,
-                        errors.FORBIDDEN
+                        errors.HTTP.MESSAGE.FORBIDDEN
                     )
                 )
                 .end()
@@ -96,7 +96,7 @@ const refreshTokenVerifyMiddleware = async (req, res, next) => {
                     response.responseError(
                         errors.HTTP.CODE.FORBIDDEN,
                         errors.HTTP.STATUS.FORBIDDEN,
-                        errors.FORBIDDEN
+                        errors.HTTP.MESSAGE.FORBIDDEN
                     )
                 )
                 .end()
