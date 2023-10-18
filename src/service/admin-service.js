@@ -19,6 +19,9 @@ const add = async (req) => {
             where: {
                 id: roleId,
             },
+            select: {
+                isActive: true,
+            },
         })
 
         if (!findRole) {
@@ -26,6 +29,16 @@ const add = async (req) => {
                 errors.HTTP.CODE.NOT_FOUND,
                 errors.HTTP.STATUS.NOT_FOUND,
                 errors.ROLE.NOT_FOUND
+            )
+        }
+
+        const { isActive: roleIsActive } = findRole
+
+        if (!roleIsActive) {
+            throw new ResponseError(
+                errors.HTTP.CODE.BAD_REQUEST,
+                errors.HTTP.STATUS.BAD_REQUEST,
+                errors.ROLE.IS_NOT_ACTIVE
             )
         }
 
@@ -286,6 +299,9 @@ const remove = async (req) => {
             where: {
                 id: paramUserId,
             },
+            select: {
+                isActive: true,
+            },
         })
 
         if (!findUser) {
@@ -293,6 +309,16 @@ const remove = async (req) => {
                 errors.HTTP.CODE.NOT_FOUND,
                 errors.HTTP.STATUS.NOT_FOUND,
                 errors.USER.NOT_FOUND
+            )
+        }
+
+        const { isActive: userIsActive } = findUser
+
+        if (!userIsActive) {
+            throw new ResponseError(
+                errors.HTTP.CODE.BAD_REQUEST,
+                errors.HTTP.STATUS.BAD_REQUEST,
+                errors.USER.IS_NOT_ACTIVE
             )
         }
 
