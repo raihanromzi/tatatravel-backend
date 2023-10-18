@@ -1,4 +1,5 @@
 import fs from 'fs/promises'
+import { logger } from '../application/logging.js'
 
 class ResponseError extends Error {
     constructor(code, status, error) {
@@ -23,6 +24,24 @@ class MulterError extends Error {
     }
 }
 
+class MulterErrorMultipleImages extends Error {
+    constructor(code, status, error, images) {
+        super(error)
+        this.status = status
+        this.code = code
+        this.images = images
+    }
+
+    async deleteImages() {
+        logger.info(this.images)
+        for (const images of this.images) {
+            for (const image of images) {
+                await fs.unlink(image.path)
+            }
+        }
+    }
+}
+
 class JoiError extends Error {
     constructor(code, status, errors) {
         super()
@@ -41,4 +60,4 @@ class JoiError extends Error {
     }
 }
 
-export { ResponseError, MulterError, JoiError }
+export { ResponseError, MulterError, JoiError, MulterErrorMultipleImages }

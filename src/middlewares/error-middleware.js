@@ -1,4 +1,9 @@
-import { JoiError, MulterError, ResponseError } from '../utils/response-error.js'
+import {
+    JoiError,
+    MulterError,
+    MulterErrorMultipleImages,
+    ResponseError,
+} from '../utils/response-error.js'
 import response from '../utils/response-api.js'
 import { errors } from '../utils/message-error.js'
 
@@ -21,11 +26,18 @@ const errorMiddleware = async (err, req, res, next) => {
                 response.responseError(
                     errors.HTTP.CODE.BAD_REQUEST,
                     errors.HTTP.STATUS.BAD_REQUEST,
-                    errors.AVATAR.MUST_LESS_THAN_2MB
+                    errors.AVATAR.MUST_BE_LESS_THAN_2MB
                 )
             )
             .end()
     } else if (err instanceof MulterError) {
+        // handle multer error
+        await err.deleteImages()
+        return res
+            .status(err.code)
+            .send(response.responseError(err.code, err.status, err.message))
+            .end()
+    } else if (err instanceof MulterErrorMultipleImages) {
         // handle multer error
         await err.deleteImages()
         return res

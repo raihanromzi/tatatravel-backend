@@ -5,23 +5,56 @@ import {
     imagesValidationSchema,
     searchBlogValidationSchema,
 } from '../validation/blog-validation.js'
-import { MulterError, ResponseError } from '../utils/response-error.js'
+import { MulterError, MulterErrorMultipleImages, ResponseError } from '../utils/response-error.js'
 import { prismaClient } from '../application/database.js'
 import { errors } from '../utils/message-error.js'
 import fs from 'fs/promises'
+import { userIdValidationSchema } from '../validation/user-validation.js'
 
 const add = async (req) => {
-    const blog = validate(addBlogValidationSchema, req.body)
+    const {
+        categoryId: categoryIdExist,
+        title: titleExist,
+        slug: slugExist,
+        desc: descExist,
+        content: contentExist,
+    } = req.body
+
+    if (!categoryIdExist || !titleExist || !slugExist || !descExist || !contentExist) {
+        throw new MulterError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.BLOG.FAILED_ADD,
+            req.files
+        )
+    }
+
+    const { categoryId, title, slug, desc, content } = validate(addBlogValidationSchema, req.body)
+    const { id: userId } = validate(userIdValidationSchema, { id: req.user.id })
     const images = validate(imagesValidationSchema, req.files)
-    const blogImages = images.map((image) => {
-        return {
+
+    const imgDetail = images
+        .filter((image) => image.fieldname === 'imgDetail')
+        .map((image) => ({
             id: null,
             filename: image.filename,
             path: image.path,
-        }
-    })
-    const { id: userId } = req.user
-    const { categoryId, title, slug, description, content } = blog
+        }))
+    const imgHead = images
+        .filter((image) => image.fieldname === 'imgHead')
+        .map((image) => ({
+            filename: image.filename,
+            path: image.path,
+        }))
+
+    if (imgDetail.length === 0 || imgHead.length === 0) {
+        throw new MulterError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.BLOG.IMAGES.IS_REQUIRED,
+            req.files
+        )
+    }
 
     return prismaClient.$transaction(async (prisma) => {
         const findUser = await prisma.user.findUnique({
@@ -31,11 +64,11 @@ const add = async (req) => {
         })
 
         if (!findUser) {
-            throw new MulterError(
+            throw new MulterErrorMultipleImages(
                 errors.HTTP.CODE.NOT_FOUND,
                 errors.HTTP.STATUS.NOT_FOUND,
                 errors.USER.NOT_FOUND,
-                blogImages
+                [imgDetail, imgHead]
             )
         }
 
@@ -43,25 +76,28 @@ const add = async (req) => {
             where: {
                 id: categoryId,
             },
+            select: {
+                isActive: true,
+            },
         })
 
         if (!findCategory) {
-            throw new MulterError(
+            throw new MulterErrorMultipleImages(
                 errors.HTTP.CODE.NOT_FOUND,
                 errors.HTTP.STATUS.NOT_FOUND,
                 errors.CATEGORY.NOT_FOUND,
-                blogImages
+                [imgDetail, imgHead]
             )
         }
 
         const { isActive } = findCategory
 
         if (isActive === false) {
-            throw new MulterError(
+            throw new MulterErrorMultipleImages(
                 errors.HTTP.CODE.BAD_REQUEST,
                 errors.HTTP.STATUS.BAD_REQUEST,
                 errors.CATEGORY.NOT_ACTIVE,
-                blogImages
+                [imgDetail, imgHead]
             )
         }
 
@@ -74,11 +110,11 @@ const add = async (req) => {
         })
 
         if (findSlug) {
-            throw new MulterError(
+            throw new MulterErrorMultipleImages(
                 errors.HTTP.CODE.BAD_REQUEST,
                 errors.HTTP.STATUS.BAD_REQUEST,
                 errors.BLOG.SLUG.ALREADY_EXISTS,
-                blogImages
+                [imgDetail, imgHead]
             )
         }
 
@@ -95,12 +131,13 @@ const add = async (req) => {
                     },
                 },
                 title: title,
+                imgHead: imgHead[0].path,
                 slug: validSlug,
-                description: description,
+                desc: desc,
                 content: content,
-                BlogImage: {
+                imgDetail: {
                     createMany: {
-                        data: blogImages.map((image) => {
+                        data: imgDetail.map((image) => {
                             const { path } = image
                             return {
                                 image: path,
@@ -111,101 +148,173 @@ const add = async (req) => {
             },
             select: {
                 id: true,
-                BlogImage: {
+                imgDetail: {
                     select: {
                         id: true,
                         image: true,
                     },
                 },
                 title: true,
+                imgHead: true,
                 slug: true,
-                description: true,
+                desc: true,
             },
         })
 
         if (!newBlog) {
-            throw new MulterError(
+            throw new MulterErrorMultipleImages(
                 errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
                 errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
                 errors.BLOG.FAILED_ADD,
-                blogImages
+                [imgDetail, imgHead]
             )
         }
 
-        for (const image in newBlog.BlogImage) {
-            const { id, image: path } = newBlog.BlogImage[image]
-            for (const image of blogImages) {
-                if (image.id === null) {
-                    if (image.path === path) {
-                        image.id = id
+        const { id: newBlogId, imgDetail: newBlogImagesDetail } = newBlog
+
+        for (const newBlogImageDetail in newBlogImagesDetail) {
+            const { id, image: path } = newBlogImagesDetail[newBlogImageDetail]
+            for (const oldBlogImageDetail of imgDetail) {
+                if (id === null) {
+                    if (oldBlogImageDetail.path === path) {
+                        oldBlogImageDetail.id = id
                     }
                 }
             }
         }
 
-        const { id } = newBlog
-
         try {
-            await fs.mkdir(`public/images/blog/${id}`, { recursive: true })
+            await fs.mkdir(`public/images/blog/${newBlogId}/details`, { recursive: true })
+            await fs.mkdir(`public/images/blog/${newBlogId}/header`, { recursive: true })
         } catch (error) {
-            throw new MulterError(
+            throw new MulterErrorMultipleImages(
                 errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
                 errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
                 errors.BLOG.FAILED_TO_CREATE_DIRECTORY,
-                blogImages
+                [imgDetail, imgHead]
             )
         }
 
         await Promise.all(
-            blogImages.map(async (image) => {
-                const { path, filename, id: imageBlogId } = image
+            imgHead.map(async (image) => {
+                const { path, filename } = image
                 const oldPath = path
-                const newPath = `public/images/blog/${id}/${filename}`
+                const newPath = `public/images/blog/${newBlogId}/header/${filename}`
 
                 try {
-                    await fs.rename(oldPath, newPath)
-                    await prisma.blogImage.update({
+                    await prisma.blog.update({
                         where: {
-                            id: imageBlogId,
+                            id: newBlogId,
                         },
                         data: {
-                            image: newPath,
+                            imgHead: newPath,
                         },
                     })
+                    await fs.rename(oldPath, newPath)
                     return newPath
                 } catch (e) {
                     const deleteBlogAndImages = async () => {
-                        await fs.rm(`public/images/blog/${id}`, { recursive: true, force: true })
-                        await prisma.blog.deleteMany({
+                        await fs.rm(`public/images/blog/${newBlogId}/header`, {
+                            recursive: true,
+                            force: true,
+                        })
+                        await prisma.blog.delete({
                             where: {
-                                id: id,
+                                id: newBlogId,
                             },
                         })
                         await fs.rm(oldPath, { recursive: true, force: true })
                     }
 
-                    return deleteBlogAndImages()
-                        .then(() => {
-                            throw new MulterError(
-                                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                                errors.BLOG.FAILED_ADD,
-                                blogImages
-                            )
-                        })
-                        .catch((error) => {
-                            throw new MulterError(
-                                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                                error,
-                                blogImages
-                            )
-                        })
+                    return deleteBlogAndImages().catch(() => {
+                        throw new ResponseError(
+                            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                            errors.BLOG.FAILED_ADD
+                        )
+                    })
                 }
             })
         )
 
-        return newBlog
+        await Promise.all(
+            imgDetail.map(async (image) => {
+                const { path, filename, id: IdDetailImage } = image
+                const oldPath = path
+                const newPath = `public/images/blog/${newBlogId}/details/${filename}`
+
+                try {
+                    await prisma.blogImage.updateMany({
+                        where: {
+                            blogId: newBlogId,
+                        },
+                        data: {
+                            image: newPath,
+                        },
+                    })
+                    await fs.rename(oldPath, newPath)
+                    return newPath
+                } catch (e) {
+                    const deleteBlogAndImages = async () => {
+                        await fs.rm(`public/images/blog/${newBlogId}/details`, {
+                            recursive: true,
+                            force: true,
+                        })
+                        await prisma.blog.deleteMany({
+                            where: {
+                                id: IdDetailImage,
+                            },
+                        })
+                        await fs.rm(oldPath, { recursive: true, force: true })
+                    }
+
+                    return deleteBlogAndImages().catch((error) => {
+                        throw new MulterErrorMultipleImages(
+                            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                            error,
+                            [imgDetail, imgHead]
+                        )
+                    })
+                }
+            })
+        )
+
+        const result = await prisma.blog.findUnique({
+            where: {
+                id: newBlogId,
+            },
+            select: {
+                id: true,
+                title: true,
+                desc: true,
+                slug: true,
+                imgHead: true,
+                imgDetail: {
+                    select: {
+                        image: true,
+                    },
+                },
+            },
+        })
+
+        const {
+            id: resultId,
+            title: resultTitle,
+            desc: resultDesc,
+            slug: resultSlug,
+            imgHead: imgHeadPath,
+            imgDetail: imgDetailPath,
+        } = result
+
+        return {
+            id: resultId,
+            title: resultTitle,
+            desc: resultDesc,
+            slug: resultSlug,
+            imgHead: imgHeadPath,
+            imgDetail: imgDetailPath.map((image) => image.image),
+        }
     })
 }
 
@@ -220,9 +329,9 @@ const getById = async (req) => {
             select: {
                 title: true,
                 slug: true,
-                description: true,
+                desc: true,
                 content: true,
-                BlogImage: {
+                imgDetail: {
                     select: {
                         image: true,
                     },
@@ -230,7 +339,7 @@ const getById = async (req) => {
                 user: {
                     select: {
                         fullName: true,
-                        username: true,
+                        userName: true,
                         avatar: true,
                     },
                 },
@@ -299,8 +408,8 @@ const get = async (req) => {
             },
             select: {
                 title: true,
-                description: true,
-                BlogImage: {
+                desc: true,
+                imgDetail: {
                     select: {
                         image: true,
                     },
@@ -308,7 +417,7 @@ const get = async (req) => {
                 user: {
                     select: {
                         fullName: true,
-                        username: true,
+                        userName: true,
                         avatar: true,
                     },
                 },
@@ -511,7 +620,7 @@ const update = async (req) => {
             data: data,
             select: {
                 id: true,
-                BlogImage: {
+                imgDetail: {
                     select: {
                         id: true,
                         image: true,
@@ -519,7 +628,7 @@ const update = async (req) => {
                 },
                 title: true,
                 slug: true,
-                description: true,
+                desc: true,
             },
         })
 
@@ -532,8 +641,8 @@ const update = async (req) => {
             )
         }
 
-        for (const image in updatedBlog.BlogImage) {
-            const { id, image: path } = updatedBlog.BlogImage[image]
+        for (const image in updatedBlog.imgDetail) {
+            const { id, image: path } = updatedBlog.imgDetail[image]
             for (const image of blogImages) {
                 if (image.id === null) {
                     if (image.path === path) {

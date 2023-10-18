@@ -221,9 +221,13 @@ const avatarValidationSchema = Joi.object({
         .items(
             Joi.object()
                 .keys({
-                    path: Joi.string().messages({
-                        'string.base': `${errors.AVATAR.MUST_BE_STRING}`,
-                    }),
+                    path: Joi.string()
+                        .required()
+                        .messages({
+                            'string.base': `${errors.AVATAR.MUST_BE_STRING}`,
+                            'string.empty': `${errors.AVATAR.CANNOT_BE_EMPTY}`,
+                            'any.required': `${errors.AVATAR.IS_REQUIRED}`,
+                        }),
                 })
                 .unknown(true)
                 .error(new Error(`${errors.AVATAR.MUST_BE_VALID_FORMAT}`))

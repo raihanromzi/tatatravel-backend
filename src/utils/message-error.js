@@ -214,6 +214,7 @@ const avatarErrors = {
     MUST_BE_LESS_THAN_2MB: 'The avatar file size must be less than 2MB.',
     CANNOT_BE_EMPTY: 'The avatar cannot be left empty.',
     FAILED_TO_CREATE_DIRECTORY: 'Failed to create the user avatar directory.',
+    IS_REQUIRED: 'Please provide an avatar.',
 }
 
 const sortByErrors = {
@@ -229,52 +230,58 @@ const orderByErrors = {
 
 const blogErrors = {
     TITLE: {
-        IS_REQUIRED: 'title is required',
-        MUST_STRING: 'title must be a string',
-        MUST_MIN: 'title is min 3 characters',
-        MUST_MAX: 'title is max 255 characters',
-        CANNOT_EMPTY: 'title cannot be empty',
+        IS_REQUIRED: 'Please provide a title for the blog.',
+        MUST_BE_STRING: 'The title must be a string of 3 to 255 characters.',
+        CANNOT_BE_EMPTY: 'The title cannot be left empty.',
+        MUST_BE_3_CHAR_MIN: 'The title should be at least 3 characters long.',
+        MUST_BE_255_CHAR_MAX: 'The title cannot exceed 255 characters.',
     },
     IMAGES: {
-        PATH_MUST_STRING: 'images path must be a string',
-        MUST_VALID: 'failed to add image, please upload image with PNG, JPG, or JPEG format',
-        IS_REQUIRED: 'minimum 1 image is required',
-        IMAGE_NOT_VALID: 'image is not valid, please upload image with PNG, JPG, or JPEG format',
-        IMAGE_ARRAY: 'images must be an array',
+        PATH_MUST_STRING: 'The image path must be a valid string.',
+        MUST_BE_VALID_FORMAT:
+            'Invalid image format. Please upload images in PNG, JPG, or JPEG format.',
+        IS_REQUIRED: 'At least 1 image of header and 1 image of details is required for a blog.',
+        IMAGE_NOT_VALID: 'The uploaded image is not valid. Please use PNG, JPG, or JPEG format.',
+        IMAGE_ARRAY: 'The images must be provided as an array.',
+        CANNOT_BE_EMPTY: 'The images cannot be left empty.',
     },
     SLUG: {
-        IS_REQUIRED: 'slug is required',
-        MUST_STRING: 'slug must be a string',
-        MUST_MIN: 'slug is min 3 characters',
-        MUST_MAX: 'slug is max 100 characters',
-        CANNOT_EMPTY: 'slug cannot be empty',
-        ALREADY_EXISTS: 'slug already exists',
+        IS_REQUIRED: 'Please provide a slug for the blog.',
+        MUST_BE_STRING: 'The slug must be a string of 3 to 100 characters.',
+        CANNOT_BE_EMPTY: 'The slug cannot be left empty.',
+        MUST_BE_3_CHAR_MIN: 'The slug should be at least 3 characters long.',
+        MUST_BE_100_CHAR_MAX: 'The slug cannot exceed 100 characters.',
+        ALREADY_EXISTS: 'This slug already exists.',
     },
     DESCRIPTION: {
-        IS_REQUIRED: 'description is required',
-        MUST_STRING: 'description must be a string',
-        MUST_MIN: 'description is min 3 characters',
-        MUST_MAX: 'description is max 255 characters',
-        CANNOT_EMPTY: 'description cannot be empty',
+        IS_REQUIRED: 'Please provide a description for the blog.',
+        MUST_BE_STRING: 'The description must be a string of 3 to 255 characters.',
+        CANNOT_BE_EMPTY: 'The description cannot be left empty.',
+        MUST_BE_3_CHAR_MIN: 'The description should be at least 3 characters long.',
+        MUST_BE_255_CHAR_MAX: 'The description cannot exceed 255 characters.',
     },
     CONTENT: {
-        IS_REQUIRED: 'content is required',
-        MUST_STRING: 'content must be a string',
-        MUST_MIN: 'content is min 3 characters',
-        CANNOT_EMPTY: 'content cannot be empty',
+        IS_REQUIRED: 'Please provide content for the blog.',
+        MUST_BE_STRING: 'The content must be a string of at least 3 characters.',
+        MUST_BE_3_CHAR_MIN: 'The content should be at least 3 characters long.',
+        CANNOT_BE_EMPTY: 'The content cannot be left empty.',
     },
     ID: {
-        IS_REQUIRED: 'blog id is required',
-        MUST_NUMBER: 'blog id must be a number',
-        MUST_POSITIVE: 'blog id must be a positive number',
-        CANNOT_EMPTY: 'blog id cannot be empty',
+        IS_REQUIRED: 'Please specify the blog ID.',
+        MUST_BE_NUMBER: 'Blog ID must be a valid number.',
+        MUST_BE_POSITIVE: 'Blog ID must be a positive number.',
+        CANNOT_BE_EMPTY: 'The blog ID cannot be left empty.',
     },
-    FAILED_ADD: 'failed to add blog',
-    FAILED_UPDATE: 'failed to update blog',
-    FAILED_DELETE: 'failed to delete blog',
-    NOT_FOUND: 'blog is not found',
-    FAILED_TO_CREATE_DIRECTORY: 'failed to create blog images directory',
-    FAILED_TO_FIND_DIRECTORY: 'failed to find blog images directory',
+    FAILED_ADD: 'We encountered an issue while trying to add the blog. Please try again later.',
+    FAILED_UPDATE:
+        'We encountered an issue while trying to update the blog. Please try again later.',
+    FAILED_DELETE:
+        'We encountered an issue while trying to delete the blog. Please try again later.',
+    NOT_FOUND: 'The specified blog was not found.',
+    FAILED_TO_CREATE_DIRECTORY:
+        'We encountered an issue while trying to create the blog images directory.',
+    FAILED_TO_FIND_DIRECTORY:
+        'We encountered an issue while trying to find the blog images directory.',
 }
 
 const tourErrors = {

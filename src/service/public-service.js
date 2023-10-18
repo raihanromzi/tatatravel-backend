@@ -9,96 +9,117 @@ import tokenService from './token-service.js'
 const login = async (req, res) => {
     const { emailOrUserName, password } = validate(loginValidationSchema, req.body)
 
-    const findUser = await prismaClient.user.findFirst({
-        where: {
-            OR: [
-                {
-                    email: emailOrUserName,
-                },
-                {
-                    userName: emailOrUserName,
-                },
-            ],
-        },
-        select: {
-            id: true,
-            userName: true,
-            password: true,
-            isActive: true,
-            roleId: true,
-        },
-    })
+    return prismaClient.$transaction(async (prisma) => {
+        const findUser = await prisma.user.findFirst({
+            where: {
+                OR: [
+                    {
+                        email: emailOrUserName,
+                    },
+                    {
+                        userName: emailOrUserName,
+                    },
+                ],
+            },
+            select: {
+                id: true,
+                userName: true,
+                password: true,
+                isActive: true,
+                roleId: true,
+            },
+        })
 
-    if (!findUser) {
-        throw new ResponseError(
-            errors.HTTP.CODE.UNAUTHORIZED,
-            errors.HTTP.STATUS.UNAUTHORIZED,
-            errors.AUTHENTICATION.USERNAME_OR_EMAIL
-        )
-    }
+        if (!findUser) {
+            throw new ResponseError(
+                errors.HTTP.CODE.UNAUTHORIZED,
+                errors.HTTP.STATUS.UNAUTHORIZED,
+                errors.AUTHENTICATION.USERNAME_OR_EMAIL
+            )
+        }
 
-    const { id, userName, password: passwordHash, isActive, roleId } = findUser
+        const { id, userName, password: passwordHash, isActive, roleId } = findUser
 
-    if (!isActive) {
-        throw new ResponseError(
-            errors.HTTP.CODE.UNAUTHORIZED,
-            errors.HTTP.STATUS.UNAUTHORIZED,
-            errors.USER.IS_NOT_ACTIVE
-        )
-    }
+        if (!isActive) {
+            throw new ResponseError(
+                errors.HTTP.CODE.UNAUTHORIZED,
+                errors.HTTP.STATUS.UNAUTHORIZED,
+                errors.USER.IS_NOT_ACTIVE
+            )
+        }
 
-    const isPasswordValid = await bcrypt.compare(password, passwordHash)
+        const findRole = await prisma.role.findUnique({
+            where: {
+                id: roleId,
+            },
+            select: {
+                isActive: true,
+            },
+        })
 
-    if (!isPasswordValid) {
-        throw new ResponseError(
-            errors.HTTP.CODE.UNAUTHORIZED,
-            errors.HTTP.STATUS.UNAUTHORIZED,
-            errors.AUTHENTICATION.PASSWORD
-        )
-    }
+        const { isActive: isRoleActive } = findRole
 
-    const userAccessTokenData = {
-        id: id,
-        roleId: roleId,
-    }
+        if (!isRoleActive) {
+            throw new ResponseError(
+                errors.HTTP.CODE.UNAUTHORIZED,
+                errors.HTTP.STATUS.UNAUTHORIZED,
+                errors.ROLE.IS_NOT_ACTIVE
+            )
+        }
 
-    const userRefreshTokenData = {
-        id: id,
-        userName: userName,
-        roleId: roleId,
-    }
+        const isPasswordValid = await bcrypt.compare(password, passwordHash)
 
-    const accessToken = tokenService.generateAccessToken(userAccessTokenData)
-    const refreshToken = tokenService.generateRefreshToken(userRefreshTokenData)
+        if (!isPasswordValid) {
+            throw new ResponseError(
+                errors.HTTP.CODE.UNAUTHORIZED,
+                errors.HTTP.STATUS.UNAUTHORIZED,
+                errors.AUTHENTICATION.PASSWORD
+            )
+        }
 
-    res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        sameSite: 'None',
-        secure: true,
-        maxAge: 1000 * 60 * 60 * 24, // 1 day
-    })
+        const userAccessTokenData = {
+            id: id,
+            roleId: roleId,
+        }
 
-    const updateUserToken = await prismaClient.user.update({
-        where: {
+        const userRefreshTokenData = {
             id: id,
             userName: userName,
-        },
-        data: {
-            token: refreshToken,
-        },
+            roleId: roleId,
+        }
+
+        const accessToken = tokenService.generateAccessToken(userAccessTokenData)
+        const refreshToken = tokenService.generateRefreshToken(userRefreshTokenData)
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            sameSite: 'None',
+            secure: true,
+            maxAge: 1000 * 60 * 60 * 24, // 1 day
+        })
+
+        const updateUserToken = await prisma.user.update({
+            where: {
+                id: id,
+                userName: userName,
+            },
+            data: {
+                token: refreshToken,
+            },
+        })
+
+        if (!updateUserToken) {
+            throw new ResponseError(
+                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                errors.HTTP.MESSAGE.INTERNAL_SERVER_ERROR
+            )
+        }
+
+        return {
+            accessToken: accessToken,
+        }
     })
-
-    if (!updateUserToken) {
-        throw new ResponseError(
-            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-            errors.HTTP.MESSAGE.INTERNAL_SERVER_ERROR
-        )
-    }
-
-    return {
-        accessToken: accessToken,
-    }
 }
 
 export default { login }
