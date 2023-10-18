@@ -24,6 +24,7 @@ const login = async (req, res) => {
             id: true,
             userName: true,
             password: true,
+            isActive: true,
             roleId: true,
         },
     })
@@ -36,7 +37,16 @@ const login = async (req, res) => {
         )
     }
 
-    const { id, userName, password: passwordHash, roleId } = findUser
+    const { id, userName, password: passwordHash, isActive, roleId } = findUser
+
+    if (!isActive) {
+        throw new ResponseError(
+            errors.HTTP.CODE.UNAUTHORIZED,
+            errors.HTTP.STATUS.UNAUTHORIZED,
+            errors.USER.IS_NOT_ACTIVE
+        )
+    }
+
     const isPasswordValid = await bcrypt.compare(password, passwordHash)
 
     if (!isPasswordValid) {

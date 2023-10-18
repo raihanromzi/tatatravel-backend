@@ -140,6 +140,12 @@ const getUserValidationSchema = Joi.object({
             'string.base': `${errors.FULL_NAME.MUST_BE_STRING}`,
             'string.max': `${errors.FULL_NAME.MUST_BE_50_CHAR_MAX}`,
         }),
+    isActive: Joi.boolean()
+        .optional()
+        .messages({
+            'boolean.base': `${errors.USER.IS_ACTIVE.MUST_BE_BOOLEAN}`,
+            'boolean.empty': `${errors.USER.IS_ACTIVE.CANNOT_BE_EMPTY}`,
+        }),
     role: Joi.string()
         .max(30)
         .optional()

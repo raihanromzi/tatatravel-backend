@@ -101,7 +101,7 @@ const add = async (req) => {
     })
 }
 const get = async (req) => {
-    const { name, email, userName, role, page, size, sortBy, orderBy } = validate(
+    const { name, email, userName, isActive, role, page, size, sortBy, orderBy } = validate(
         getUserValidationSchema,
         req.query
     )
@@ -156,6 +156,12 @@ const get = async (req) => {
                     contains: role,
                 },
             },
+        })
+    }
+
+    if (isActive !== undefined) {
+        filters.push({
+            isActive: isActive,
         })
     }
 
