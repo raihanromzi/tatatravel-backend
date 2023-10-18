@@ -23,7 +23,6 @@ const updateRoleValidationSchema = Joi.object({
     isActive: Joi.boolean().optional().messages({
         'boolean.base': errors.ROLE.IS_ACTIVE.MUST_BE_BOOLEAN,
         'boolean.empty': errors.ROLE.IS_ACTIVE.CANNOT_BE_EMPTY,
-        'any.required': errors.ROLE.IS_ACTIVE.IS_REQUIRED,
     }),
 }).messages({
     'object.unknown': errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR,

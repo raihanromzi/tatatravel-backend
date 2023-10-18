@@ -17,6 +17,28 @@ const add = async (req, res, next) => {
     }
 }
 
+const get = async (req, res, next) => {
+    try {
+        const result = await categoryService.get(req)
+        res.status(success.HTTP.CODE.OK).send(
+            responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
+        )
+    } catch (e) {
+        next(e)
+    }
+}
+
+const getById = async (req, res, next) => {
+    try {
+        const result = await categoryService.getById(req)
+        res.status(success.HTTP.CODE.OK).send(
+            responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
+        )
+    } catch (e) {
+        next(e)
+    }
+}
+
 const update = async (req, res, next) => {
     try {
         const result = await categoryService.update(req)
@@ -37,28 +59,6 @@ const remove = async (req, res, next) => {
                 success.HTTP.STATUS.OK,
                 success.CATEGORY.DELETE
             )
-        )
-    } catch (e) {
-        next(e)
-    }
-}
-
-const get = async (req, res, next) => {
-    try {
-        const result = await categoryService.get(req)
-        res.status(success.HTTP.CODE.OK).send(
-            responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
-        )
-    } catch (e) {
-        next(e)
-    }
-}
-
-const getById = async (req, res, next) => {
-    try {
-        const result = await categoryService.getById(req)
-        res.status(success.HTTP.CODE.OK).send(
-            responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
         )
     } catch (e) {
         next(e)

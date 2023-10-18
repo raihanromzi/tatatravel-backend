@@ -26,26 +26,26 @@ const httpErrors = {
 
 const categoryErrors = {
     NAME: {
-        IS_REQUIRED: 'category name is required',
-        MUST_STRING: 'category name must be a string',
-        MUST_MIN: 'category name is min 3 characters',
-        MUST_MAX: 'category name is max 100 characters',
-        CANNOT_EMPTY: 'category name cannot be empty',
+        IS_REQUIRED: 'Please provide a category name.',
+        MUST_BE_STRING: 'Category name must be a string of 3 to 100 characters.',
+        CANNOT_BE_EMPTY: 'Category name cannot be left empty.',
+        MUST_BE_3_CHAR_MIN: 'Category name should be at least 3 characters long.',
+        MUST_BE_50_CHAR_MAX: 'Category name cannot exceed 50 characters.',
     },
     ID: {
-        IS_REQUIRED: 'category id is required',
-        MUST_NUMBER: 'category id must be a number',
-        MUST_POSITIVE: 'category id must be a positive number',
-        CANNOT_EMPTY: 'category id cannot be empty',
+        IS_REQUIRED: 'Please provide the category ID.',
+        MUST_BE_NUMBER: 'Category ID must be a valid number.',
+        MUST_BE_POSITIVE: 'Category ID must be a positive number.',
+        CANNOT_BE_EMPTY: 'Category ID cannot be left empty.',
     },
     IS_ACTIVE: {
-        IS_REQUIRED: 'is active is required',
-        MUST_BOOLEAN: 'is active must be a boolean',
-        CANNOT_EMPTY: 'is active cannot be empty',
+        IS_REQUIRED: 'Please specify if the category is active.',
+        MUST_BE_BOOLEAN: 'The is active value must be a valid boolean.',
+        CANNOT_BE_EMPTY: 'The is active field cannot be left empty.',
     },
-    ALREADY_EXISTS: 'category already exists',
-    NOT_FOUND: 'category is not found',
-    NOT_ACTIVE: 'category is not active',
+    ALREADY_EXISTS: 'This category already exists.',
+    NOT_FOUND: 'The specified category was not found.',
+    NOT_ACTIVE: 'This category is currently not active.',
     FAILED_TO_ADD:
         'Sorry, we encountered an issue while adding the category. Please try again later.',
     FAILED_TO_UPDATE:

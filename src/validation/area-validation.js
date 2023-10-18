@@ -26,8 +26,6 @@ const getAreaValidationSchema = Joi.object({
     }),
     name: Joi.string().max(100).optional().empty('').messages({
         'string.base': errors.AREA.NAME.MUST_BE_STRING,
-        'string.empty': errors.AREA.NAME.CANNOT_BE_EMPTY,
-        'string.min': errors.AREA.NAME.MUST_BE_3_CHAR_MIN,
         'string.max': errors.AREA.NAME.MUST_BE_50_CHAR_MAX,
     }),
     sortBy: Joi.string()
