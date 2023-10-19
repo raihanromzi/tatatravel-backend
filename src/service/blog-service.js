@@ -11,6 +11,7 @@ import { prismaClient } from '../application/database.js'
 import { errors } from '../utils/message-error.js'
 import fs from 'fs/promises'
 import { userIdValidationSchema } from '../validation/user-validation.js'
+import { clearDirectory } from '../utils/clear-directory.js'
 
 const add = async (req) => {
     // validate request body, should exist
@@ -165,56 +166,60 @@ const add = async (req) => {
             )
         }
 
-        const newBlog = await prisma.blog.create({
-            data: {
-                user: {
-                    connect: {
-                        id: userId,
-                    },
-                },
-                category: {
-                    connect: {
-                        id: categoryId,
-                    },
-                },
-                title: title,
-                imgHead: imgHead[0].path,
-                slug: validSlug,
-                desc: desc,
-                content: content,
-                imgDetail: {
-                    createMany: {
-                        data: imgDetail.map((image) => {
-                            const { path } = image
-                            return {
-                                image: path,
-                            }
-                        }),
-                    },
-                },
-            },
-            select: {
-                id: true,
-                imgDetail: {
-                    select: {
-                        id: true,
-                        image: true,
-                    },
-                },
-                title: true,
-                imgHead: true,
-                slug: true,
-                desc: true,
-            },
-        })
+        let newBlog = null
 
-        if (!newBlog) {
-            throw new MulterErrorMultipleImages(
-                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                errors.BLOG.FAILED_ADD,
-                [imgDetail, imgHead]
-            )
+        try {
+            newBlog = await prisma.blog.create({
+                data: {
+                    user: {
+                        connect: {
+                            id: userId,
+                        },
+                    },
+                    category: {
+                        connect: {
+                            id: categoryId,
+                        },
+                    },
+                    title: title,
+                    imgHead: imgHead[0].path,
+                    slug: validSlug,
+                    desc: desc,
+                    content: content,
+                    imgDetail: {
+                        createMany: {
+                            data: imgDetail.map((image) => {
+                                const { path } = image
+                                return {
+                                    image: path,
+                                }
+                            }),
+                        },
+                    },
+                },
+                select: {
+                    id: true,
+                    imgDetail: {
+                        select: {
+                            id: true,
+                            image: true,
+                        },
+                    },
+                    title: true,
+                    imgHead: true,
+                    slug: true,
+                    desc: true,
+                },
+            })
+        } catch (error) {
+            if (error) {
+                throw new MulterErrorMultipleImages(
+                    errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                    errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                    errors.BLOG.FAILED_ADD,
+                    [imgDetail, imgHead]
+                )
+            }
         }
 
         const { id: newBlogId, imgDetail: newBlogImagesDetail } = newBlog
@@ -274,10 +279,11 @@ const add = async (req) => {
                     }
 
                     return deleteBlogAndImages().catch(() => {
-                        throw new ResponseError(
+                        throw new MulterErrorMultipleImages(
                             errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
                             errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                            errors.BLOG.FAILED_ADD
+                            errors.BLOG.FAILED_ADD,
+                            [imgDetail, imgHead]
                         )
                     })
                 }
@@ -315,11 +321,11 @@ const add = async (req) => {
                         await fs.rm(oldPath, { recursive: true, force: true })
                     }
 
-                    return deleteBlogAndImages().catch((error) => {
+                    return deleteBlogAndImages().catch(() => {
                         throw new MulterErrorMultipleImages(
                             errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
                             errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                            error,
+                            errors.BLOG.FAILED_ADD,
                             [imgDetail, imgHead]
                         )
                     })
@@ -534,6 +540,7 @@ const update = async (req) => {
         req.body
     )
     const images = validate(imagesValidationSchema, req.files)
+    const data = {}
 
     for (let i = 0; i <= images.length - 1; i++) {
         const { fieldname } = images[i]
@@ -580,6 +587,47 @@ const update = async (req) => {
         )
     }
 
+    if (title) {
+        data.title = title
+    }
+
+    if (desc) {
+        data.desc = desc
+    }
+
+    if (content) {
+        data.content = content
+    }
+
+    if (slug) {
+        data.slug = slug.split(' ')?.join('-')
+    }
+
+    if (categoryId) {
+        data.category = {
+            connect: {
+                id: categoryId,
+            },
+        }
+    }
+
+    if (imgHead) {
+        data.imgHead = imgHead[0].path
+    }
+
+    if (imgDetail) {
+        data.imgDetail = {
+            createMany: {
+                data: imgDetail.map((image) => {
+                    const { path } = image
+                    return {
+                        image: path,
+                    }
+                }),
+            },
+        }
+    }
+
     return prismaClient.$transaction(async (prisma) => {
         const findBlog = await prisma.blog.findUnique({
             where: {
@@ -596,53 +644,57 @@ const update = async (req) => {
             )
         }
 
-        const findCategory = await prisma.category.findUnique({
-            where: {
-                id: categoryId,
-            },
-            select: {
-                isActive: true,
-            },
-        })
-
-        if (!findCategory) {
-            throw new MulterErrorMultipleImages(
-                errors.HTTP.CODE.NOT_FOUND,
-                errors.HTTP.STATUS.NOT_FOUND,
-                errors.CATEGORY.NOT_FOUND,
-                [imgDetail, imgHead]
-            )
-        }
-
-        const { isActive } = findCategory
-
-        if (isActive === false) {
-            throw new MulterErrorMultipleImages(
-                errors.HTTP.CODE.BAD_REQUEST,
-                errors.HTTP.STATUS.BAD_REQUEST,
-                errors.CATEGORY.NOT_ACTIVE,
-                [imgDetail, imgHead]
-            )
-        }
-
-        const validSlug = slug.split(' ').join('-')
-
-        const findSlug = await prisma.blog.findUnique({
-            where: {
-                slug: validSlug,
-                NOT: {
-                    id: blogId,
+        // category check
+        if (categoryId) {
+            const findCategory = await prisma.category.findUnique({
+                where: {
+                    id: categoryId,
                 },
-            },
-        })
+                select: {
+                    isActive: true,
+                },
+            })
 
-        if (findSlug) {
-            throw new MulterErrorMultipleImages(
-                errors.HTTP.CODE.BAD_REQUEST,
-                errors.HTTP.STATUS.BAD_REQUEST,
-                errors.BLOG.SLUG.ALREADY_EXISTS,
-                [imgDetail, imgHead]
-            )
+            if (!findCategory) {
+                throw new MulterErrorMultipleImages(
+                    errors.HTTP.CODE.NOT_FOUND,
+                    errors.HTTP.STATUS.NOT_FOUND,
+                    errors.CATEGORY.NOT_FOUND,
+                    [imgDetail, imgHead]
+                )
+            }
+
+            const { isActive } = findCategory
+
+            if (isActive === false) {
+                throw new MulterErrorMultipleImages(
+                    errors.HTTP.CODE.BAD_REQUEST,
+                    errors.HTTP.STATUS.BAD_REQUEST,
+                    errors.CATEGORY.NOT_ACTIVE,
+                    [imgDetail, imgHead]
+                )
+            }
+        }
+
+        // slug check
+        if (data.slug) {
+            const findSlug = await prisma.blog.findUnique({
+                where: {
+                    slug: data.slug,
+                    NOT: {
+                        id: blogId,
+                    },
+                },
+            })
+
+            if (findSlug) {
+                throw new MulterErrorMultipleImages(
+                    errors.HTTP.CODE.BAD_REQUEST,
+                    errors.HTTP.STATUS.BAD_REQUEST,
+                    errors.BLOG.SLUG.ALREADY_EXISTS,
+                    [imgDetail, imgHead]
+                )
+            }
         }
 
         try {
@@ -657,36 +709,32 @@ const update = async (req) => {
             )
         }
 
-        const updatedBlog = await prisma.blog.update({
-            where: {
-                id: blogId,
-            },
-            data: {
-                title: title,
-                desc: desc,
-                content: content,
-                slug: slug,
-                imgHead: imgHead[0].path,
-                imgDetail: {
-                    createMany: {
-                        data: imgDetail.map((image) => {
-                            const { path } = image
-                            return {
-                                image: path,
-                            }
-                        }),
-                    },
-                },
-            },
-        })
+        let updatedBlog = null
 
-        if (!updatedBlog) {
-            throw new MulterErrorMultipleImages(
-                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                errors.BLOG.FAILED_UPDATE,
-                [imgDetail, imgHead]
-            )
+        try {
+            await prisma.blogImage.deleteMany({
+                where: {
+                    blogId: blogId,
+                },
+            })
+            updatedBlog = await prisma.blog.update({
+                where: {
+                    id: blogId,
+                },
+                data: data,
+                select: {
+                    imgDetail: true,
+                },
+            })
+        } catch (error) {
+            if (error) {
+                throw new MulterErrorMultipleImages(
+                    errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                    errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                    errors.BLOG.FAILED_UPDATE,
+                    [imgDetail, imgHead]
+                )
+            }
         }
 
         const { imgDetail: updatedBlogImageDetail } = updatedBlog
@@ -694,21 +742,21 @@ const update = async (req) => {
         for (const image in updatedBlogImageDetail) {
             const { id, image: path } = updatedBlogImageDetail[image]
             for (const oldBlogImageDetail of imgDetail) {
-                if (image.id === null) {
+                if (oldBlogImageDetail.id === null) {
                     if (oldBlogImageDetail.path === path) {
                         oldBlogImageDetail.id = id
                     }
                 }
             }
         }
+        try {
+            await clearDirectory(`public/images/blog/${blogId}/header`)
+            await Promise.all(
+                imgHead.map(async (image) => {
+                    const { path, filename } = image
+                    const oldPath = path
+                    const newPath = `public/images/blog/${blogId}/header/${filename}`
 
-        await Promise.all(
-            imgHead.map(async (image) => {
-                const { path, filename } = image
-                const oldPath = path
-                const newPath = `public/images/blog/${blogId}/header/${filename}`
-
-                try {
                     await prisma.blog.update({
                         where: {
                             id: blogId,
@@ -717,75 +765,66 @@ const update = async (req) => {
                             imgHead: newPath,
                         },
                     })
-                    await fs.rename(oldPath, newPath)
-                    return newPath
-                } catch (e) {
-                    const deleteBlogAndImages = async () => {
-                        await fs.rm(`public/images/blog/${blogId}/header`, {
-                            recursive: true,
-                            force: true,
-                        })
-                        await prisma.blog.delete({
-                            where: {
-                                id: blogId,
-                            },
-                        })
-                        await fs.rm(oldPath, { recursive: true, force: true })
-                    }
 
-                    return deleteBlogAndImages().catch(() => {
-                        throw new ResponseError(
+                    try {
+                        await fs.rename(oldPath, newPath)
+                    } catch (e) {
+                        throw new MulterError(
                             errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
                             errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                            errors.BLOG.FAILED_ADD
+                            errors.BLOG.FAILED_ADD,
+                            imgHead
                         )
-                    })
-                }
-            })
-        )
+                    }
 
-        await Promise.all(
-            imgDetail.map(async (image) => {
-                const { path, filename, id: IdDetailImage } = image
-                const oldPath = path
-                const newPath = `public/images/blog/${blogId}/details/${filename}`
-
-                try {
-                    await prisma.blogImage.updateMany({
-                        where: {
-                            blogId: blogId,
-                        },
-                        data: {
-                            image: newPath,
-                        },
-                    })
-                    await fs.rename(oldPath, newPath)
                     return newPath
-                } catch (e) {
-                    const deleteBlogAndImages = async () => {
-                        await fs.rm(`public/images/blog/${blogId}/details`, {
-                            recursive: true,
-                            force: true,
-                        })
-                        await prisma.blog.deleteMany({
+                })
+            )
+        } catch (e) {
+            throw new ResponseError(
+                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                errors.BLOG.FAILED_ADD
+            )
+        }
+
+        try {
+            await clearDirectory(`public/images/blog/${blogId}/details`)
+            await Promise.all(
+                imgDetail.map(async (image) => {
+                    const { path, filename, id: IdDetailImage } = image
+                    const oldPath = path
+                    const newPath = `public/images/blog/${blogId}/details/${filename}`
+
+                    try {
+                        await prisma.blogImage.update({
                             where: {
                                 id: IdDetailImage,
                             },
+                            data: {
+                                image: newPath,
+                            },
                         })
-                        await fs.rm(oldPath, { recursive: true, force: true })
-                    }
-
-                    return deleteBlogAndImages().catch((error) => {
-                        throw new MulterErrorMultipleImages(
+                        await fs.rename(oldPath, newPath)
+                    } catch (e) {
+                        throw new MulterError(
                             errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
                             errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                            error,
-                            [imgDetail, imgHead]
+                            errors.BLOG.FAILED_ADD,
+                            imgDetail
                         )
-                    })
-                }
-            })
-        )
+                    }
+
+                    return newPath
+                })
+            )
+        } catch (e) {
+            throw new ResponseError(
+                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                errors.BLOG.FAILED_ADD
+            )
+        }
 
         const result = await prisma.blog.findUnique({
             where: {
@@ -796,6 +835,11 @@ const update = async (req) => {
                 title: true,
                 desc: true,
                 slug: true,
+                category: {
+                    select: {
+                        name: true,
+                    },
+                },
                 imgHead: true,
                 imgDetail: {
                     select: {
@@ -810,8 +854,9 @@ const update = async (req) => {
             title: resultTitle,
             desc: resultDesc,
             slug: resultSlug,
-            imgHead: imgHeadPath,
-            imgDetail: imgDetailPath,
+            category: { name: resultCategory },
+            imgHead: resultImgHead,
+            imgDetail: resultImgDetail,
         } = result
 
         return {
@@ -819,8 +864,9 @@ const update = async (req) => {
             title: resultTitle,
             desc: resultDesc,
             slug: resultSlug,
-            imgHead: imgHeadPath,
-            imgDetail: imgDetailPath.map((image) => image.image),
+            category: resultCategory,
+            imgHead: resultImgHead,
+            imgDetail: resultImgDetail.map((image) => image.image),
         }
     })
 }
