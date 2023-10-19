@@ -21,6 +21,7 @@ import {
 import { adminMiddleware } from '../middlewares/admin-middleware.js'
 import { errors } from '../utils/message-error.js'
 import response from '../utils/response-api.js'
+import { checkDbMiddleware } from '../middlewares/check-db-middleware.js'
 
 const web = express()
 
@@ -28,6 +29,7 @@ web.use(express.json())
 web.use(express.urlencoded({ extended: false }))
 web.use(express.static('public', { etag: true }))
 web.use(cookieParser())
+web.use(checkDbMiddleware)
 web.use(
     multer({
         limits: {
@@ -37,6 +39,7 @@ web.use(
         fileFilter: fileFilterMiddleware,
     }).any('images')
 )
+
 web.use(cors())
 
 web.use(publicRouter)

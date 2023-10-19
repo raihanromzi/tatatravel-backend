@@ -388,6 +388,9 @@ const errors = {
             'Your username or email is incorrect. Please double-check and try again.',
         PASSWORD: 'Your password is incorrect. Please verify and retry.',
     },
+    DATABASE: {
+        CONNECTION: 'Failed to connect to the database. Please try again later.',
+    },
 }
 
 export { errors }

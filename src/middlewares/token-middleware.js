@@ -70,13 +70,13 @@ const refreshTokenVerifyMiddleware = async (req, res, next) => {
     }
 
     // check refresh token in db
-    const foundRefreshTokenInDB = await prismaClient.user.count({
-        where: {
-            token: foundRefreshToken,
-        },
-    })
-
-    if (foundRefreshTokenInDB !== 1) {
+    try {
+        await prismaClient.user.count({
+            where: {
+                token: foundRefreshToken,
+            },
+        })
+    } catch (error) {
         res.status(errors.HTTP.CODE.UNAUTHORIZED)
             .send(
                 response.responseError(
@@ -86,6 +86,7 @@ const refreshTokenVerifyMiddleware = async (req, res, next) => {
                 )
             )
             .end()
+
         return
     }
 
