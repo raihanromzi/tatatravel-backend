@@ -244,6 +244,7 @@ const blogErrors = {
         IMAGE_NOT_VALID: 'The uploaded image is not valid. Please use PNG, JPG, or JPEG format.',
         IMAGE_ARRAY: 'The images must be provided as an array.',
         CANNOT_BE_EMPTY: 'The images cannot be left empty.',
+        HEADER_IMAGE_MUST_BE_ONE: 'Only 1 header image is allowed.',
     },
     SLUG: {
         IS_REQUIRED: 'Please provide a slug for the blog.',
@@ -272,6 +273,8 @@ const blogErrors = {
         MUST_BE_POSITIVE: 'Blog ID must be a positive number.',
         CANNOT_BE_EMPTY: 'The blog ID cannot be left empty.',
     },
+    BAD_REQUEST:
+        'To add a blog, please provide the Category, Title, Slug, Description, Content, and at least one Image Header and one Image Detail.',
     FAILED_ADD: 'We encountered an issue while trying to add the blog. Please try again later.',
     FAILED_UPDATE:
         'We encountered an issue while trying to update the blog. Please try again later.',
