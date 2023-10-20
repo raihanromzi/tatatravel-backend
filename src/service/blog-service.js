@@ -14,7 +14,7 @@ import { userIdValidationSchema } from '../validation/user-validation.js'
 import { clearDirectory } from '../utils/clear-directory.js'
 
 const add = async (req) => {
-    // validate request body, should exist. If not remove images
+    // validate request body, should exist
     const {
         categoryId: categoryIdExist,
         title: titleExist,
@@ -79,14 +79,14 @@ const add = async (req) => {
             path: image.path,
         }))
 
-    const imgHeadArray = images
+    const imgHead = images
         .filter((image) => image.fieldname === 'imgHead')
         .map((image) => ({
             filename: image.filename,
             path: image.path,
         }))
 
-    if (imgDetail.length === 0 || imgHeadArray.length === 0) {
+    if (imgDetail.length === 0 || imgHead.length === 0) {
         throw new MulterError(
             errors.HTTP.CODE.BAD_REQUEST,
             errors.HTTP.STATUS.BAD_REQUEST,
@@ -95,7 +95,7 @@ const add = async (req) => {
         )
     }
 
-    if (imgHeadArray && imgHeadArray.length > 1) {
+    if (imgHead && imgHead.length > 1) {
         throw new MulterErrorMultipleImages(
             errors.HTTP.CODE.BAD_REQUEST,
             errors.HTTP.STATUS.BAD_REQUEST,
@@ -103,14 +103,6 @@ const add = async (req) => {
             [imgDetail, imgHead]
         )
     }
-
-    let imgHead = {}
-    imgHeadArray.map((image) => {
-        imgHead = {
-            filename: image.filename,
-            path: image.path,
-        }
-    })
 
     return prismaClient.$transaction(async (prisma) => {
         const findUser = await prisma.user.findUnique({
@@ -124,7 +116,7 @@ const add = async (req) => {
                 errors.HTTP.CODE.NOT_FOUND,
                 errors.HTTP.STATUS.NOT_FOUND,
                 errors.USER.NOT_FOUND,
-                [imgDetail, [imgHead]]
+                [imgDetail, imgHead]
             )
         }
 
@@ -142,7 +134,7 @@ const add = async (req) => {
                 errors.HTTP.CODE.NOT_FOUND,
                 errors.HTTP.STATUS.NOT_FOUND,
                 errors.CATEGORY.NOT_FOUND,
-                [imgDetail, [imgHead]]
+                [imgDetail, imgHead]
             )
         }
 
@@ -153,7 +145,7 @@ const add = async (req) => {
                 errors.HTTP.CODE.BAD_REQUEST,
                 errors.HTTP.STATUS.BAD_REQUEST,
                 errors.CATEGORY.NOT_ACTIVE,
-                [imgDetail, [imgHead]]
+                [imgDetail, imgHead]
             )
         }
 
@@ -170,7 +162,7 @@ const add = async (req) => {
                 errors.HTTP.CODE.BAD_REQUEST,
                 errors.HTTP.STATUS.BAD_REQUEST,
                 errors.BLOG.SLUG.ALREADY_EXISTS,
-                [imgDetail, [imgHead]]
+                [imgDetail, imgHead]
             )
         }
 
@@ -190,7 +182,7 @@ const add = async (req) => {
                         },
                     },
                     title: title,
-                    imgHead: imgHead.path,
+                    imgHead: imgHead[0].path,
                     slug: validSlug,
                     desc: desc,
                     content: content,
@@ -220,27 +212,28 @@ const add = async (req) => {
                 },
             })
         } catch (error) {
-            throw new MulterErrorMultipleImages(
-                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                errors.BLOG.FAILED_ADD,
-                [imgDetail, [imgHead]]
-            )
+            if (error) {
+                throw new MulterErrorMultipleImages(
+                    errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                    errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                    errors.BLOG.FAILED_ADD,
+                    [imgDetail, imgHead]
+                )
+            }
         }
 
         const { id: newBlogId, imgDetail: newBlogImagesDetail } = newBlog
 
-        // update id for imgDetail
-        newBlogImagesDetail.forEach(({ id, image: path }) => {
-            const matchingOldImage = imgDetail.find(
-                (oldBlogImageDetail) =>
-                    oldBlogImageDetail.id === null && oldBlogImageDetail.path === path
-            )
-
-            if (matchingOldImage) {
-                matchingOldImage.id = id
+        for (const newBlogImageDetail in newBlogImagesDetail) {
+            const { id, image: path } = newBlogImagesDetail[newBlogImageDetail]
+            for (const oldBlogImageDetail of imgDetail) {
+                if (oldBlogImageDetail.id === null) {
+                    if (oldBlogImageDetail.path === path) {
+                        oldBlogImageDetail.id = id
+                    }
+                }
             }
-        })
+        }
 
         try {
             await fs.mkdir(`public/images/blog/${newBlogId}/details`, { recursive: true })
@@ -254,82 +247,91 @@ const add = async (req) => {
             )
         }
 
-        const { path: oldPath, filename } = imgHead
-        const newPath = `public/images/blog/${newBlogId}/header/${filename}`
+        await Promise.all(
+            imgHead.map(async (image) => {
+                const { path, filename } = image
+                const oldPath = path
+                const newPath = `public/images/blog/${newBlogId}/header/${filename}`
 
-        try {
-            await prisma.blog.update({
-                where: {
-                    id: newBlogId,
-                },
-                data: {
-                    imgHead: newPath,
-                },
-            })
-            await fs.rename(oldPath, newPath)
-        } catch (e) {
-            const deleteBlogAndImages = async () => {
-                await fs.rm(`public/images/blog/${newBlogId}/header`, {
-                    recursive: true,
-                    force: true,
-                })
-                await prisma.blog.delete({
-                    where: {
-                        id: newBlogId,
-                    },
-                })
-                await fs.rm(oldPath, { recursive: true, force: true })
-            }
-
-            return deleteBlogAndImages().then(() => {
-                throw new MulterErrorMultipleImages(
-                    errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                    errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                    errors.BLOG.FAILED_ADD,
-                    [imgDetail, imgHead]
-                )
-            })
-        }
-
-        for (const image of imgDetail) {
-            const { path, filename, id: IdDetailImage } = image
-            const oldPath = path
-            const newPath = `public/images/blog/${newBlogId}/details/${filename}`
-
-            try {
-                await prisma.blogImage.update({
-                    where: {
-                        id: IdDetailImage,
-                    },
-                    data: {
-                        image: newPath,
-                    },
-                })
-                await fs.rename(oldPath, newPath)
-            } catch (e) {
-                const deleteBlogAndImages = async () => {
-                    await fs.rm(`public/images/blog/${newBlogId}/details`, {
-                        recursive: true,
-                        force: true,
+                try {
+                    await prisma.blog.update({
+                        where: {
+                            id: newBlogId,
+                        },
+                        data: {
+                            imgHead: newPath,
+                        },
                     })
-                    await prisma.blog.deleteMany({
+                    await fs.rename(oldPath, newPath)
+                    return newPath
+                } catch (e) {
+                    const deleteBlogAndImages = async () => {
+                        await fs.rm(`public/images/blog/${newBlogId}/header`, {
+                            recursive: true,
+                            force: true,
+                        })
+                        await prisma.blog.delete({
+                            where: {
+                                id: newBlogId,
+                            },
+                        })
+                        await fs.rm(oldPath, { recursive: true, force: true })
+                    }
+
+                    return deleteBlogAndImages().catch(() => {
+                        throw new MulterErrorMultipleImages(
+                            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                            errors.BLOG.FAILED_ADD,
+                            [imgDetail, imgHead]
+                        )
+                    })
+                }
+            })
+        )
+
+        await Promise.all(
+            imgDetail.map(async (image) => {
+                const { path, filename, id: IdDetailImage } = image
+                const oldPath = path
+                const newPath = `public/images/blog/${newBlogId}/details/${filename}`
+
+                try {
+                    await prisma.blogImage.update({
                         where: {
                             id: IdDetailImage,
                         },
+                        data: {
+                            image: newPath,
+                        },
                     })
-                    await fs.rm(oldPath, { recursive: true, force: true })
-                }
+                    await fs.rename(oldPath, newPath)
+                    return newPath
+                } catch (e) {
+                    const deleteBlogAndImages = async () => {
+                        await fs.rm(`public/images/blog/${newBlogId}/details`, {
+                            recursive: true,
+                            force: true,
+                        })
+                        await prisma.blog.deleteMany({
+                            where: {
+                                id: IdDetailImage,
+                            },
+                        })
+                        await fs.rm(oldPath, { recursive: true, force: true })
+                    }
 
-                deleteBlogAndImages().then(() => {
-                    throw new MulterErrorMultipleImages(
-                        errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                        errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                        errors.BLOG.FAILED_ADD,
-                        [imgDetail, imgHead]
-                    )
-                })
-            }
-        }
+                    return deleteBlogAndImages().catch(() => {
+                        throw new MulterErrorMultipleImages(
+                            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                            errors.BLOG.FAILED_ADD,
+                            [imgDetail, imgHead]
+                        )
+                    })
+                }
+            })
+        )
 
         const result = await prisma.blog.findUnique({
             where: {
