@@ -212,14 +212,12 @@ const add = async (req) => {
                 },
             })
         } catch (error) {
-            if (error) {
-                throw new MulterErrorMultipleImages(
-                    errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                    errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                    errors.BLOG.FAILED_ADD,
-                    [imgDetail, imgHead]
-                )
-            }
+            throw new MulterErrorMultipleImages(
+                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                errors.BLOG.FAILED_ADD,
+                [imgDetail, imgHead]
+            )
         }
 
         const { id: newBlogId, imgDetail: newBlogImagesDetail } = newBlog
@@ -278,7 +276,7 @@ const add = async (req) => {
                         await fs.rm(oldPath, { recursive: true, force: true })
                     }
 
-                    return deleteBlogAndImages().catch(() => {
+                    return deleteBlogAndImages().then(() => {
                         throw new MulterErrorMultipleImages(
                             errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
                             errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
@@ -321,7 +319,7 @@ const add = async (req) => {
                         await fs.rm(oldPath, { recursive: true, force: true })
                     }
 
-                    return deleteBlogAndImages().catch(() => {
+                    return deleteBlogAndImages().then(() => {
                         throw new MulterErrorMultipleImages(
                             errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
                             errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
