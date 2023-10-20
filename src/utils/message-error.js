@@ -214,7 +214,7 @@ const avatarErrors = {
     MUST_BE_LESS_THAN_2MB: 'The avatar file size must be less than 2MB.',
     CANNOT_BE_EMPTY: 'The avatar cannot be left empty.',
     FAILED_TO_CREATE_DIRECTORY: 'Failed to create the user avatar directory.',
-    IS_REQUIRED: 'Please provide an avatar.',
+    IS_REQUIRED: 'Please provide only 1 avatar.',
 }
 
 const sortByErrors = {

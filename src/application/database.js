@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { Prisma, PrismaClient } from '@prisma/client'
 import { logger } from './logging.js'
 
 export const prismaClient = new PrismaClient({
@@ -22,6 +22,8 @@ export const prismaClient = new PrismaClient({
         },
     ],
 })
+
+export const prisma = Prisma
 
 prismaClient.$on('error', (e) => {
     logger.error(e)

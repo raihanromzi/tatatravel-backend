@@ -217,24 +217,21 @@ const updateUserValidationSchema = Joi.object({
 })
 
 const avatarValidationSchema = Joi.object({
-    avatar: Joi.array()
-        .items(
-            Joi.object()
-                .keys({
-                    path: Joi.string()
-                        .required()
-                        .messages({
-                            'string.base': `${errors.AVATAR.MUST_BE_STRING}`,
-                            'string.empty': `${errors.AVATAR.CANNOT_BE_EMPTY}`,
-                            'any.required': `${errors.AVATAR.IS_REQUIRED}`,
-                        }),
-                })
-                .unknown(true)
-                .error(new Error(`${errors.AVATAR.MUST_BE_VALID_FORMAT}`))
-        )
-        .max(1)
-        .error(new Error(`${errors.AVATAR.MUST_BE_VALID_FORMAT}`)),
+    avatar: Joi.array().items(
+        Joi.object()
+            .keys({
+                path: Joi.string()
+                    .required()
+                    .messages({
+                        'string.base': `${errors.AVATAR.MUST_BE_STRING}`,
+                        'string.empty': `${errors.AVATAR.CANNOT_BE_EMPTY}`,
+                        'any.required': `${errors.AVATAR.IS_REQUIRED}`,
+                    }),
+            })
+            .unknown(true)
+    ),
 }).messages({
+    'array.max': `${errors.AVATAR.IS_REQUIRED}`,
     'object.unknown': `${errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR}`,
 })
 

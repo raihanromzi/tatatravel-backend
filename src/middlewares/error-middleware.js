@@ -6,6 +6,7 @@ import {
 } from '../utils/response-error.js'
 import response from '../utils/response-api.js'
 import { errors } from '../utils/message-error.js'
+import { prisma } from '../application/database.js'
 
 const errorMiddleware = async (err, req, res, next) => {
     if (!err) {
@@ -49,6 +50,18 @@ const errorMiddleware = async (err, req, res, next) => {
         return res
             .status(err.code)
             .send(response.responseError(err.code, err.status, err.errors))
+            .end()
+    } else if (err instanceof prisma.PrismaClientKnownRequestError) {
+        // handle prisma error
+        return res
+            .status(errors.HTTP.CODE.BAD_REQUEST)
+            .send(
+                response.responseError(
+                    errors.HTTP.CODE.BAD_REQUEST,
+                    errors.HTTP.STATUS.BAD_REQUEST,
+                    errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR
+                )
+            )
             .end()
     } else {
         return res

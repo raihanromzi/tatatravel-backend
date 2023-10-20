@@ -63,10 +63,20 @@ const update = async (req) => {
     const { userName, fullName, password } = validate(updateUserValidationSchema, req.body)
     const { id: userId } = validate(userIdValidationSchema, { id: req.user.id })
     const { avatar: images } = validate(avatarValidationSchema, { avatar: req.files })
-    let avatar = []
+
+    if (images.length > 1) {
+        throw new MulterError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.AVATAR.IS_REQUIRED,
+            images
+        )
+    }
+
+    let avatar = {}
     if (images && images.length > 0) {
-        avatar = images.map((image) => {
-            return {
+        images.map((image) => {
+            avatar = {
                 filename: image.filename,
                 path: image.path,
             }
@@ -128,14 +138,15 @@ const update = async (req) => {
             }
         }
 
-        const updateUser = await prisma.user.update({
-            where: {
-                id: userId,
-            },
-            data: data,
-        })
-
-        if (!updateUser) {
+        try {
+            await prisma.user.update({
+                where: {
+                    id: userId,
+                },
+                data: data,
+            })
+            await fs.mkdir(`public/images/avatar/${userId}`, { recursive: true })
+        } catch (error) {
             throw new MulterError(
                 errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
                 errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
@@ -144,82 +155,39 @@ const update = async (req) => {
             )
         }
 
-        if (avatar.length > 0) {
-            try {
-                await fs.mkdir(`public/images/avatar/${userId}`, { recursive: true })
-                const oldAvatar = await fs.readdir(`public/images/avatar/${userId}`)
+        const { path: oldPath, filename } = avatar
+        const newPath = `public/images/avatar/${userId}/${filename}`
 
-                // Delete old avatar
-                for (const avatar of oldAvatar) {
-                    await fs.unlink(`public/images/avatar/${userId}/${avatar}`)
-                }
-            } catch (error) {
-                throw new MulterError(
-                    errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                    errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                    errors.AVATAR.FAILED_TO_CREATE_DIRECTORY,
-                    avatar
-                )
-            }
-
-            await Promise.all(
-                avatar.map(async (image) => {
-                    const { path: oldPath, filename } = image
-                    const newPath = `public/images/avatar/${userId}/${filename}`
-
-                    try {
-                        await fs.rename(oldPath, newPath)
-                        await prisma.user.update({
-                            where: {
-                                id: userId,
-                            },
-                            data: {
-                                avatar: newPath,
-                            },
-                            select: {
-                                userName: true,
-                                fullName: true,
-                                avatar: true,
-                            },
-                        })
-                    } catch (error) {
-                        const deleteDirectoryAndEmptyAvatar = async () => {
-                            await fs.rm(`public/images/avatar/${userId}`, {
-                                recursive: true,
-                                force: true,
-                            })
-                            await prisma.user.update({
-                                where: {
-                                    id: userId,
-                                },
-                                data: {
-                                    avatar: null,
-                                },
-                            })
-                            await fs.rm(oldPath, { recursive: true, force: true })
-                        }
-
-                        return deleteDirectoryAndEmptyAvatar()
-                            .then(() => {
-                                throw new MulterError(
-                                    errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                                    errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                                    errors.USER.FAILED_TO_UPDATE,
-                                    avatar
-                                )
-                            })
-                            .catch(() => {
-                                throw new MulterError(
-                                    errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                                    errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                                    errors.USER.FAILED_TO_UPDATE,
-                                    avatar
-                                )
-                            })
-                    }
-                })
+        try {
+            await prisma.user.update({
+                where: {
+                    id: userId,
+                },
+                data: {
+                    avatar: newPath,
+                },
+                select: {
+                    userName: true,
+                    fullName: true,
+                    avatar: true,
+                },
+            })
+        } catch (error) {
+            throw new MulterError(
+                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                errors.USER.FAILED_TO_UPDATE,
+                [avatar]
             )
         }
+
+        // Delete old avatar
+        const oldAvatar = await fs.readdir(`public/images/avatar/${userId}`)
+        for (const avatar of oldAvatar) {
+            await fs.unlink(`public/images/avatar/${userId}/${avatar}`)
+        }
+
+        await fs.rename(oldPath, newPath)
 
         return prisma.user.findUnique({
             where: {

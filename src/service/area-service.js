@@ -18,7 +18,7 @@ const add = async (req) => {
             },
         })
 
-        if (countArea === 1) {
+        if (countArea > 0) {
             throw new ResponseError(
                 errors.HTTP.CODE.BAD_REQUEST,
                 errors.HTTP.STATUS.BAD_REQUEST,
@@ -26,7 +26,7 @@ const add = async (req) => {
             )
         }
 
-        const result = await prisma.area.create({
+        return prisma.area.create({
             data: {
                 name: name,
             },
@@ -34,16 +34,6 @@ const add = async (req) => {
                 name: true,
             },
         })
-
-        if (!result) {
-            throw new ResponseError(
-                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                errors.AREA.FAILED_TO_ADD
-            )
-        }
-
-        return result
     })
 }
 
@@ -147,7 +137,7 @@ const update = async (req) => {
             )
         }
 
-        const result = await prisma.area.update({
+        return prisma.area.update({
             where: {
                 id: areaId,
             },
@@ -158,16 +148,6 @@ const update = async (req) => {
                 name: true,
             },
         })
-
-        if (!result) {
-            throw new ResponseError(
-                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                errors.AREA.FAILED_TO_UPDATE
-            )
-        }
-
-        return result
     })
 }
 
@@ -175,7 +155,7 @@ const remove = async (req) => {
     const { id: areaId } = validate(areaIdValidationSchema, req.params)
 
     return prismaClient.$transaction(async (prisma) => {
-        const findArea = await prisma.area.findUniqueOrThrow({
+        const findArea = await prisma.area.findUnique({
             where: {
                 id: areaId,
             },
@@ -189,21 +169,11 @@ const remove = async (req) => {
             )
         }
 
-        const result = await prisma.area.delete({
+        return prisma.area.delete({
             where: {
                 id: areaId,
             },
         })
-
-        if (!result) {
-            throw new ResponseError(
-                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                errors.AREA.FAILED_TO_DELETE
-            )
-        }
-
-        return result
     })
 }
 
