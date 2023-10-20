@@ -184,7 +184,7 @@ const update = async (req) => {
             )
         }
 
-        const updateRole = await prisma.role.update({
+        return prisma.role.update({
             where: {
                 id: roleId,
             },
@@ -198,16 +198,6 @@ const update = async (req) => {
                 isActive: true,
             },
         })
-
-        if (!updateRole) {
-            throw new ResponseError(
-                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                errors.ROLE.FAILED_TO_UPDATE
-            )
-        }
-
-        return updateRole
     })
 }
 
@@ -229,21 +219,11 @@ const remove = async (req) => {
             )
         }
 
-        const result = await prisma.role.delete({
+        await prisma.role.delete({
             where: {
                 id: roleId,
             },
         })
-
-        if (!result) {
-            throw new ResponseError(
-                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                errors.ROLE.FAILED_TO_DELETE
-            )
-        }
-
-        return result
     })
 }
 

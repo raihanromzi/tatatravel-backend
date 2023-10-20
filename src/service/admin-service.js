@@ -190,6 +190,7 @@ const get = async (req) => {
                 id: true,
                 fullName: true,
                 userName: true,
+                avatar: true,
                 email: true,
                 role: {
                     select: {
@@ -256,7 +257,7 @@ const update = async (req) => {
             )
         }
 
-        const result = prisma.user.update({
+        return prisma.user.update({
             where: {
                 id: paramUserid,
             },
@@ -269,16 +270,6 @@ const update = async (req) => {
                 isActive: true,
             },
         })
-
-        if (!result) {
-            throw new ResponseError(
-                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                errors.USER.FAILED_TO_UPDATE
-            )
-        }
-
-        return result
     })
 }
 
@@ -332,4 +323,4 @@ const remove = async (req) => {
     })
 }
 
-export default { add, remove, get, update }
+export default { add, get, update, remove }

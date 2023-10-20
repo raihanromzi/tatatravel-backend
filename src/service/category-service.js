@@ -19,7 +19,7 @@ const add = async (req) => {
             },
         })
 
-        if (countCategory === 1) {
+        if (countCategory > 0) {
             throw new ResponseError(
                 errors.HTTP.CODE.BAD_REQUEST,
                 errors.HTTP.STATUS.BAD_REQUEST,
@@ -27,7 +27,7 @@ const add = async (req) => {
             )
         }
 
-        const result = await prisma.category.create({
+        return prisma.category.create({
             data: {
                 name: name,
             },
@@ -35,16 +35,6 @@ const add = async (req) => {
                 name: true,
             },
         })
-
-        if (!result) {
-            throw new ResponseError(
-                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                errors.CATEGORY.FAILED_TO_ADD
-            )
-        }
-
-        return result
     })
 }
 
@@ -178,7 +168,7 @@ const update = async (req) => {
             )
         }
 
-        const result = await prisma.category.update({
+        return prisma.category.update({
             where: {
                 id: categoryId,
             },
@@ -192,16 +182,6 @@ const update = async (req) => {
                 isActive: true,
             },
         })
-
-        if (!result) {
-            throw new ResponseError(
-                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                errors.CATEGORY.FAILED_TO_UPDATE
-            )
-        }
-
-        return result
     })
 }
 
@@ -223,20 +203,12 @@ const remove = async (req) => {
             )
         }
 
-        const result = await prisma.category.delete({
+        await prisma.category.delete({
             where: {
                 id: categoryId,
             },
         })
-
-        if (!result) {
-            throw new ResponseError(
-                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                errors.CATEGORY.FAILED_TO_DELETE
-            )
-        }
     })
 }
 
-export default { add, update, remove, get, getById }
+export default { add, get, getById, update, remove }

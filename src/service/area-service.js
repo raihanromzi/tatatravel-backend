@@ -177,4 +177,4 @@ const remove = async (req) => {
     })
 }
 
-export default { add, update, get, getById, remove }
+export default { add, get, getById, update, remove }

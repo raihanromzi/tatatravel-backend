@@ -19,7 +19,7 @@ const add = async (req) => {
             },
         })
 
-        if (countCountry === 1) {
+        if (countCountry > 0) {
             throw new ResponseError(
                 errors.HTTP.CODE.BAD_REQUEST,
                 errors.HTTP.STATUS.BAD_REQUEST,
@@ -41,7 +41,7 @@ const add = async (req) => {
             )
         }
 
-        const result = await prisma.country.create({
+        return prisma.country.create({
             data: {
                 name: name,
                 areaId: areaId,
@@ -51,16 +51,6 @@ const add = async (req) => {
                 name: true,
             },
         })
-
-        if (!result) {
-            throw new ResponseError(
-                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                errors.COUNTRY.FAILED_TO_ADD
-            )
-        }
-
-        return result
     })
 }
 
@@ -226,14 +216,6 @@ const update = async (req) => {
             },
         })
 
-        if (!result) {
-            throw new ResponseError(
-                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                errors.COUNTRY.FAILED_TO_UPDATE
-            )
-        }
-
         const { id, name: countryName, area } = result
 
         return {
@@ -262,19 +244,11 @@ const remove = async (req) => {
             )
         }
 
-        const result = await prisma.country.delete({
+        await prisma.country.delete({
             where: {
                 id: countryId,
             },
         })
-
-        if (!result) {
-            throw new ResponseError(
-                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                errors.COUNTRY.FAILED_TO_DELETE
-            )
-        }
     })
 }
 export default { add, get, getById, update, remove }
