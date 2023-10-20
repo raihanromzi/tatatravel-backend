@@ -59,32 +59,35 @@ const add = async (req) => {
     const { id: userId } = validate(userIdValidationSchema, { id: req.user.id })
     const images = validate(imagesValidationSchema, req.files)
 
-    for (let i = 0; i <= images.length - 1; i++) {
-        const { fieldname } = images[i]
-        if (fieldname !== 'imgDetail' && fieldname !== 'imgHead') {
-            throw new MulterError(
-                errors.HTTP.CODE.BAD_REQUEST,
-                errors.HTTP.STATUS.BAD_REQUEST,
-                errors.BLOG.IMAGES.IS_REQUIRED,
-                req.files
-            )
-        }
+    if (
+        !images.every((image) => image.fieldname === 'imgDetail' || image.fieldname === 'imgHead')
+    ) {
+        throw new MulterError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.BLOG.IMAGES.IS_REQUIRED,
+            req.files
+        )
     }
 
-    const imgDetail = images
-        .filter((image) => image.fieldname === 'imgDetail')
-        .map((image) => ({
-            id: null,
-            filename: image.filename,
-            path: image.path,
-        }))
-
-    const imgHead = images
-        .filter((image) => image.fieldname === 'imgHead')
-        .map((image) => ({
-            filename: image.filename,
-            path: image.path,
-        }))
+    const { imgDetail, imgHead } = images.reduce(
+        (result, image) => {
+            if (image.fieldname === 'imgDetail') {
+                result.imgDetail.push({
+                    id: null,
+                    filename: image.filename,
+                    path: image.path,
+                })
+            } else if (image.fieldname === 'imgHead') {
+                result.imgHead.push({
+                    filename: image.filename,
+                    path: image.path,
+                })
+            }
+            return result
+        },
+        { imgDetail: [], imgHead: [] }
+    )
 
     if (imgDetail.length === 0 || imgHead.length === 0) {
         throw new MulterError(
@@ -222,16 +225,17 @@ const add = async (req) => {
 
         const { id: newBlogId, imgDetail: newBlogImagesDetail } = newBlog
 
-        for (const newBlogImageDetail in newBlogImagesDetail) {
-            const { id, image: path } = newBlogImagesDetail[newBlogImageDetail]
-            for (const oldBlogImageDetail of imgDetail) {
-                if (oldBlogImageDetail.id === null) {
-                    if (oldBlogImageDetail.path === path) {
-                        oldBlogImageDetail.id = id
-                    }
-                }
+        // update id for imgDetail
+        newBlogImagesDetail.forEach(({ id, image: path }) => {
+            const matchingOldImage = imgDetail.find(
+                (oldBlogImageDetail) =>
+                    oldBlogImageDetail.id === null && oldBlogImageDetail.path === path
+            )
+
+            if (matchingOldImage) {
+                matchingOldImage.id = id
             }
-        }
+        })
 
         try {
             await fs.mkdir(`public/images/blog/${newBlogId}/details`, { recursive: true })
@@ -540,32 +544,35 @@ const update = async (req) => {
     const images = validate(imagesValidationSchema, req.files)
     const data = {}
 
-    for (let i = 0; i <= images.length - 1; i++) {
-        const { fieldname } = images[i]
-        if (fieldname !== 'imgDetail' && fieldname !== 'imgHead') {
-            throw new MulterError(
-                errors.HTTP.CODE.BAD_REQUEST,
-                errors.HTTP.STATUS.BAD_REQUEST,
-                errors.BLOG.IMAGES.IS_REQUIRED,
-                req.files
-            )
-        }
+    if (
+        !images.every((image) => image.fieldname === 'imgDetail' || image.fieldname === 'imgHead')
+    ) {
+        throw new MulterError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.BLOG.IMAGES.IS_REQUIRED,
+            req.files
+        )
     }
 
-    const imgDetail = images
-        .filter((image) => image.fieldname === 'imgDetail')
-        .map((image) => ({
-            id: null,
-            filename: image.filename,
-            path: image.path,
-        }))
-
-    const imgHead = images
-        .filter((image) => image.fieldname === 'imgHead')
-        .map((image) => ({
-            filename: image.filename,
-            path: image.path,
-        }))
+    const { imgDetail, imgHead } = images.reduce(
+        (result, image) => {
+            if (image.fieldname === 'imgDetail') {
+                result.imgDetail.push({
+                    id: null,
+                    filename: image.filename,
+                    path: image.path,
+                })
+            } else if (image.fieldname === 'imgHead') {
+                result.imgHead.push({
+                    filename: image.filename,
+                    path: image.path,
+                })
+            }
+            return result
+        },
+        { imgDetail: [], imgHead: [] }
+    )
 
     if (imgDetail.length === 0 || imgHead.length === 0) {
         throw new MulterError(
@@ -737,16 +744,18 @@ const update = async (req) => {
 
         const { imgDetail: updatedBlogImageDetail } = updatedBlog
 
-        for (const image in updatedBlogImageDetail) {
-            const { id, image: path } = updatedBlogImageDetail[image]
-            for (const oldBlogImageDetail of imgDetail) {
-                if (oldBlogImageDetail.id === null) {
-                    if (oldBlogImageDetail.path === path) {
-                        oldBlogImageDetail.id = id
-                    }
-                }
+        // update id for imgDetail
+        updatedBlogImageDetail.forEach(({ id, image: path }) => {
+            const matchingOldImage = imgDetail.find(
+                (oldBlogImageDetail) =>
+                    oldBlogImageDetail.id === null && oldBlogImageDetail.path === path
+            )
+
+            if (matchingOldImage) {
+                matchingOldImage.id = id
             }
-        }
+        })
+
         try {
             await clearDirectory(`public/images/blog/${blogId}/header`)
             await Promise.all(
@@ -764,25 +773,15 @@ const update = async (req) => {
                         },
                     })
 
-                    try {
-                        await fs.rename(oldPath, newPath)
-                    } catch (e) {
-                        throw new MulterError(
-                            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                            errors.BLOG.FAILED_ADD,
-                            imgHead
-                        )
-                    }
-
-                    return newPath
+                    await fs.rename(oldPath, newPath)
                 })
             )
         } catch (e) {
-            throw new ResponseError(
+            throw new MulterError(
                 errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
                 errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                errors.BLOG.FAILED_ADD
+                errors.BLOG.FAILED_UPDATE,
+                imgHead
             )
         }
 
@@ -794,33 +793,23 @@ const update = async (req) => {
                     const oldPath = path
                     const newPath = `public/images/blog/${blogId}/details/${filename}`
 
-                    try {
-                        await prisma.blogImage.update({
-                            where: {
-                                id: IdDetailImage,
-                            },
-                            data: {
-                                image: newPath,
-                            },
-                        })
-                        await fs.rename(oldPath, newPath)
-                    } catch (e) {
-                        throw new MulterError(
-                            errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                            errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                            errors.BLOG.FAILED_ADD,
-                            imgDetail
-                        )
-                    }
-
-                    return newPath
+                    await prisma.blogImage.update({
+                        where: {
+                            id: IdDetailImage,
+                        },
+                        data: {
+                            image: newPath,
+                        },
+                    })
+                    await fs.rename(oldPath, newPath)
                 })
             )
         } catch (e) {
-            throw new ResponseError(
+            throw new MulterError(
                 errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
                 errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                errors.BLOG.FAILED_ADD
+                errors.BLOG.FAILED_ADD,
+                imgDetail
             )
         }
 

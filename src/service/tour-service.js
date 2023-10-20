@@ -348,42 +348,6 @@ const get = async (req) => {
     })
 }
 
-const remove = async (req) => {
-    const { id } = validate(idTourValidationSchema, req.params)
-
-    return prismaClient.$transaction(async (prisma) => {
-        const findTour = await prisma.tour.findUnique({
-            where: {
-                id: id,
-            },
-        })
-
-        if (!findTour) {
-            throw new ResponseError(
-                errors.HTTP.CODE.NOT_FOUND,
-                errors.HTTP.STATUS.NOT_FOUND,
-                errors.TOUR.NOT_FOUND
-            )
-        }
-
-        await prisma.tour.delete({
-            where: {
-                id: id,
-            },
-        })
-
-        try {
-            await fs.rm(`public/images/tour/${id}`, { recursive: true, force: true })
-        } catch (error) {
-            throw new ResponseError(
-                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
-                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
-                errors.TOUR.FAILED_TO_DELETE_DIRECTORY
-            )
-        }
-    })
-}
-
 const update = async (req) => {
     const { id: tourId } = validate(idTourValidationSchema, req.params)
     const tour = validate(addTourValidationSchema, req.body)
@@ -632,6 +596,42 @@ const update = async (req) => {
             dateEnd: updatedTourDateEnd,
             duration: updatedTourDuration,
             description: updatedTourDescription,
+        }
+    })
+}
+
+const remove = async (req) => {
+    const { id } = validate(idTourValidationSchema, req.params)
+
+    return prismaClient.$transaction(async (prisma) => {
+        const findTour = await prisma.tour.findUnique({
+            where: {
+                id: id,
+            },
+        })
+
+        if (!findTour) {
+            throw new ResponseError(
+                errors.HTTP.CODE.NOT_FOUND,
+                errors.HTTP.STATUS.NOT_FOUND,
+                errors.TOUR.NOT_FOUND
+            )
+        }
+
+        await prisma.tour.delete({
+            where: {
+                id: id,
+            },
+        })
+
+        try {
+            await fs.rm(`public/images/tour/${id}`, { recursive: true, force: true })
+        } catch (error) {
+            throw new ResponseError(
+                errors.HTTP.CODE.INTERNAL_SERVER_ERROR,
+                errors.HTTP.STATUS.INTERNAL_SERVER_ERROR,
+                errors.TOUR.FAILED_TO_DELETE_DIRECTORY
+            )
         }
     })
 }
