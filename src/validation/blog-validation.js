@@ -78,11 +78,11 @@ const imagesValidationSchema = Joi.array()
                     }),
             })
             .unknown(true)
-            .error(new Error(`${errors.BLOG.IMAGES.MUST_BE_VALID_FORMAT}`))
     )
-    .min(1)
-    .required()
-    .error(new Error(`${errors.BLOG.IMAGES.MUST_BE_VALID_FORMAT}`))
+    .messages({
+        'array.base': `${errors.BLOG.IMAGES.MUST_BE_VALID_FORMAT}`,
+        'array.includesRequiredUnknowns': `${errors.BLOG.IMAGES.MUST_BE_VALID_FORMAT}`,
+    })
 
 const idBlogValidationSchema = Joi.object({
     id: Joi.number()
