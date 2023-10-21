@@ -127,9 +127,11 @@ const idTourValidationSchema = Joi.object({
             'number.positive': `${errors.TOUR.ID.MUST_BE_POSITIVE}`,
             'any.required': `${errors.TOUR.ID.IS_REQUIRED}`,
         }),
-}).unknown(true)
+}).messages({
+    'object.unknown': `${errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR}`,
+})
 
-const searchTourValidationSchema = Joi.object({
+const getTourValidationSchema = Joi.object({
     page: Joi.number().min(1).positive().default(1).messages({
         'number.base': errors.PAGE.MUST_BE_NUMBER,
         'number.empty': errors.PAGE.CANNOT_BE_EMPTY,
@@ -143,8 +145,10 @@ const searchTourValidationSchema = Joi.object({
     sortBy: Joi.string()
         .optional()
         .default('id')
+        .empty('')
         .messages({
             'string.base': `${errors.SORT_BY.MUST_BE_STRING}`,
+            'any.only': `${errors.SORT_BY.MUST_BE_VALID}`,
         }),
     orderBy: Joi.string()
         .valid('asc', 'desc')
@@ -152,21 +156,149 @@ const searchTourValidationSchema = Joi.object({
         .default('asc')
         .messages({
             'string.base': `${errors.ORDER_BY.MUST_BE_STRING}`,
-            'any.valid': `${errors.ORDER_BY.MUST_VALID}`,
+            'any.valid': `${errors.ORDER_BY.MUST_BE_VALID}`,
+            'string.empty': `${errors.ORDER_BY.CANNOT_BE_EMPTY}`,
+            'any.only': `${errors.ORDER_BY.MUST_BE_VALID}`,
         }),
     name: Joi.string()
         .optional()
+        .min(3)
+        .empty('')
         .max(255)
         .messages({
             'string.base': `${errors.TOUR.NAME.MUST_BE_STRING}`,
+            'string.min': `${errors.TOUR.NAME.MUST_BE_3_CHAR_MIN}`,
             'string.empty': `${errors.TOUR.NAME.CANNOT_BE_EMPTY}`,
             'string.max': `${errors.TOUR.NAME.MUST_BE_255_CHAR_MAX}`,
         }),
+    place: Joi.string()
+        .min(3)
+        .optional()
+        .empty('')
+        .max(255)
+        .messages({
+            'string.base': `${errors.TOUR.PLACE.NAME.MUST_BE_STRING}`,
+            'string.empty': `${errors.TOUR.PLACE.NAME.CANNOT_BE_EMPTY}`,
+            'string.min': `${errors.TOUR.PLACE.NAME.MUST_BE_3_CHAR_MIN}`,
+            'string.max': `${errors.TOUR.PLACE.NAME.MUST_BE_255_CHAR_MAX}`,
+        }),
+    country: Joi.string().min(3).max(100).optional().empty('').messages({
+        'string.base': errors.COUNTRY.NAME.MUST_BE_STRING,
+        'string.max': errors.COUNTRY.NAME.MUST_BE_100_CHAR_MAX,
+        'string.min': errors.COUNTRY.NAME.MUST_BE_3_CHAR_MIN,
+        'string.empty': errors.COUNTRY.NAME.CANNOT_BE_EMPTY,
+        'any.required': errors.COUNTRY.NAME.IS_REQUIRED,
+    }),
+})
+
+const updateTourValidationSchema = Joi.object({
+    name: Joi.string()
+        .min(3)
+        .max(255)
+        .optional()
+        .messages({
+            'string.base': `${errors.TOUR.NAME.MUST_BE_STRING}`,
+            'string.empty': `${errors.TOUR.NAME.CANNOT_BE_EMPTY}`,
+            'string.min': `${errors.TOUR.NAME.MUST_BE_3_CHAR_MIN}`,
+            'string.max': `${errors.TOUR.NAME.MUST_BE_255_CHAR_MAX}`,
+        }),
+    price: Joi.string()
+        .min(3)
+        .max(255)
+        .optional()
+        .messages({
+            'string.base': `${errors.TOUR.PRICE.MUST_BE_STRING}`,
+            'string.empty': `${errors.TOUR.PRICE.CANNOT_BE_EMPTY}`,
+            'string.min': `${errors.TOUR.PRICE.MUST_BE_3_CHAR_MIN}`,
+            'string.max': `${errors.TOUR.PRICE.MUST_BE_255_CHAR_MAX}`,
+        }),
+    dateStart: Joi.number()
+        .min(1)
+        .positive()
+        .optional()
+        .messages({
+            'number.base': `${errors.TOUR.DATE_START.MUST_BE_NUMBER}`,
+            'number.empty': `${errors.TOUR.DATE_START.CANNOT_BE_EMPTY}`,
+            'number.min': `${errors.TOUR.DATE_START.MUST_BE_GREATER_THAN_0}`,
+            'number.positive': `${errors.TOUR.DATE_START.MUST_BE_POSITIVE}`,
+        }),
+    dateEnd: Joi.number()
+        .when('dateStart', {
+            is: Joi.number().required(),
+            then: Joi.number()
+                .min(1)
+                .positive()
+                .required()
+                .messages({
+                    'number.base': `${errors.TOUR.DATE_END.MUST_BE_NUMBER}`,
+                    'number.empty': `${errors.TOUR.DATE_END.CANNOT_BE_EMPTY}`,
+                    'number.min': `${errors.TOUR.DATE_END.MUST_BE_GREATER_THAN_0}`,
+                    'number.positive': `${errors.TOUR.DATE_END.MUST_BE_POSITIVE}`,
+                    'any.required': `${errors.TOUR.DATE_END.IS_REQUIRED}`,
+                }),
+            otherwise: Joi.forbidden(),
+        })
+        .messages({
+            'any.unknown': `${errors.TOUR.DATE_START.IS_REQUIRED}`,
+        }),
+    desc: Joi.string()
+        .min(3)
+        .max(255)
+        .optional()
+        .messages({
+            'string.base': `${errors.TOUR.DESCRIPTION.MUST_BE_STRING}`,
+            'string.empty': `${errors.TOUR.DESCRIPTION.CANNOT_BE_EMPTY}`,
+            'string.min': `${errors.TOUR.DESCRIPTION.MUST_BE_3_CHAR_MIN}`,
+            'string.max': `${errors.TOUR.DESCRIPTION.MUST_BE_255_CHAR_MAX}`,
+        }),
+    isActive: Joi.boolean()
+        .optional()
+        .messages({
+            'boolean.base': `${errors.TOUR.IS_ACTIVE.MUST_BE_BOOLEAN}`,
+            'boolean.empty': `${errors.USER.IS_ACTIVE.CANNOT_BE_EMPTY}`,
+        }),
+    place: Joi.array()
+        .items(
+            Joi.string()
+                .min(3)
+                .max(255)
+                .messages({
+                    'string.base': `${errors.TOUR.PLACE.NAME.MUST_BE_STRING}`,
+                    'string.empty': `${errors.TOUR.PLACE.NAME.CANNOT_BE_EMPTY}`,
+                    'string.min': `${errors.TOUR.PLACE.NAME.MUST_BE_3_CHAR_MIN}`,
+                    'string.max': `${errors.TOUR.PLACE.NAME.MUST_BE_255_CHAR_MAX}`,
+                })
+        )
+        .optional()
+        .min(1)
+        .messages({
+            'array.base': `${errors.TOUR.PLACE.MUST_BE_ARRAY}`,
+            'array.min': `${errors.TOUR.PLACE.MUST_BE_1_PLACE_MIN}`,
+            'any.empty': `${errors.TOUR.PLACE.CANNOT_BE_EMPTY}`,
+        }),
+    countryId: Joi.number().positive().optional().messages({
+        'number.base': errors.COUNTRY.ID.MUST_BE_NUMBER,
+        'number.empty': errors.COUNTRY.ID.CANNOT_BE_EMPTY,
+        'number.positive': errors.COUNTRY.ID.MUST_BE_POSITIVE,
+    }),
+    imgHead: Joi.string()
+        .empty('')
+        .messages({
+            'string.base': `${errors.TOUR.IMAGES.IS_REQUIRED}`,
+        }),
+    imgDetail: Joi.string()
+        .empty('')
+        .messages({
+            'string.base': `${errors.TOUR.IMAGES.IS_REQUIRED}`,
+        }),
+}).messages({
+    'object.unknown': errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR,
 })
 
 export {
     addTourValidationSchema,
     imagesValidationSchema,
     idTourValidationSchema,
-    searchTourValidationSchema,
+    getTourValidationSchema,
+    updateTourValidationSchema,
 }

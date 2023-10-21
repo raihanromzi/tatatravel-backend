@@ -352,6 +352,10 @@ const tourErrors = {
         IS_REQUIRED: 'At least 1 image of header and 1 image of details is required for a tour.',
         HEADER_IMAGE_MUST_BE_ONE: 'Only 1 header image is allowed.',
     },
+    IS_ACTIVE: {
+        MUST_BE_BOOLEAN: 'The is active value must be a valid boolean.',
+        CANNOT_BE_EMPTY: 'The is active field cannot be left empty.',
+    },
     NOT_FOUND: 'The requested tour was not found.',
     FAILED_TO_DELETE_DIRECTORY: 'Failed to delete the tour images directory.',
     FAILED_TO_CREATE_DIRECTORY: 'Failed to create the tour images directory.',
@@ -359,6 +363,8 @@ const tourErrors = {
     BAD_REQUEST:
         'To add a tour, please provide the Name, Price, Start Date, End Date, Description, Place, Country ID and at least 1 Image Header and 1 Image Detail.',
     FAILED_TO_ADD: 'We encountered an issue while trying to add the tour. Please try again later.',
+    FAILED_TO_UPDATE:
+        'We encountered an issue while trying to update the tour. Please try again later.',
 }
 
 const userNameOrEmailErrors = {
