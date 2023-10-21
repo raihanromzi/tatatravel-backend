@@ -73,7 +73,7 @@ const imagesValidationSchema = Joi.array()
                     .required()
                     .messages({
                         'string.base': `${errors.BLOG.IMAGES.PATH_MUST_STRING}`,
-                        'string.empty': `${errors.BLOG.IMAGES.CANNOT_EMPTY}`,
+                        'string.empty': `${errors.BLOG.IMAGES.CANNOT_BE_EMPTY}`,
                         'any.required': `${errors.BLOG.IMAGES.IS_REQUIRED}`,
                     }),
             })

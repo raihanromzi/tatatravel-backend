@@ -265,19 +265,18 @@ const add = async (req) => {
                         },
                     })
                     await fs.rename(oldPath, newPath)
-                    return newPath
                 } catch (e) {
                     const deleteBlogAndImages = async () => {
                         await fs.rm(`public/images/blog/${newBlogId}/header`, {
                             recursive: true,
                             force: true,
                         })
+                        await fs.unlink(oldPath)
                         await prisma.blog.delete({
                             where: {
                                 id: newBlogId,
                             },
                         })
-                        await fs.rm(oldPath, { recursive: true, force: true })
                     }
 
                     return deleteBlogAndImages().then(() => {
@@ -308,19 +307,18 @@ const add = async (req) => {
                         },
                     })
                     await fs.rename(oldPath, newPath)
-                    return newPath
                 } catch (e) {
                     const deleteBlogAndImages = async () => {
                         await fs.rm(`public/images/blog/${newBlogId}/details`, {
                             recursive: true,
                             force: true,
                         })
+                        await fs.unlink(oldPath)
                         await prisma.blog.deleteMany({
                             where: {
                                 id: IdDetailImage,
                             },
                         })
-                        await fs.rm(oldPath, { recursive: true, force: true })
                     }
 
                     return deleteBlogAndImages().then(() => {

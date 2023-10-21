@@ -123,7 +123,7 @@ model Place {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  tour Tour @relation(fields: [tourId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  tour Tour @relation(fields: [tourId], references: [id], onDelete: Cascade)
 
   @@map("places")
 }
@@ -135,8 +135,8 @@ model TourCountry {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  tour    Tour    @relation(fields: [tourId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  country Country @relation(fields: [countryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  tour    Tour    @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  country Country @relation(fields: [countryId], references: [id], onDelete: Cascade)
 
   @@map("tour_countries")
 }
@@ -148,7 +148,7 @@ model TourImage {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  tour Tour @relation(fields: [tourId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  tour Tour @relation(fields: [tourId], references: [id], onDelete: Cascade)
 
   @@map("tour_images")
 }
