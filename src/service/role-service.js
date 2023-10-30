@@ -123,10 +123,18 @@ const get = async (req) => {
 const getById = async (req) => {
     const { id: roleId } = await validate(roleIdValidationSchema, req.params)
 
+    if (!parseInt(roleId)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.ROLE.ID.MUST_BE_VALID
+        )
+    }
+
     return prismaClient.$transaction(async (prisma) => {
         const findRole = await prisma.role.count({
             where: {
-                id: roleId,
+                id: parseInt(roleId),
             },
         })
 
@@ -140,7 +148,7 @@ const getById = async (req) => {
 
         return prisma.role.findUnique({
             where: {
-                id: roleId,
+                id: parseInt(roleId),
             },
             select: {
                 id: true,
@@ -155,10 +163,18 @@ const update = async (req) => {
     const { name, isActive } = validate(updateRoleValidationSchema, req.body)
     const { id: roleId } = validate(roleIdValidationSchema, req.params)
 
+    if (!parseInt(roleId)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.ROLE.ID.MUST_BE_VALID
+        )
+    }
+
     return prismaClient.$transaction(async (prisma) => {
         const findRole = await prisma.role.findUnique({
             where: {
-                id: roleId,
+                id: parseInt(roleId),
             },
         })
 
@@ -186,7 +202,7 @@ const update = async (req) => {
 
         return prisma.role.update({
             where: {
-                id: roleId,
+                id: parseInt(roleId),
             },
             data: {
                 name: name,
@@ -204,10 +220,18 @@ const update = async (req) => {
 const remove = async (req) => {
     const { id: roleId } = validate(roleIdValidationSchema, req.params)
 
+    if (!parseInt(roleId)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.ROLE.ID.MUST_BE_VALID
+        )
+    }
+
     return prismaClient.$transaction(async (prisma) => {
         const countRole = await prisma.role.count({
             where: {
-                id: roleId,
+                id: parseInt(roleId),
             },
         })
 
@@ -221,7 +245,7 @@ const remove = async (req) => {
 
         await prisma.role.delete({
             where: {
-                id: roleId,
+                id: parseInt(roleId),
             },
         })
     })

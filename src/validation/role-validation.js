@@ -68,11 +68,10 @@ const getRoleValidationSchema = Joi.object({
 })
 
 const roleIdValidationSchema = Joi.object({
-    id: Joi.number().positive().required().messages({
-        'number.base': errors.ROLE.ID.MUST_BE_VALID,
-        'number.empty': errors.ROLE.ID.CANNOT_BE_EMPTY,
-        'number.positive': errors.ROLE.ID.MUST_BE_POSITIVE,
+    id: Joi.string().required().messages({
         'any.required': errors.ROLE.ID.IS_REQUIRED,
+        'string.base': errors.ROLE.ID.MUST_BE_VALID,
+        'string.empty': errors.ROLE.ID.CANNOT_BE_EMPTY,
     }),
 }).messages({
     'object.unknown': errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR,
