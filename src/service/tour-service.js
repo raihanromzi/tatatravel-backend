@@ -67,6 +67,14 @@ const add = async (req) => {
     )
     const images = validate(imagesValidationSchema, req.files)
 
+    if (!parseInt(countryId)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.COUNTRY.ID.MUST_BE_VALID
+        )
+    }
+
     if (
         !images.every((image) => image.fieldname === 'imgDetail' || image.fieldname === 'imgHead')
     ) {
@@ -118,7 +126,7 @@ const add = async (req) => {
     return prismaClient.$transaction(async (prisma) => {
         const findCountry = await prisma.country.findUnique({
             where: {
-                id: countryId,
+                id: parseInt(countryId),
             },
         })
 
@@ -143,7 +151,7 @@ const add = async (req) => {
                     desc: desc,
                     TourCountry: {
                         create: {
-                            countryId: countryId,
+                            countryId: parseInt(countryId),
                         },
                     },
                     Place: {
@@ -340,10 +348,18 @@ const add = async (req) => {
 const getById = async (req) => {
     const { id } = validate(idTourValidationSchema, req.params)
 
+    if (!parseInt(id)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.TOUR.ID.MUST_BE_VALID
+        )
+    }
+
     return prismaClient.$transaction(async (prisma) => {
         const result = await prisma.tour.findUnique({
             where: {
-                id: id,
+                id: parseInt(id),
             },
             select: {
                 id: true,
@@ -561,6 +577,22 @@ const update = async (req) => {
     )
     const images = validate(imagesValidationSchema, req.files)
 
+    if (!parseInt(tourId)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.TOUR.ID.MUST_BE_VALID
+        )
+    }
+
+    if (!parseInt(countryId)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.COUNTRY.ID.MUST_BE_VALID
+        )
+    }
+
     if (
         !images.every((image) => image.fieldname === 'imgDetail' || image.fieldname === 'imgHead')
     ) {
@@ -612,7 +644,7 @@ const update = async (req) => {
     return prismaClient.$transaction(async (prisma) => {
         const findTour = await prisma.tour.findUnique({
             where: {
-                id: tourId,
+                id: parseInt(tourId),
             },
             select: {
                 TourCountry: {
@@ -644,7 +676,7 @@ const update = async (req) => {
         if (countryId) {
             const findCountry = await prisma.country.findUnique({
                 where: {
-                    id: countryId,
+                    id: parseInt(countryId),
                 },
             })
 
@@ -675,18 +707,18 @@ const update = async (req) => {
             if (place.length > 0) {
                 await prisma.place.deleteMany({
                     where: {
-                        tourId: tourId,
+                        tourId: parseInt(tourId),
                     },
                 })
             }
             await prisma.tourImage.deleteMany({
                 where: {
-                    tourId: tourId,
+                    tourId: parseInt(tourId),
                 },
             })
             updatedTour = await prisma.tour.update({
                 where: {
-                    id: tourId,
+                    id: parseInt(tourId),
                 },
                 data: {
                     name: name,
@@ -720,10 +752,10 @@ const update = async (req) => {
                         update: {
                             where: {
                                 id: findTour.TourCountry[0].id,
-                                tourId: tourId,
+                                tourId: parseInt(tourId),
                             },
                             data: {
-                                countryId: countryId,
+                                countryId: parseInt(countryId),
                             },
                         },
                     },
@@ -768,7 +800,7 @@ const update = async (req) => {
 
                 await prisma.tour.update({
                     where: {
-                        id: tourId,
+                        id: parseInt(tourId),
                     },
                     data: {
                         imgHead: newPath,
@@ -779,7 +811,7 @@ const update = async (req) => {
         } catch (e) {
             await prisma.tour.delete({
                 where: {
-                    id: tourId,
+                    id: parseInt(tourId),
                 },
             })
             await fs.rm(`public/images/tour/${tourId}`, { recursive: true, force: true })
@@ -810,7 +842,7 @@ const update = async (req) => {
         } catch (e) {
             await prisma.tour.delete({
                 where: {
-                    id: tourId,
+                    id: parseInt(tourId),
                 },
             })
             await fs.rm(`public/images/tour/${tourId}`, { recursive: true, force: true })
@@ -824,7 +856,7 @@ const update = async (req) => {
 
         const result = await prisma.tour.findUnique({
             where: {
-                id: tourId,
+                id: parseInt(tourId),
             },
             select: {
                 id: true,
@@ -891,10 +923,18 @@ const update = async (req) => {
 const remove = async (req) => {
     const { id } = validate(idTourValidationSchema, req.params)
 
+    if (!parseInt(id)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.TOUR.ID.MUST_BE_VALID
+        )
+    }
+
     return prismaClient.$transaction(async (prisma) => {
         const findTour = await prisma.tour.findUnique({
             where: {
-                id: id,
+                id: parseInt(id),
             },
             select: {
                 imgDetail: {
@@ -916,13 +956,13 @@ const remove = async (req) => {
 
         await prisma.tour.delete({
             where: {
-                id: id,
+                id: parseInt(id),
             },
         })
 
         await prisma.tourImage.deleteMany({
             where: {
-                tourId: id,
+                tourId: parseInt(id),
             },
         })
 

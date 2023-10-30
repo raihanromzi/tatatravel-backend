@@ -77,10 +77,8 @@ const addTourValidationSchema = Joi.object({
             'any.empty': `${errors.TOUR.PLACE.CANNOT_BE_EMPTY}`,
             'any.required': `${errors.TOUR.PLACE.IS_REQUIRED}`,
         }),
-    countryId: Joi.number().positive().required().messages({
-        'number.base': errors.COUNTRY.ID.MUST_BE_NUMBER,
-        'number.empty': errors.COUNTRY.ID.CANNOT_BE_EMPTY,
-        'number.positive': errors.COUNTRY.ID.MUST_BE_POSITIVE,
+    countryId: Joi.string().required().messages({
+        'string.base': errors.COUNTRY.ID.MUST_BE_VALID,
         'any.required': errors.COUNTRY.ID.IS_REQUIRED,
     }),
     imgHead: Joi.string()
@@ -118,13 +116,10 @@ const imagesValidationSchema = Joi.array()
     })
 
 const idTourValidationSchema = Joi.object({
-    id: Joi.number()
-        .positive()
+    id: Joi.string()
         .required()
         .messages({
-            'number.base': `${errors.TOUR.ID.MUST_BE_NUMBER}`,
-            'number.empty': `${errors.TOUR.ID.CANNOT_BE_EMPTY}`,
-            'number.positive': `${errors.TOUR.ID.MUST_BE_POSITIVE}`,
+            'string.base': `${errors.TOUR.ID.MUST_BE_VALID}`,
             'any.required': `${errors.TOUR.ID.IS_REQUIRED}`,
         }),
 }).messages({
@@ -276,10 +271,8 @@ const updateTourValidationSchema = Joi.object({
             'array.min': `${errors.TOUR.PLACE.MUST_BE_1_PLACE_MIN}`,
             'any.empty': `${errors.TOUR.PLACE.CANNOT_BE_EMPTY}`,
         }),
-    countryId: Joi.number().positive().optional().messages({
-        'number.base': errors.COUNTRY.ID.MUST_BE_NUMBER,
-        'number.empty': errors.COUNTRY.ID.CANNOT_BE_EMPTY,
-        'number.positive': errors.COUNTRY.ID.MUST_BE_POSITIVE,
+    countryId: Joi.string().optional().messages({
+        'string.base': errors.COUNTRY.ID.MUST_BE_VALID,
     }),
     imgHead: Joi.string()
         .empty('')

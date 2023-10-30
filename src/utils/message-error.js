@@ -193,6 +193,7 @@ const countryErrors = {
         MUST_BE_NUMBER: 'Country ID must be a valid number.',
         MUST_BE_POSITIVE: 'Country ID must be a positive number.',
         CANNOT_BE_EMPTY: 'Country ID cannot be left empty.',
+        MUST_BE_VALID: 'Country ID must be a valid.',
     },
     NAME: {
         IS_REQUIRED: 'Please provide the country name.',
@@ -299,6 +300,7 @@ const tourErrors = {
         MUST_BE_NUMBER: 'Tour ID must be a valid number',
         MUST_BE_POSITIVE: 'Tour ID must be a positive number',
         CANNOT_BE_EMPTY: 'Tour ID cannot be empty',
+        MUST_BE_VALID: 'Tour ID must be a valid',
     },
     NAME: {
         IS_REQUIRED: 'Tour name is required. Please provide a name for the tour.',
