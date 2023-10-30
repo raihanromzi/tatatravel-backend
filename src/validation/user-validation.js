@@ -69,27 +69,24 @@ const userValidationSchema = Joi.object({
             'string.empty': `${errors.PASSWORD.CANNOT_BE_EMPTY}`,
             'any.required': `${errors.PASSWORD.REQUIRED}`,
         }),
-    roleId: Joi.number()
+    roleId: Joi.string()
         .required()
-        .positive()
         .messages({
             'any.required': `${errors.ROLE.ID.IS_REQUIRED}`,
-            'number.base': `${errors.ROLE.ID.MUST_BE_NUMBER}`,
-            'number.positive': `${errors.ROLE.ID.MUST_BE_POSITIVE}`,
+            'string.empty': `${errors.ROLE.ID.CANNOT_BE_EMPTY}`,
+            'string.base': `${errors.ROLE.ID.MUST_BE_VALID}`,
         }),
 }).messages({
     'object.unknown': `${errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR}`,
 })
 
 const userIdValidationSchema = Joi.object({
-    id: Joi.number()
+    id: Joi.string()
         .required()
-        .positive()
         .messages({
-            'number.base': `${errors.USERID.MUST_BE_NUMBER}`,
-            'number.positive': `${errors.USERID.MUST_BE_POSITIVE}`,
-            'number.empty': `${errors.USERID.CANNOT_BE_EMPTY}`,
             'any.required': `${errors.USERID.IS_REQUIRED}`,
+            'string.empty': `${errors.USERID.CANNOT_BE_EMPTY}`,
+            'string.base': `${errors.USERID.MUST_BE_VALID}`,
         }),
 }).messages({
     'object.unknown': `${errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR}`,

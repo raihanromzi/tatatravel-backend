@@ -14,10 +14,18 @@ import fs from 'fs/promises'
 const add = async (req) => {
     const { fullName, userName, email, password, roleId } = validate(userValidationSchema, req.body)
 
+    if (!parseInt(roleId)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.ROLE.ID.MUST_BE_VALID
+        )
+    }
+
     return prismaClient.$transaction(async (prisma) => {
         const findRole = await prisma.role.findUnique({
             where: {
-                id: roleId,
+                id: parseInt(roleId),
             },
             select: {
                 isActive: true,
@@ -78,7 +86,7 @@ const add = async (req) => {
                 password: await bcrypt.hash(password, 10),
                 role: {
                     connect: {
-                        id: roleId,
+                        id: parseInt(roleId),
                     },
                 },
             },
@@ -183,7 +191,7 @@ const get = async (req) => {
             where: {
                 AND: filters,
                 NOT: {
-                    id: userId,
+                    id: parseInt(userId),
                 },
             },
             select: {
@@ -232,6 +240,22 @@ const update = async (req) => {
     const { id: paramUserid } = validate(userIdValidationSchema, req.params)
     const { id: currentUserId } = req.user
 
+    if (!parseInt(paramUserid)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.USER.ID.MUST_BE_VALID
+        )
+    }
+
+    if (!parseInt(currentUserId)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.USER.ID.MUST_BE_VALID
+        )
+    }
+
     if (paramUserid === currentUserId) {
         throw new ResponseError(
             errors.HTTP.CODE.FORBIDDEN,
@@ -245,7 +269,7 @@ const update = async (req) => {
     return prismaClient.$transaction(async (prisma) => {
         const findUser = await prisma.user.findUnique({
             where: {
-                id: paramUserid,
+                id: parseInt(paramUserid),
             },
         })
 
@@ -259,7 +283,7 @@ const update = async (req) => {
 
         return prisma.user.update({
             where: {
-                id: paramUserid,
+                id: parseInt(paramUserid),
             },
             data: {
                 isActive: isActive,
@@ -277,6 +301,22 @@ const remove = async (req) => {
     const { id: paramUserId } = validate(userIdValidationSchema, req.params)
     const { id: currentUserId } = req.user
 
+    if (!parseInt(paramUserId)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.USER.ID.MUST_BE_VALID
+        )
+    }
+
+    if (!parseInt(currentUserId)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.USER.ID.MUST_BE_VALID
+        )
+    }
+
     if (paramUserId === currentUserId) {
         throw new ResponseError(
             errors.HTTP.CODE.FORBIDDEN,
@@ -288,7 +328,7 @@ const remove = async (req) => {
     return prismaClient.$transaction(async (prisma) => {
         const findUser = await prisma.user.findUnique({
             where: {
-                id: paramUserId,
+                id: parseInt(paramUserId),
             },
             select: {
                 isActive: true,
@@ -313,11 +353,14 @@ const remove = async (req) => {
             )
         }
 
-        await fs.rm(`public/images/avatar/${paramUserId}`, { recursive: true, force: true })
+        await fs.rm(`public/images/avatar/${parseInt(paramUserId)}`, {
+            recursive: true,
+            force: true,
+        })
 
         return prisma.user.delete({
             where: {
-                id: paramUserId,
+                id: parseInt(paramUserId),
             },
         })
     })

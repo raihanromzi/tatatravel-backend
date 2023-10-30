@@ -20,7 +20,7 @@ const httpErrors = {
             'The requested API route is not valid. Please check your request and try again later.',
         FORBIDDEN: 'you are not allowed to access this resource',
         NOT_FOUND: 'the requested resource is not found',
-        UNKNOWN_BODY_ERROR: 'an unknown error occurred with the request. please try again later.',
+        UNKNOWN_BODY_ERROR: 'The request body is invalid. Please check your input and try again.',
     },
 }
 
@@ -55,6 +55,9 @@ const categoryErrors = {
 }
 
 const userErrors = {
+    ID: {
+        MUST_BE_VALID: 'User ID must be a valid.',
+    },
     IS_ACTIVE: {
         IS_REQUIRED: 'Please specify if the user is active.',
         MUST_BE_BOOLEAN: 'The is active value must be either true or false.',
@@ -84,7 +87,7 @@ const roleErrors = {
     },
     ID: {
         IS_REQUIRED: 'Role is required.',
-        MUST_BE_NUMBER: 'Role must be a valid number.',
+        MUST_BE_VALID: 'Role must be a valid.',
         MUST_BE_POSITIVE: 'Role must be a positive number.',
         CANNOT_BE_EMPTY: 'Role cannot be empty.',
     },
@@ -132,7 +135,7 @@ const emailErrors = {
 
 const useridErrors = {
     IS_REQUIRED: 'Please provide a user ID.',
-    MUST_BE_NUMBER: 'User ID must be a valid number.',
+    MUST_BE_VALID: 'User ID must be a valid.',
     MUST_BE_POSITIVE: 'User ID must be a positive number.',
     CANNOT_BE_EMPTY: 'User ID cannot be left empty.',
 }
