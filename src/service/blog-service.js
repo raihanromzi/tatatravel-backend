@@ -10,7 +10,6 @@ import { MulterError, MulterErrorMultipleImages, ResponseError } from '../utils/
 import { prismaClient } from '../application/database.js'
 import { errors } from '../utils/message-error.js'
 import fs from 'fs/promises'
-import { userIdValidationSchema } from '../validation/user-validation.js'
 import { clearDirectory } from '../utils/clear-directory.js'
 
 const add = async (req) => {
@@ -56,8 +55,16 @@ const add = async (req) => {
     }
 
     const { categoryId, title, slug, desc, content } = validate(addBlogValidationSchema, req.body)
-    const { id: userId } = validate(userIdValidationSchema, { id: req.user.id })
     const images = validate(imagesValidationSchema, req.files)
+    const { id: userId } = req.user
+
+    if (!parseInt(categoryId)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.CATEGORY.ID.MUST_VALID
+        )
+    }
 
     if (
         !images.every((image) => image.fieldname === 'imgDetail' || image.fieldname === 'imgHead')
@@ -110,7 +117,7 @@ const add = async (req) => {
     return prismaClient.$transaction(async (prisma) => {
         const findUser = await prisma.user.findUnique({
             where: {
-                id: userId,
+                id: parseInt(userId),
             },
         })
 
@@ -125,7 +132,7 @@ const add = async (req) => {
 
         const findCategory = await prisma.category.findUnique({
             where: {
-                id: categoryId,
+                id: parseInt(categoryId),
             },
             select: {
                 isActive: true,
@@ -176,12 +183,12 @@ const add = async (req) => {
                 data: {
                     user: {
                         connect: {
-                            id: userId,
+                            id: parseInt(userId),
                         },
                     },
                     category: {
                         connect: {
-                            id: categoryId,
+                            id: parseInt(categoryId),
                         },
                     },
                     title: title,
@@ -374,10 +381,18 @@ const add = async (req) => {
 const getById = async (req) => {
     const { id } = validate(idBlogValidationSchema, req.params)
 
+    if (!parseInt(id)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.BLOG.ID.MUST_VALID
+        )
+    }
+
     return prismaClient.$transaction(async (prisma) => {
         const result = await prisma.blog.findUnique({
             where: {
-                id: id,
+                id: parseInt(id),
             },
             select: {
                 title: true,
@@ -542,6 +557,22 @@ const update = async (req) => {
     const images = validate(imagesValidationSchema, req.files)
     const data = {}
 
+    if (!parseInt(blogId)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.BLOG.ID.MUST_BE_VALID
+        )
+    }
+
+    if (!parseInt(categoryId)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.CATEGORY.ID.MUST_VALID
+        )
+    }
+
     if (
         !images.every((image) => image.fieldname === 'imgDetail' || image.fieldname === 'imgHead')
     ) {
@@ -609,7 +640,7 @@ const update = async (req) => {
     if (categoryId) {
         data.category = {
             connect: {
-                id: categoryId,
+                id: parseInt(categoryId),
             },
         }
     }
@@ -634,7 +665,7 @@ const update = async (req) => {
     return prismaClient.$transaction(async (prisma) => {
         const findBlog = await prisma.blog.findUnique({
             where: {
-                id: blogId,
+                id: parseInt(blogId),
             },
         })
 
@@ -651,7 +682,7 @@ const update = async (req) => {
         if (categoryId) {
             const findCategory = await prisma.category.findUnique({
                 where: {
-                    id: categoryId,
+                    id: parseInt(categoryId),
                 },
                 select: {
                     isActive: true,
@@ -685,7 +716,7 @@ const update = async (req) => {
                 where: {
                     slug: data.slug,
                     NOT: {
-                        id: blogId,
+                        id: parseInt(blogId),
                     },
                 },
             })
@@ -717,12 +748,12 @@ const update = async (req) => {
         try {
             await prisma.blogImage.deleteMany({
                 where: {
-                    blogId: blogId,
+                    blogId: parseInt(blogId),
                 },
             })
             updatedBlog = await prisma.blog.update({
                 where: {
-                    id: blogId,
+                    id: parseInt(blogId),
                 },
                 data: data,
                 select: {
@@ -764,7 +795,7 @@ const update = async (req) => {
 
                     await prisma.blog.update({
                         where: {
-                            id: blogId,
+                            id: parseInt(blogId),
                         },
                         data: {
                             imgHead: newPath,
@@ -813,7 +844,7 @@ const update = async (req) => {
 
         const result = await prisma.blog.findUnique({
             where: {
-                id: blogId,
+                id: parseInt(blogId),
             },
             select: {
                 id: true,
@@ -859,10 +890,18 @@ const update = async (req) => {
 const remove = async (req) => {
     const { id } = validate(idBlogValidationSchema, req.params)
 
+    if (!parseInt(id)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.BLOG.ID.MUST_VALID
+        )
+    }
+
     return prismaClient.$transaction(async (prisma) => {
         const findBlog = await prisma.blog.findUnique({
             where: {
-                id: id,
+                id: parseInt(id),
             },
             select: {
                 id: true,
@@ -885,13 +924,13 @@ const remove = async (req) => {
 
         await prisma.blog.delete({
             where: {
-                id: id,
+                id: parseInt(id),
             },
         })
 
         await prisma.blogImage.deleteMany({
             where: {
-                blogId: id,
+                blogId: parseInt(id),
             },
         })
 

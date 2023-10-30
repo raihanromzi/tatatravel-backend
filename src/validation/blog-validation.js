@@ -2,11 +2,10 @@ import Joi from 'joi'
 import { errors } from '../utils/message-error.js'
 
 const addBlogValidationSchema = Joi.object({
-    categoryId: Joi.number().positive().required().messages({
-        'number.base': errors.CATEGORY.ID.MUST_BE_NUMBER,
-        'number.empty': errors.CATEGORY.ID.CANNOT_BE_EMPTY,
-        'number.positive': errors.CATEGORY.ID.MUST_BE_POSITIVE,
+    categoryId: Joi.string().required().messages({
         'any.required': errors.CATEGORY.ID.IS_REQUIRED,
+        'string.empty': errors.CATEGORY.ID.CANNOT_BE_EMPTY,
+        'string.base': errors.CATEGORY.ID.MUST_VALID,
     }),
     title: Joi.string()
         .min(3)
@@ -85,14 +84,12 @@ const imagesValidationSchema = Joi.array()
     })
 
 const idBlogValidationSchema = Joi.object({
-    id: Joi.number()
-        .positive()
+    id: Joi.string()
         .required()
         .messages({
-            'number.base': `${errors.BLOG.ID.MUST_BE_NUMBER}`,
-            'number.empty': `${errors.BLOG.ID.CANNOT_BE_EMPTY}`,
-            'number.positive': `${errors.BLOG.ID.MUST_BE_POSITIVE}`,
             'any.required': `${errors.BLOG.ID.IS_REQUIRED}`,
+            'string.empty': `${errors.BLOG.ID.CANNOT_BE_EMPTY}`,
+            'string.base': `${errors.BLOG.ID.MUST_BE_VALID}`,
         }),
 }).messages({
     'object.unknown': `${errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR}`,
@@ -148,10 +145,8 @@ const getBlogValidationSchema = Joi.object({
 })
 
 const updateBlogValidationSchema = Joi.object({
-    categoryId: Joi.number().positive().messages({
-        'number.base': errors.CATEGORY.ID.MUST_BE_NUMBER,
-        'number.empty': errors.CATEGORY.ID.CANNOT_BE_EMPTY,
-        'number.positive': errors.CATEGORY.ID.MUST_BE_POSITIVE,
+    categoryId: Joi.string().messages({
+        'string.base': `${errors.CATEGORY.ID.MUST_VALID}`,
     }),
     title: Joi.string()
         .min(3)

@@ -275,6 +275,7 @@ const blogErrors = {
     ID: {
         IS_REQUIRED: 'Please specify the blog ID.',
         MUST_BE_NUMBER: 'Blog ID must be a valid number.',
+        MUST_BE_VALID: 'Blog ID must be a valid.',
         MUST_BE_POSITIVE: 'Blog ID must be a positive number.',
         CANNOT_BE_EMPTY: 'The blog ID cannot be left empty.',
     },
