@@ -37,6 +37,7 @@ const categoryErrors = {
         MUST_BE_NUMBER: 'Category ID must be a valid number.',
         MUST_BE_POSITIVE: 'Category ID must be a positive number.',
         CANNOT_BE_EMPTY: 'Category ID cannot be left empty.',
+        MUST_VALID: 'Category ID must be a valid.',
     },
     IS_ACTIVE: {
         IS_REQUIRED: 'Please specify if the category is active.',

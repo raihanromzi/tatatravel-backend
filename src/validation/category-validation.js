@@ -29,11 +29,10 @@ const updateCategoryValidationSchema = Joi.object({
 })
 
 const categoryIdValidationSchema = Joi.object({
-    id: Joi.number().positive().required().messages({
-        'number.base': errors.CATEGORY.ID.MUST_BE_NUMBER,
-        'number.empty': errors.CATEGORY.ID.CANNOT_BE_EMPTY,
-        'number.positive': errors.CATEGORY.ID.MUST_BE_POSITIVE,
+    id: Joi.string().required().messages({
         'any.required': errors.CATEGORY.ID.IS_REQUIRED,
+        'string.empty': errors.CATEGORY.ID.CANNOT_BE_EMPTY,
+        'string.base': errors.CATEGORY.ID.MUST_VALID,
     }),
 }).messages({
     'object.unknown': errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR,

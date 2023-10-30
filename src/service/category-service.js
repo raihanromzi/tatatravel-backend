@@ -111,10 +111,18 @@ const get = async (req) => {
 const getById = async (req) => {
     const { id: categoryId } = validate(categoryIdValidationSchema, req.params)
 
+    if (!parseInt(categoryId)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.CATEGORY.ID.MUST_VALID
+        )
+    }
+
     return prismaClient.$transaction(async (prisma) => {
         const foundCategory = await prisma.category.findFirst({
             where: {
-                id: categoryId,
+                id: parseInt(categoryId),
             },
             select: {
                 id: true,
@@ -139,10 +147,18 @@ const update = async (req) => {
     const { name, isActive } = validate(updateCategoryValidationSchema, req.body)
     const { id: categoryId } = validate(categoryIdValidationSchema, req.params)
 
+    if (!parseInt(categoryId)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.CATEGORY.ID.MUST_VALID
+        )
+    }
+
     return prismaClient.$transaction(async (prisma) => {
         const findCategory = await prisma.category.findUnique({
             where: {
-                id: categoryId,
+                id: parseInt(categoryId),
             },
         })
 
@@ -170,7 +186,7 @@ const update = async (req) => {
 
         return prisma.category.update({
             where: {
-                id: categoryId,
+                id: parseInt(categoryId),
             },
             data: {
                 name: name,
@@ -188,10 +204,18 @@ const update = async (req) => {
 const remove = async (req) => {
     const { id: categoryId } = validate(categoryIdValidationSchema, req.params)
 
+    if (!parseInt(categoryId)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.CATEGORY.ID.MUST_VALID
+        )
+    }
+
     return prismaClient.$transaction(async (prisma) => {
         const countCategory = await prisma.category.count({
             where: {
-                id: categoryId,
+                id: parseInt(categoryId),
             },
         })
 
@@ -205,7 +229,7 @@ const remove = async (req) => {
 
         await prisma.category.delete({
             where: {
-                id: categoryId,
+                id: parseInt(categoryId),
             },
         })
     })
