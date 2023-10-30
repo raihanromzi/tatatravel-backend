@@ -2,7 +2,6 @@ import { validate } from '../validation/validation.js'
 import {
     avatarValidationSchema,
     updateUserValidationSchema,
-    userIdValidationSchema,
 } from '../validation/user-validation.js'
 import { prismaClient } from '../application/database.js'
 import { MulterError, ResponseError } from '../utils/response-error.js'
@@ -11,12 +10,28 @@ import { errors } from '../utils/message-error.js'
 import fs from 'fs/promises'
 
 const get = async (req) => {
-    const { id: userId } = validate(userIdValidationSchema, { id: req.user.id })
-    const { roleId } = req.user
+    const { id: userId, roleId } = req.user
+
+    if (!parseInt(userId)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.USER.ID.MUST_BE_VALID
+        )
+    }
+
+    if (!parseInt(roleId)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.ROLE.ID.MUST_BE_VALID
+        )
+    }
 
     const findUser = await prismaClient.user.findUnique({
         where: {
-            id: userId,
+            id: parseInt(userId),
+            roleId: parseInt(roleId),
         },
         select: {
             email: true,
@@ -61,8 +76,16 @@ const get = async (req) => {
 
 const update = async (req) => {
     const { userName, fullName, password } = validate(updateUserValidationSchema, req.body)
-    const { id: userId } = validate(userIdValidationSchema, { id: req.user.id })
     const { avatar: images } = validate(avatarValidationSchema, { avatar: req.files })
+    const { id: userId } = req.user
+
+    if (!parseInt(userId)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.USER.ID.MUST_BE_VALID
+        )
+    }
 
     if (images.length > 1) {
         throw new MulterError(
@@ -104,7 +127,7 @@ const update = async (req) => {
     return prismaClient.$transaction(async (prisma) => {
         const findUser = await prisma.user.findUnique({
             where: {
-                id: userId,
+                id: parseInt(userId),
             },
         })
 
@@ -139,22 +162,22 @@ const update = async (req) => {
         }
 
         const { path: oldPath, filename } = avatar
-        const newPath = `public/images/avatar/${userId}/${filename}`
+        const newPath = `public/images/avatar/${parseInt(userId)}/${filename}`
 
         try {
             // Delete old avatar
-            const oldAvatar = await fs.readdir(`public/images/avatar/${userId}`)
+            const oldAvatar = await fs.readdir(`public/images/avatar/${parseInt(userId)}`)
             for (const avatar of oldAvatar) {
-                await fs.unlink(`public/images/avatar/${userId}/${avatar}`)
+                await fs.unlink(`public/images/avatar/${parseInt(userId)}/${avatar}`)
             }
 
             await prisma.user.update({
                 where: {
-                    id: userId,
+                    id: parseInt(userId),
                 },
                 data: { ...data, avatar: newPath },
             })
-            await fs.mkdir(`public/images/avatar/${userId}`, { recursive: true })
+            await fs.mkdir(`public/images/avatar/${parseInt(userId)}`, { recursive: true })
             await fs.rename(oldPath, newPath)
         } catch (error) {
             throw new MulterError(
@@ -167,7 +190,7 @@ const update = async (req) => {
 
         return prisma.user.findUnique({
             where: {
-                id: userId,
+                id: parseInt(userId),
             },
             select: {
                 fullName: true,
@@ -179,12 +202,20 @@ const update = async (req) => {
 }
 
 const logout = async (req, res) => {
-    const { id: userId } = validate(userIdValidationSchema, { id: req.user.id })
+    const { id: userId } = req.user
+
+    if (!parseInt(userId)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.USER.ID.MUST_BE_VALID
+        )
+    }
 
     return prismaClient.$transaction(async (prisma) => {
         const findUser = await prisma.user.findUnique({
             where: {
-                id: userId,
+                id: parseInt(userId),
             },
         })
 
@@ -200,7 +231,7 @@ const logout = async (req, res) => {
 
         return prisma.user.update({
             where: {
-                id: userId,
+                id: parseInt(userId),
             },
             data: {
                 token: null,
