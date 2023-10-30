@@ -51,11 +51,10 @@ const getAreaValidationSchema = Joi.object({
 })
 
 const areaIdValidationSchema = Joi.object({
-    id: Joi.number().positive().required().messages({
-        'number.base': errors.AREA.ID.MUST_BE_NUMBER,
-        'number.empty': errors.AREA.ID.CANNOT_BE_EMPTY,
-        'number.positive': errors.AREA.ID.MUST_BE_POSITIVE,
+    id: Joi.string().required().messages({
         'any.required': errors.AREA.ID.IS_REQUIRED,
+        'string.empty': errors.AREA.ID.CANNOT_BE_EMPTY,
+        'string.base': errors.AREA.ID.MUST_BE_VALID,
     }),
 }).messages({
     'object.unknown': errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR,

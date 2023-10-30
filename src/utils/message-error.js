@@ -175,6 +175,7 @@ const areaErrors = {
         MUST_BE_NUMBER: 'Area ID must be a valid number.',
         MUST_BE_POSITIVE: 'Area ID must be a positive number.',
         CANNOT_BE_EMPTY: 'Area ID cannot be left empty.',
+        MUST_BE_VALID: 'Area ID must be a valid.',
     },
     NOT_FOUND: 'Area not found.',
     ALREADY_EXISTS: 'The area already exists.',

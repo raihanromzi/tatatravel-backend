@@ -96,10 +96,18 @@ const get = async (req) => {
 const getById = async (req) => {
     const { id: areaId } = validate(areaIdValidationSchema, req.params)
 
+    if (!parseInt(areaId)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.AREA.ID.MUST_BE_VALID
+        )
+    }
+
     return prismaClient.$transaction(async (prisma) => {
         const area = await prisma.area.findUnique({
             where: {
-                id: areaId,
+                id: parseInt(areaId),
             },
             select: {
                 name: true,
@@ -122,10 +130,18 @@ const update = async (req) => {
     const { name } = validate(areaNameValidationSchema, req.body)
     const { id: areaId } = validate(areaIdValidationSchema, req.params)
 
+    if (!parseInt(areaId)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.AREA.ID.MUST_BE_VALID
+        )
+    }
+
     return prismaClient.$transaction(async (prisma) => {
         const findArea = await prisma.area.findUnique({
             where: {
-                id: areaId,
+                id: parseInt(areaId),
             },
         })
 
@@ -139,7 +155,7 @@ const update = async (req) => {
 
         return prisma.area.update({
             where: {
-                id: areaId,
+                id: parseInt(areaId),
             },
             data: {
                 name: name,
@@ -154,10 +170,18 @@ const update = async (req) => {
 const remove = async (req) => {
     const { id: areaId } = validate(areaIdValidationSchema, req.params)
 
+    if (!parseInt(areaId)) {
+        throw new ResponseError(
+            errors.HTTP.CODE.BAD_REQUEST,
+            errors.HTTP.STATUS.BAD_REQUEST,
+            errors.AREA.ID.MUST_BE_VALID
+        )
+    }
+
     return prismaClient.$transaction(async (prisma) => {
         const findArea = await prisma.area.findUnique({
             where: {
-                id: areaId,
+                id: parseInt(areaId),
             },
         })
 
@@ -171,7 +195,7 @@ const remove = async (req) => {
 
         return prisma.area.delete({
             where: {
-                id: areaId,
+                id: parseInt(areaId),
             },
         })
     })
