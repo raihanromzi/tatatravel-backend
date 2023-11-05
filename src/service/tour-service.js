@@ -562,6 +562,7 @@ const get = async (req) => {
             }),
             pagination: {
                 page: page,
+                skip: skip,
                 total_item: totalItems,
                 total_page: Math.ceil(totalItems / size),
             },

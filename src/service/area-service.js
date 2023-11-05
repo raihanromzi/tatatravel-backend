@@ -86,6 +86,7 @@ const get = async (req) => {
             data: areas,
             pagination: {
                 page: page,
+                skip: skip,
                 total_item: totalItems,
                 total_page: Math.ceil(totalItems / size),
             },
