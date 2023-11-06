@@ -1,6 +1,5 @@
 import express from 'express'
 import cookieParser from 'cookie-parser'
-import multer from 'multer'
 import cors from 'cors'
 import { errorMiddleware } from '../middlewares/error-middleware.js'
 import { publicRouter } from '../routes/public-route.js'
@@ -13,7 +12,6 @@ import { roleRouter } from '../routes/role-route.js'
 import { categoryRouter } from '../routes/category-route.js'
 import { blogRouter } from '../routes/blog-route.js'
 import { tourRouter } from '../routes/tour-route.js'
-import { fileFilterMiddleware, fileStorageImages } from '../middlewares/multer-middleware.js'
 import {
     accessTokenVerifyMiddleware,
     refreshTokenVerifyMiddleware,
@@ -22,6 +20,7 @@ import { adminMiddleware } from '../middlewares/admin-middleware.js'
 import { errors } from '../utils/message-error.js'
 import response from '../utils/response-api.js'
 import { checkDbMiddleware } from '../middlewares/check-db-middleware.js'
+import { multerMiddleware } from '../middlewares/multer-middleware.js'
 
 const web = express()
 
@@ -30,15 +29,7 @@ web.use(express.urlencoded({ extended: false }))
 web.use(express.static('public', { etag: true }))
 web.use(cookieParser())
 web.use(checkDbMiddleware)
-web.use(
-    multer({
-        limits: {
-            fileSize: 1024 * 1024 * 5, // 5MB
-        },
-        storage: fileStorageImages,
-        fileFilter: fileFilterMiddleware,
-    }).any('images')
-)
+web.use(multerMiddleware)
 
 web.use(cors())
 

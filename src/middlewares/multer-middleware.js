@@ -37,4 +37,12 @@ const fileFilterMiddleware = (req, file, cb) => {
     }
 }
 
-export { fileStorageImages, fileFilterMiddleware }
+const multerMiddleware = multer({
+    limits: {
+        fileSize: 1024 * 1024 * 5, // 5MB
+    },
+    storage: fileStorageImages,
+    fileFilter: fileFilterMiddleware,
+}).any('images')
+
+export { multerMiddleware }
