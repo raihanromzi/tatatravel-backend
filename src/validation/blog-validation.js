@@ -34,11 +34,11 @@ const addBlogValidationSchema = Joi.object({
         .max(255)
         .required()
         .messages({
-            'string.base': `${errors.BLOG.DESCRIPTION.MUST_BE_STRING}`,
-            'string.empty': `${errors.BLOG.DESCRIPTION.CANNOT_BE_EMPTY}`,
-            'string.min': `${errors.BLOG.DESCRIPTION.MUST_BE_3_CHAR_MIN}`,
-            'string.max': `${errors.BLOG.DESCRIPTION.MUST_BE_255_CHAR_MAX}`,
-            'any.required': `${errors.BLOG.DESCRIPTION.IS_REQUIRED}`,
+            'string.base': `${errors.BLOG.DESC.MUST_BE_STRING}`,
+            'string.empty': `${errors.BLOG.DESC.CANNOT_BE_EMPTY}`,
+            'string.min': `${errors.BLOG.DESC.MUST_BE_3_CHAR_MIN}`,
+            'string.max': `${errors.BLOG.DESC.MUST_BE_255_CHAR_MAX}`,
+            'any.required': `${errors.BLOG.DESC.IS_REQUIRED}`,
         }),
     content: Joi.string()
         .min(3)
@@ -132,13 +132,20 @@ const getBlogValidationSchema = Joi.object({
             'string.base': `${errors.BLOG.TITLE.MUST_BE_STRING}`,
             'string.max': `${errors.BLOG.TITLE.MUST_BE_255_CHAR_MAX}`,
         }),
-    description: Joi.string()
+    desc: Joi.string()
         .max(255)
         .optional()
         .empty('')
         .messages({
-            'string.base': `${errors.BLOG.DESCRIPTION.MUST_BE_STRING}`,
-            'string.max': `${errors.BLOG.DESCRIPTION.MUST_BE_255_CHAR_MAX}`,
+            'string.base': `${errors.BLOG.DESC.MUST_BE_STRING}`,
+            'string.max': `${errors.BLOG.DESC.MUST_BE_255_CHAR_MAX}`,
+        }),
+    isActive: Joi.boolean()
+        .optional()
+        .empty('')
+        .messages({
+            'boolean.base': `${errors.BLOG.IS_ACTIVE.MUST_BE_BOOLEAN}`,
+            'boolean.empty': `${errors.BLOG.IS_ACTIVE.CANNOT_BE_EMPTY}`,
         }),
 }).messages({
     'object.unknown': errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR,
@@ -170,10 +177,10 @@ const updateBlogValidationSchema = Joi.object({
         .min(3)
         .max(255)
         .messages({
-            'string.base': `${errors.BLOG.DESCRIPTION.MUST_BE_STRING}`,
-            'string.empty': `${errors.BLOG.DESCRIPTION.CANNOT_BE_EMPTY}`,
-            'string.min': `${errors.BLOG.DESCRIPTION.MUST_BE_3_CHAR_MIN}`,
-            'string.max': `${errors.BLOG.DESCRIPTION.MUST_BE_255_CHAR_MAX}`,
+            'string.base': `${errors.BLOG.DESC.MUST_BE_STRING}`,
+            'string.empty': `${errors.BLOG.DESC.CANNOT_BE_EMPTY}`,
+            'string.min': `${errors.BLOG.DESC.MUST_BE_3_CHAR_MIN}`,
+            'string.max': `${errors.BLOG.DESC.MUST_BE_255_CHAR_MAX}`,
         }),
     content: Joi.string()
         .min(3)

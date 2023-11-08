@@ -211,6 +211,11 @@ const countryErrors = {
         'Sorry, we encountered an issue while updating the country. Please try again later.',
     FAILED_TO_DELETE:
         'Sorry, we encountered an issue while deleting the country. Please try again later.',
+    IS_ACTIVE: {
+        IS_REQUIRED: 'Please specify if the user is active.',
+        MUST_BE_BOOLEAN: 'The is active value must be either true or false.',
+        CANNOT_BE_EMPTY: 'The is active field cannot be left empty.',
+    },
 }
 
 const avatarErrors = {
@@ -260,7 +265,7 @@ const blogErrors = {
         MUST_BE_100_CHAR_MAX: 'The slug cannot exceed 100 characters.',
         ALREADY_EXISTS: 'This slug already exists.',
     },
-    DESCRIPTION: {
+    DESC: {
         IS_REQUIRED: 'Please provide a description for the blog.',
         MUST_BE_STRING: 'The description must be a string of 3 to 255 characters.',
         CANNOT_BE_EMPTY: 'The description cannot be left empty.',
@@ -292,6 +297,11 @@ const blogErrors = {
         'We encountered an issue while trying to create the blog images directory.',
     FAILED_TO_FIND_DIRECTORY:
         'We encountered an issue while trying to find the blog images directory.',
+    IS_ACTIVE: {
+        IS_REQUIRED: 'Please specify if the user is active.',
+        MUST_BE_BOOLEAN: 'The is active value must be either true or false.',
+        CANNOT_BE_EMPTY: 'The is active field cannot be left empty.',
+    },
 }
 
 const tourErrors = {
@@ -330,7 +340,7 @@ const tourErrors = {
         MUST_BE_GREATER_THAN_0: 'Start date must be greater than 0.',
         CANNOT_BE_EMPTY: 'End date cannot be left empty.',
     },
-    DESCRIPTION: {
+    DESC: {
         IS_REQUIRED: 'Description is required. Please provide a description for the tour.',
         MUST_BE_STRING: 'Description must be a valid string.',
         MUST_BE_3_CHAR_MIN: 'Description should have at least 3 characters.',

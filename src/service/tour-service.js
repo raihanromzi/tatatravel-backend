@@ -369,6 +369,7 @@ const getById = async (req) => {
                 dateEnd: true,
                 duration: true,
                 desc: true,
+                isActive: true,
                 imgHead: true,
                 imgDetail: {
                     select: {
@@ -390,6 +391,7 @@ const getById = async (req) => {
                         },
                     },
                 },
+                createdAt: true,
             },
         })
 
@@ -409,10 +411,12 @@ const getById = async (req) => {
             dateEnd: resultDateEnd,
             duration: resultDuration,
             desc: resultDescription,
+            isActive: resultIsActive,
             imgHead: resultImgHead,
             imgDetail: resultImgDetail,
             Place: resultPlace,
             TourCountry: resultTourCountry,
+            createdAt: resultCreatedAt,
         } = result
 
         return {
@@ -423,16 +427,18 @@ const getById = async (req) => {
             dateEnd: resultDateEnd,
             duration: resultDuration,
             description: resultDescription,
+            isActive: resultIsActive,
             imgHead: resultImgHead,
             imgDetail: resultImgDetail,
             place: resultPlace.map((place) => place.name),
             country: resultTourCountry.map((country) => country.country.name),
+            createdAt: resultCreatedAt,
         }
     })
 }
 
 const get = async (req) => {
-    const { page, size, sortBy, orderBy, name, place, country } = validate(
+    const { page, size, sortBy, orderBy, name, place, country, isActive } = validate(
         getTourValidationSchema,
         req.query
     )
@@ -465,7 +471,9 @@ const get = async (req) => {
         filters.push({
             Place: {
                 some: {
-                    name: place,
+                    name: {
+                        contains: place,
+                    },
                 },
             },
         })
@@ -486,6 +494,7 @@ const get = async (req) => {
     return prismaClient.$transaction(async (prisma) => {
         const tours = await prisma.tour.findMany({
             where: {
+                isActive: isActive,
                 AND: filters,
             },
             select: {
@@ -496,6 +505,7 @@ const get = async (req) => {
                 dateEnd: true,
                 duration: true,
                 desc: true,
+                isActive: true,
                 imgHead: true,
                 imgDetail: {
                     select: {
@@ -517,6 +527,7 @@ const get = async (req) => {
                         },
                     },
                 },
+                createdAt: true,
             },
             take: size,
             skip: skip,
@@ -527,9 +538,11 @@ const get = async (req) => {
 
         const totalItems = await prisma.tour.count({
             where: {
+                isActive: isActive,
                 AND: filters,
             },
         })
+
         return {
             data: tours.map((tour) => {
                 const {
@@ -540,10 +553,12 @@ const get = async (req) => {
                     dateEnd: resultDateEnd,
                     duration: resultDuration,
                     desc: resultDescription,
+                    isActive: resultIsActive,
                     imgHead: resultImgHead,
                     imgDetail: resultImgDetail,
                     Place: resultPlace,
                     TourCountry: resultTourCountry,
+                    createdAt: resultCreatedAt,
                 } = tour
 
                 return {
@@ -554,10 +569,12 @@ const get = async (req) => {
                     dateEnd: resultDateEnd,
                     duration: resultDuration,
                     description: resultDescription,
+                    isActive: resultIsActive,
                     imgHead: resultImgHead,
                     imgDetail: resultImgDetail,
                     place: resultPlace.map((place) => place.name),
                     country: resultTourCountry.map((country) => country.country.name),
+                    createdAt: resultCreatedAt,
                 }
             }),
             pagination: {

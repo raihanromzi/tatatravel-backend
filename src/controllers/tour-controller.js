@@ -30,9 +30,14 @@ const getById = async (req, res, next) => {
 
 const get = async (req, res, next) => {
     try {
-        const result = await tourService.get(req)
+        const { data, pagination } = await tourService.get(req)
         res.status(success.HTTP.CODE.OK).send(
-            responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
+            responses.responseSuccess(
+                success.HTTP.CODE.OK,
+                success.HTTP.STATUS.OK,
+                data,
+                pagination
+            )
         )
     } catch (e) {
         next(e)

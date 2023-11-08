@@ -398,6 +398,7 @@ const getById = async (req) => {
                 title: true,
                 slug: true,
                 desc: true,
+                isActive: true,
                 content: true,
                 imgHead: true,
                 imgDetail: {
@@ -416,6 +417,7 @@ const getById = async (req) => {
                         name: true,
                     },
                 },
+                createdAt: true,
             },
         })
 
@@ -427,7 +429,18 @@ const getById = async (req) => {
             )
         }
 
-        const { title, slug, desc, content, imgHead, imgDetail, user, category } = result
+        const {
+            title,
+            slug,
+            desc,
+            isActive,
+            content,
+            imgHead,
+            imgDetail,
+            user,
+            category,
+            createdAt,
+        } = result
 
         return {
             title: title,
@@ -435,15 +448,17 @@ const getById = async (req) => {
             slug: slug,
             category: category.name,
             desc: desc,
+            isActive: isActive,
             content: content,
             imgHead: imgHead,
             imgDetail: imgDetail.map((image) => image.image),
+            createdAt: createdAt,
         }
     })
 }
 
 const get = async (req) => {
-    const { title, description, page, size, sortBy, orderBy } = validate(
+    const { title, desc, page, size, sortBy, orderBy, isActive } = validate(
         getBlogValidationSchema,
         req.query
     )
@@ -474,10 +489,10 @@ const get = async (req) => {
         })
     }
 
-    if (description) {
+    if (desc) {
         filters.push({
-            description: {
-                contains: description,
+            desc: {
+                contains: desc,
             },
         })
     }
@@ -485,12 +500,14 @@ const get = async (req) => {
     return prismaClient.$transaction(async (prisma) => {
         const blogs = await prisma.blog.findMany({
             where: {
+                isActive: isActive,
                 AND: filters,
             },
             select: {
                 title: true,
                 slug: true,
                 desc: true,
+                isActive: true,
                 content: true,
                 imgHead: true,
                 imgDetail: {
@@ -509,6 +526,7 @@ const get = async (req) => {
                         name: true,
                     },
                 },
+                createdAt: true,
             },
             take: size,
             skip: skip,
@@ -519,21 +537,35 @@ const get = async (req) => {
 
         const totalItems = await prisma.blog.count({
             where: {
+                isActive: isActive,
                 AND: filters,
             },
         })
 
         for (let i = 0; i <= blogs.length - 1; i++) {
-            const { title, slug, desc, content, imgHead, imgDetail, user, category } = blogs[i]
+            const {
+                title,
+                slug,
+                desc,
+                isActive,
+                content,
+                imgHead,
+                imgDetail,
+                user,
+                category,
+                createdAt,
+            } = blogs[i]
             blogs[i] = {
                 title: title,
                 author: user,
                 slug: slug,
                 category: category.name,
                 desc: desc,
+                isActive: isActive,
                 content: content,
                 imgHead: imgHead,
                 imgDetail: imgDetail.map((image) => image.image),
+                createdAt: createdAt,
             }
         }
 

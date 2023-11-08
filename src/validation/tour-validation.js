@@ -51,11 +51,11 @@ const addTourValidationSchema = Joi.object({
         .max(255)
         .required()
         .messages({
-            'string.base': `${errors.TOUR.DESCRIPTION.MUST_BE_STRING}`,
-            'string.empty': `${errors.TOUR.DESCRIPTION.CANNOT_BE_EMPTY}`,
-            'string.min': `${errors.TOUR.DESCRIPTION.MUST_BE_3_CHAR_MIN}`,
-            'string.max': `${errors.TOUR.DESCRIPTION.MUST_BE_255_CHAR_MAX}`,
-            'any.required': `${errors.TOUR.DESCRIPTION.IS_REQUIRED}`,
+            'string.base': `${errors.TOUR.DESC.MUST_BE_STRING}`,
+            'string.empty': `${errors.TOUR.DESC.CANNOT_BE_EMPTY}`,
+            'string.min': `${errors.TOUR.DESC.MUST_BE_3_CHAR_MIN}`,
+            'string.max': `${errors.TOUR.DESC.MUST_BE_255_CHAR_MAX}`,
+            'any.required': `${errors.TOUR.DESC.IS_REQUIRED}`,
         }),
     place: Joi.array()
         .items(
@@ -184,6 +184,13 @@ const getTourValidationSchema = Joi.object({
         'string.empty': errors.COUNTRY.NAME.CANNOT_BE_EMPTY,
         'any.required': errors.COUNTRY.NAME.IS_REQUIRED,
     }),
+    isActive: Joi.boolean()
+        .optional()
+        .empty('')
+        .messages({
+            'boolean.base': `${errors.COUNTRY.IS_ACTIVE.MUST_BE_BOOLEAN}`,
+            'boolean.empty': `${errors.COUNTRY.IS_ACTIVE.CANNOT_BE_EMPTY}`,
+        }),
 })
 
 const updateTourValidationSchema = Joi.object({
@@ -241,10 +248,10 @@ const updateTourValidationSchema = Joi.object({
         .max(255)
         .optional()
         .messages({
-            'string.base': `${errors.TOUR.DESCRIPTION.MUST_BE_STRING}`,
-            'string.empty': `${errors.TOUR.DESCRIPTION.CANNOT_BE_EMPTY}`,
-            'string.min': `${errors.TOUR.DESCRIPTION.MUST_BE_3_CHAR_MIN}`,
-            'string.max': `${errors.TOUR.DESCRIPTION.MUST_BE_255_CHAR_MAX}`,
+            'string.base': `${errors.TOUR.DESC.MUST_BE_STRING}`,
+            'string.empty': `${errors.TOUR.DESC.CANNOT_BE_EMPTY}`,
+            'string.min': `${errors.TOUR.DESC.MUST_BE_3_CHAR_MIN}`,
+            'string.max': `${errors.TOUR.DESC.MUST_BE_255_CHAR_MAX}`,
         }),
     isActive: Joi.boolean()
         .optional()
