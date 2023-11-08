@@ -336,7 +336,7 @@ const add = async (req) => {
             dateStart: resultDateStart,
             dateEnd: resultDateEnd,
             duration: resultDuration,
-            description: resultDescription,
+            desc: resultDescription,
             imgHead: resultImgHead,
             imgDetail: resultImgDetail,
             place: resultPlace.map((place) => place.name),
@@ -426,7 +426,7 @@ const getById = async (req) => {
             dateStart: resultDateStart,
             dateEnd: resultDateEnd,
             duration: resultDuration,
-            description: resultDescription,
+            desc: resultDescription,
             isActive: resultIsActive,
             imgHead: resultImgHead,
             imgDetail: resultImgDetail,
@@ -568,7 +568,7 @@ const get = async (req) => {
                     dateStart: resultDateStart,
                     dateEnd: resultDateEnd,
                     duration: resultDuration,
-                    description: resultDescription,
+                    desc: resultDescription,
                     isActive: resultIsActive,
                     imgHead: resultImgHead,
                     imgDetail: resultImgDetail,
@@ -777,6 +777,7 @@ const update = async (req) => {
                             },
                         },
                     },
+                    updatedAt: new Date(),
                 },
                 select: {
                     id: true,
@@ -884,6 +885,7 @@ const update = async (req) => {
                 dateEnd: true,
                 duration: true,
                 desc: true,
+                isActive: true,
                 imgHead: true,
                 imgDetail: {
                     select: {
@@ -905,6 +907,7 @@ const update = async (req) => {
                         },
                     },
                 },
+                createdAt: true,
             },
         })
 
@@ -916,10 +919,12 @@ const update = async (req) => {
             dateEnd: resultDateEnd,
             duration: resultDuration,
             desc: resultDescription,
+            isActive: resultIsActive,
             imgHead: resultImgHead,
             imgDetail: resultImgDetail,
             Place: resultPlace,
             TourCountry: resultTourCountry,
+            createdAt: resultCreatedAt,
         } = result
 
         return {
@@ -929,11 +934,13 @@ const update = async (req) => {
             dateStart: resultDateStart,
             dateEnd: resultDateEnd,
             duration: resultDuration,
-            description: resultDescription,
+            desc: resultDescription,
+            isActive: resultIsActive,
             imgHead: resultImgHead,
             imgDetail: resultImgDetail,
             place: resultPlace.map((place) => place.name),
             country: resultTourCountry.map((country) => country.country.name),
+            createdAt: resultCreatedAt,
         }
     })
 }

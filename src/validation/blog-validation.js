@@ -152,10 +152,14 @@ const getBlogValidationSchema = Joi.object({
 })
 
 const updateBlogValidationSchema = Joi.object({
-    categoryId: Joi.string().messages({
-        'string.base': `${errors.CATEGORY.ID.MUST_VALID}`,
-    }),
+    categoryId: Joi.string()
+        .optional()
+        .messages({
+            'string.base': `${errors.CATEGORY.ID.MUST_VALID}`,
+        }),
     title: Joi.string()
+        .optional()
+        .empty('')
         .min(3)
         .max(255)
         .messages({
@@ -165,6 +169,7 @@ const updateBlogValidationSchema = Joi.object({
             'string.max': `${errors.BLOG.TITLE.MUST_BE_255_CHAR_MAX}`,
         }),
     slug: Joi.string()
+        .optional()
         .min(3)
         .max(100)
         .messages({
@@ -174,6 +179,8 @@ const updateBlogValidationSchema = Joi.object({
             'string.max': `${errors.BLOG.SLUG.MUST_BE_100_CHAR_MAX}`,
         }),
     desc: Joi.string()
+        .optional()
+        .empty('')
         .min(3)
         .max(255)
         .messages({
@@ -183,11 +190,18 @@ const updateBlogValidationSchema = Joi.object({
             'string.max': `${errors.BLOG.DESC.MUST_BE_255_CHAR_MAX}`,
         }),
     content: Joi.string()
+        .optional()
         .min(3)
         .messages({
             'string.base': `${errors.BLOG.CONTENT.MUST_BE_STRING}`,
             'string.empty': `${errors.BLOG.CONTENT.CANNOT_BE_EMPTY}`,
             'string.min': `${errors.BLOG.CONTENT.MUST_BE_3_CHAR_MIN}`,
+        }),
+    isActive: Joi.boolean()
+        .optional()
+        .messages({
+            'boolean.base': `${errors.BLOG.IS_ACTIVE.MUST_BE_BOOLEAN}`,
+            'boolean.empty': `${errors.BLOG.IS_ACTIVE.CANNOT_BE_EMPTY}`,
         }),
 }).messages({
     'object.unknown': `${errors.HTTP.MESSAGE.UNKNOWN_BODY_ERROR}`,

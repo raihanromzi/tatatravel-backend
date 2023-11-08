@@ -11,6 +11,7 @@ import { prismaClient } from '../application/database.js'
 import { errors } from '../utils/message-error.js'
 import fs from 'fs/promises'
 import { clearDirectory } from '../utils/clear-directory.js'
+import { logger } from '../application/logging.js'
 
 const add = async (req) => {
     // validate request body, should exist
@@ -583,7 +584,7 @@ const get = async (req) => {
 
 const update = async (req) => {
     const { id: blogId } = validate(idBlogValidationSchema, req.params)
-    const { categoryId, title, slug, desc, content } = validate(
+    const { categoryId, title, slug, desc, content, isActive } = validate(
         updateBlogValidationSchema,
         req.body
     )
@@ -695,6 +696,10 @@ const update = async (req) => {
         }
     }
 
+    logger.info('WAKAKAK')
+    logger.info(data)
+    logger.info(isActive)
+
     return prismaClient.$transaction(async (prisma) => {
         const findBlog = await prisma.blog.findUnique({
             where: {
@@ -788,7 +793,11 @@ const update = async (req) => {
                 where: {
                     id: parseInt(blogId),
                 },
-                data: data,
+                data: {
+                    ...data,
+                    isActive: isActive,
+                    updatedAt: new Date(),
+                },
                 select: {
                     imgDetail: true,
                 },
@@ -883,6 +892,7 @@ const update = async (req) => {
                 id: true,
                 title: true,
                 desc: true,
+                isActive: true,
                 slug: true,
                 category: {
                     select: {
@@ -895,6 +905,8 @@ const update = async (req) => {
                         image: true,
                     },
                 },
+                createdAt: true,
+                updatedAt: true,
             },
         })
 
@@ -902,20 +914,26 @@ const update = async (req) => {
             id: resultId,
             title: resultTitle,
             desc: resultDesc,
+            isActive: resultIsActive,
             slug: resultSlug,
             category: { name: resultCategory },
             imgHead: resultImgHead,
             imgDetail: resultImgDetail,
+            createdAt: resultCreatedAt,
+            updatedAt: resultUpdatedAt,
         } = result
 
         return {
             id: resultId,
             title: resultTitle,
             desc: resultDesc,
+            isActive: resultIsActive,
             slug: resultSlug,
             category: resultCategory,
             imgHead: resultImgHead,
             imgDetail: resultImgDetail.map((image) => image.image),
+            createdAt: resultCreatedAt,
+            updatedAt: resultUpdatedAt,
         }
     })
 }
@@ -979,4 +997,4 @@ const remove = async (req) => {
     })
 }
 
-export default { add, getById, get, remove, update }
+export default { add, getById, get, update, remove }
