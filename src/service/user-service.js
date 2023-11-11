@@ -163,6 +163,7 @@ const update = async (req) => {
 
         const { path: oldPath, filename } = avatar
         const newPath = `public/images/avatar/${parseInt(userId)}/${filename}`
+        const urlSavedToDB = `images/avatar/${parseInt(userId)}/${filename}`
 
         try {
             // Delete old avatar
@@ -175,7 +176,7 @@ const update = async (req) => {
                 where: {
                     id: parseInt(userId),
                 },
-                data: { ...data, avatar: newPath },
+                data: { ...data, avatar: urlSavedToDB },
             })
             await fs.mkdir(`public/images/avatar/${parseInt(userId)}`, { recursive: true })
             await fs.rename(oldPath, newPath)
