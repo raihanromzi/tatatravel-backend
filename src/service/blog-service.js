@@ -11,7 +11,6 @@ import { prismaClient } from '../application/database.js'
 import { errors } from '../utils/message-error.js'
 import fs from 'fs/promises'
 import { clearDirectory } from '../utils/clear-directory.js'
-import { logger } from '../application/logging.js'
 
 const add = async (req) => {
     // validate request body, should exist
@@ -262,6 +261,7 @@ const add = async (req) => {
                 const { path, filename } = image
                 const oldPath = path
                 const newPath = `public/images/blog/${newBlogId}/header/${filename}`
+                const urlSavedToDB = `images/blog/${newBlogId}/header/${filename}`
 
                 try {
                     await prisma.blog.update({
@@ -269,7 +269,7 @@ const add = async (req) => {
                             id: newBlogId,
                         },
                         data: {
-                            imgHead: newPath,
+                            imgHead: urlSavedToDB,
                         },
                     })
                     await fs.rename(oldPath, newPath)
@@ -304,6 +304,7 @@ const add = async (req) => {
                 const { path, filename, id: IdDetailImage } = image
                 const oldPath = path
                 const newPath = `public/images/blog/${newBlogId}/details/${filename}`
+                const urlSavedToDB = `images/blog/${newBlogId}/details/${filename}`
 
                 try {
                     await prisma.blogImage.update({
@@ -311,7 +312,7 @@ const add = async (req) => {
                             id: IdDetailImage,
                         },
                         data: {
-                            image: newPath,
+                            image: urlSavedToDB,
                         },
                     })
                     await fs.rename(oldPath, newPath)
@@ -696,10 +697,6 @@ const update = async (req) => {
         }
     }
 
-    logger.info('WAKAKAK')
-    logger.info(data)
-    logger.info(isActive)
-
     return prismaClient.$transaction(async (prisma) => {
         const findBlog = await prisma.blog.findUnique({
             where: {
@@ -834,13 +831,14 @@ const update = async (req) => {
                     const { path, filename } = image
                     const oldPath = path
                     const newPath = `public/images/blog/${blogId}/header/${filename}`
+                    const urlSavedToDB = `images/blog/${blogId}/header/${filename}`
 
                     await prisma.blog.update({
                         where: {
                             id: parseInt(blogId),
                         },
                         data: {
-                            imgHead: newPath,
+                            imgHead: urlSavedToDB,
                         },
                     })
 
@@ -863,13 +861,14 @@ const update = async (req) => {
                     const { path, filename, id: IdDetailImage } = image
                     const oldPath = path
                     const newPath = `public/images/blog/${blogId}/details/${filename}`
+                    const urlSavedToDB = `images/blog/${blogId}/details/${filename}`
 
                     await prisma.blogImage.update({
                         where: {
                             id: IdDetailImage,
                         },
                         data: {
-                            image: newPath,
+                            image: urlSavedToDB,
                         },
                     })
                     await fs.rename(oldPath, newPath)
