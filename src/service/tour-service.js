@@ -223,13 +223,14 @@ const add = async (req) => {
             for (const image of imgHead) {
                 const { path: oldPath, filename } = image
                 const newPath = `public/images/tour/${newTourId}/header/${filename}`
+                const urlSavedToDB = `images/tour/${newTourId}/header/${filename}`
 
                 await prisma.tour.update({
                     where: {
                         id: newTourId,
                     },
                     data: {
-                        imgHead: newPath,
+                        imgHead: urlSavedToDB,
                     },
                 })
                 await fs.rename(oldPath, newPath)
@@ -253,13 +254,14 @@ const add = async (req) => {
             for (const image of imgDetail) {
                 const { id: IdDetailImage, path: oldPath, filename } = image
                 const newPath = `public/images/tour/${newTourId}/details/${filename}`
+                const urlSavedToDB = `images/tour/${newTourId}/details/${filename}`
 
                 await prisma.tourImage.update({
                     where: {
                         id: IdDetailImage,
                     },
                     data: {
-                        image: newPath,
+                        image: urlSavedToDB,
                     },
                 })
                 await fs.rename(oldPath, newPath)
@@ -816,13 +818,14 @@ const update = async (req) => {
             for (const image of imgHead) {
                 const { path: oldPath, filename } = image
                 const newPath = `public/images/tour/${tourId}/header/${filename}`
+                const urlSavedToDB = `images/tour/${tourId}/header/${filename}`
 
                 await prisma.tour.update({
                     where: {
                         id: parseInt(tourId),
                     },
                     data: {
-                        imgHead: newPath,
+                        imgHead: urlSavedToDB,
                     },
                 })
                 await fs.rename(oldPath, newPath)
@@ -847,13 +850,14 @@ const update = async (req) => {
             for (const image of imgDetail) {
                 const { id: IdDetailImage, path: oldPath, filename } = image
                 const newPath = `public/images/tour/${tourId}/details/${filename}`
+                const urlSavedToDB = `images/tour/${tourId}/details/${filename}`
 
                 await prisma.tourImage.update({
                     where: {
                         id: IdDetailImage,
                     },
                     data: {
-                        image: newPath,
+                        image: urlSavedToDB,
                     },
                 })
                 await fs.rename(oldPath, newPath)
