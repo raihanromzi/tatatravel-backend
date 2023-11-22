@@ -397,6 +397,7 @@ const getById = async (req) => {
                 id: parseInt(id),
             },
             select: {
+                id: true,
                 title: true,
                 slug: true,
                 desc: true,
@@ -416,6 +417,7 @@ const getById = async (req) => {
                 },
                 category: {
                     select: {
+                        id: true,
                         name: true,
                     },
                 },
@@ -432,6 +434,7 @@ const getById = async (req) => {
         }
 
         const {
+            id: resultId,
             title,
             slug,
             desc,
@@ -445,10 +448,14 @@ const getById = async (req) => {
         } = result
 
         return {
+            id: resultId,
             title: title,
             author: user,
             slug: slug,
-            category: category.name,
+            category: {
+                id: category.id,
+                name: category.name,
+            },
             desc: desc,
             isActive: isActive,
             content: content,
@@ -506,6 +513,7 @@ const get = async (req) => {
                 AND: filters,
             },
             select: {
+                id: true,
                 title: true,
                 slug: true,
                 desc: true,
@@ -525,6 +533,7 @@ const get = async (req) => {
                 },
                 category: {
                     select: {
+                        id: true,
                         name: true,
                     },
                 },
@@ -546,6 +555,7 @@ const get = async (req) => {
 
         for (let i = 0; i <= blogs.length - 1; i++) {
             const {
+                id,
                 title,
                 slug,
                 desc,
@@ -558,10 +568,14 @@ const get = async (req) => {
                 createdAt,
             } = blogs[i]
             blogs[i] = {
+                id: id,
                 title: title,
                 author: user,
                 slug: slug,
-                category: category.name,
+                category: {
+                    id: category.id,
+                    name: category.name,
+                },
                 desc: desc,
                 isActive: isActive,
                 content: content,
