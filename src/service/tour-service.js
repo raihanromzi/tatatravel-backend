@@ -23,6 +23,7 @@ const add = async (req) => {
         countryId: countryIdTourExist,
         imgHead: imgHeadTourExist,
         imgDetail: imgDetailTourExist,
+        slug: slugTourExist,
     } = req.body
 
     if (
@@ -32,7 +33,8 @@ const add = async (req) => {
             !dateEndTourExist ||
             !descriptionTourExist ||
             !placeTourExist ||
-            !countryIdTourExist) &&
+            !countryIdTourExist ||
+            !slugTourExist) &&
         req.files
     ) {
         throw new MulterError(
@@ -61,7 +63,7 @@ const add = async (req) => {
         }
     }
 
-    const { name, price, dateStart, dateEnd, desc, place, countryId } = validate(
+    const { name, price, dateStart, dateEnd, desc, place, countryId, slug } = validate(
         addTourValidationSchema,
         req.body
     )
@@ -164,6 +166,7 @@ const add = async (req) => {
                         },
                     },
                     imgHead: imgHead[0].path,
+                    slug: slug,
                     imgDetail: {
                         createMany: {
                             data: imgDetail.map((image) => {
@@ -293,6 +296,7 @@ const add = async (req) => {
                 dateEnd: true,
                 duration: true,
                 desc: true,
+                slug: true,
                 imgHead: true,
                 imgDetail: {
                     select: {
@@ -325,6 +329,7 @@ const add = async (req) => {
             dateEnd: resultDateEnd,
             duration: resultDuration,
             desc: resultDescription,
+            slug: resultSlug,
             imgHead: resultImgHead,
             imgDetail: resultImgDetail,
             Place: resultPlace,
@@ -339,6 +344,7 @@ const add = async (req) => {
             dateEnd: resultDateEnd,
             duration: resultDuration,
             desc: resultDescription,
+            slug: resultSlug,
             imgHead: resultImgHead,
             imgDetail: resultImgDetail,
             place: resultPlace.map((place) => place.name),
@@ -371,6 +377,7 @@ const getById = async (req) => {
                 dateEnd: true,
                 duration: true,
                 desc: true,
+                slug: true,
                 isActive: true,
                 imgHead: true,
                 imgDetail: {
@@ -413,6 +420,7 @@ const getById = async (req) => {
             dateEnd: resultDateEnd,
             duration: resultDuration,
             desc: resultDescription,
+            slug: resultSlug,
             isActive: resultIsActive,
             imgHead: resultImgHead,
             imgDetail: resultImgDetail,
@@ -429,6 +437,7 @@ const getById = async (req) => {
             dateEnd: resultDateEnd,
             duration: resultDuration,
             desc: resultDescription,
+            slug: resultSlug,
             isActive: resultIsActive,
             imgHead: resultImgHead,
             imgDetail: resultImgDetail,
@@ -507,6 +516,7 @@ const get = async (req) => {
                 dateEnd: true,
                 duration: true,
                 desc: true,
+                slug: true,
                 isActive: true,
                 imgHead: true,
                 imgDetail: {
@@ -555,6 +565,7 @@ const get = async (req) => {
                     dateEnd: resultDateEnd,
                     duration: resultDuration,
                     desc: resultDescription,
+                    slug: resultSlug,
                     isActive: resultIsActive,
                     imgHead: resultImgHead,
                     imgDetail: resultImgDetail,
@@ -571,6 +582,7 @@ const get = async (req) => {
                     dateEnd: resultDateEnd,
                     duration: resultDuration,
                     desc: resultDescription,
+                    slug: resultSlug,
                     isActive: resultIsActive,
                     imgHead: resultImgHead,
                     imgDetail: resultImgDetail,
@@ -591,7 +603,7 @@ const get = async (req) => {
 
 const update = async (req) => {
     const { id: tourId } = validate(idTourValidationSchema, req.params)
-    const { name, price, dateStart, dateEnd, desc, place, countryId, isActive } = validate(
+    const { name, price, dateStart, dateEnd, desc, place, countryId, isActive, slug } = validate(
         updateTourValidationSchema,
         req.body
     )
@@ -710,6 +722,26 @@ const update = async (req) => {
             }
         }
 
+        if (slug) {
+            const findSlug = await prisma.tour.findUnique({
+                where: {
+                    NOT: {
+                        id: parseInt(tourId),
+                    },
+                    slug: slug,
+                },
+            })
+
+            if (findSlug) {
+                throw new MulterErrorMultipleImages(
+                    errors.HTTP.CODE.BAD_REQUEST,
+                    errors.HTTP.STATUS.BAD_REQUEST,
+                    errors.TOUR.SLUG.ALREADY_EXISTS,
+                    [imgDetail, imgHead]
+                )
+            }
+        }
+
         try {
             await fs.access(`public/images/tour/${tourId}/details`)
             await fs.access(`public/images/tour/${tourId}/header`)
@@ -747,6 +779,7 @@ const update = async (req) => {
                     dateEnd: dateEnd,
                     duration: dateEnd - dateStart,
                     desc: desc,
+                    slug: slug,
                     Place: {
                         createMany: {
                             data: place.map((place) => {
@@ -889,6 +922,7 @@ const update = async (req) => {
                 dateEnd: true,
                 duration: true,
                 desc: true,
+                slug: true,
                 isActive: true,
                 imgHead: true,
                 imgDetail: {
@@ -923,6 +957,7 @@ const update = async (req) => {
             dateEnd: resultDateEnd,
             duration: resultDuration,
             desc: resultDescription,
+            slug: resultSlug,
             isActive: resultIsActive,
             imgHead: resultImgHead,
             imgDetail: resultImgDetail,
@@ -939,6 +974,7 @@ const update = async (req) => {
             dateEnd: resultDateEnd,
             duration: resultDuration,
             desc: resultDescription,
+            slug: resultSlug,
             isActive: resultIsActive,
             imgHead: resultImgHead,
             imgDetail: resultImgDetail,

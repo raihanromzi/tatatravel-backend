@@ -81,6 +81,17 @@ const addTourValidationSchema = Joi.object({
         'string.base': errors.COUNTRY.ID.MUST_BE_VALID,
         'any.required': errors.COUNTRY.ID.IS_REQUIRED,
     }),
+    slug: Joi.string()
+        .min(3)
+        .max(100)
+        .required()
+        .messages({
+            'string.base': `${errors.TOUR.SLUG.MUST_BE_STRING}`,
+            'string.empty': `${errors.TOUR.SLUG.CANNOT_BE_EMPTY}`,
+            'string.min': `${errors.TOUR.SLUG.MUST_BE_3_CHAR_MIN}`,
+            'string.max': `${errors.TOUR.SLUG.MUST_BE_100_CHAR_MAX}`,
+            'any.required': `${errors.TOUR.SLUG.IS_REQUIRED}`,
+        }),
     imgHead: Joi.string()
         .empty('')
         .messages({
@@ -252,6 +263,16 @@ const updateTourValidationSchema = Joi.object({
             'string.empty': `${errors.TOUR.DESC.CANNOT_BE_EMPTY}`,
             'string.min': `${errors.TOUR.DESC.MUST_BE_3_CHAR_MIN}`,
             'string.max': `${errors.TOUR.DESC.MUST_BE_255_CHAR_MAX}`,
+        }),
+    slug: Joi.string()
+        .optional()
+        .min(3)
+        .max(100)
+        .messages({
+            'string.base': `${errors.TOUR.SLUG.MUST_BE_STRING}`,
+            'string.empty': `${errors.TOUR.SLUG.CANNOT_BE_EMPTY}`,
+            'string.min': `${errors.TOUR.SLUG.MUST_BE_3_CHAR_MIN}`,
+            'string.max': `${errors.TOUR.SLUG.MUST_BE_100_CHAR_MAX}`,
         }),
     isActive: Joi.boolean()
         .optional()
