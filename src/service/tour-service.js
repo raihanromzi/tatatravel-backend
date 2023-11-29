@@ -141,6 +141,21 @@ const add = async (req) => {
             )
         }
 
+        const findSlug = await prisma.tour.findUnique({
+            where: {
+                slug: slug,
+            },
+        })
+
+        if (findSlug) {
+            throw new MulterErrorMultipleImages(
+                errors.HTTP.CODE.BAD_REQUEST,
+                errors.HTTP.STATUS.BAD_REQUEST,
+                errors.TOUR.SLUG.ALREADY_EXISTS,
+                [imgDetail, imgHead]
+            )
+        }
+
         let newTour = null
         try {
             newTour = await prisma.tour.create({
