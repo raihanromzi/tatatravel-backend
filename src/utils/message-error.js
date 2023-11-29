@@ -369,6 +369,7 @@ const tourErrors = {
             'Invalid image format. Please upload images in PNG, JPG, or JPEG format.',
         IS_REQUIRED: 'At least 1 image of header and 1 image of details is required for a tour.',
         HEADER_IMAGE_MUST_BE_ONE: 'Only 1 header image is allowed.',
+        FIELD_NAME_MUST_STRING: 'The field name must be a valid string.',
     },
     IS_ACTIVE: {
         MUST_BE_BOOLEAN: 'The is active value must be a valid boolean.',

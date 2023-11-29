@@ -624,22 +624,6 @@ const update = async (req) => {
     )
     const images = validate(imagesValidationSchema, req.files)
 
-    if (!parseInt(tourId)) {
-        throw new ResponseError(
-            errors.HTTP.CODE.BAD_REQUEST,
-            errors.HTTP.STATUS.BAD_REQUEST,
-            errors.TOUR.ID.MUST_BE_VALID
-        )
-    }
-
-    if (!parseInt(countryId)) {
-        throw new ResponseError(
-            errors.HTTP.CODE.BAD_REQUEST,
-            errors.HTTP.STATUS.BAD_REQUEST,
-            errors.COUNTRY.ID.MUST_BE_VALID
-        )
-    }
-
     if (
         !images.every((image) => image.fieldname === 'imgDetail' || image.fieldname === 'imgHead')
     ) {
