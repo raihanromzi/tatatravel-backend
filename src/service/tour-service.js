@@ -695,15 +695,6 @@ const update = async (req) => {
             )
         }
 
-        if (findTour.isActive === false) {
-            throw new MulterErrorMultipleImages(
-                errors.HTTP.CODE.BAD_REQUEST,
-                errors.HTTP.STATUS.BAD_REQUEST,
-                errors.TOUR.IS_NOT_ACTIVE,
-                [imgDetail, imgHead]
-            )
-        }
-
         if (countryId) {
             const findCountry = await prisma.country.findUnique({
                 where: {
