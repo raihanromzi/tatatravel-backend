@@ -467,21 +467,13 @@ const getById = async (req) => {
 }
 
 const get = async (req) => {
-    const { title, desc, page, size, sortBy, orderBy, isActive } = validate(
-        getBlogValidationSchema,
-        req.query
-    )
+    const { page, size, sortBy, orderBy } = validate(getBlogValidationSchema, req.query)
+    const { sl, s, c } = req.query
     const skip = (page - 1) * size
     const filters = []
 
     if (sortBy) {
-        if (
-            sortBy !== 'id' &&
-            sortBy !== 'title' &&
-            sortBy !== 'slug' &&
-            sortBy !== 'desc' &&
-            sortBy !== 'content'
-        ) {
+        if (sortBy !== 'sl' && sortBy !== 's' && sortBy !== 'c' && sortBy !== 'createdAt') {
             throw new ResponseError(
                 errors.HTTP.CODE.BAD_REQUEST,
                 errors.HTTP.STATUS.BAD_REQUEST,
@@ -490,30 +482,46 @@ const get = async (req) => {
         }
     }
 
-    if (title) {
+    if (sl) {
         filters.push({
-            title: {
-                contains: title,
+            slug: sl,
+        })
+    }
+
+    if (c) {
+        filters.push({
+            category: {
+                name: {
+                    contains: c,
+                },
             },
         })
     }
 
-    if (desc) {
+    if (s) {
         filters.push({
-            desc: {
-                contains: desc,
-            },
+            OR: [
+                {
+                    title: {
+                        contains: s,
+                    },
+                },
+                {
+                    desc: {
+                        contains: s,
+                    },
+                },
+            ],
         })
     }
 
     return prismaClient.$transaction(async (prisma) => {
         const blogs = await prisma.blog.findMany({
             where: {
-                isActive: isActive,
+                isActive: true,
                 AND: filters,
             },
             select: {
-                id: true,
                 title: true,
                 slug: true,
                 desc: true,
@@ -533,7 +541,6 @@ const get = async (req) => {
                 },
                 category: {
                     select: {
-                        id: true,
                         name: true,
                     },
                 },
@@ -548,14 +555,12 @@ const get = async (req) => {
 
         const totalItems = await prisma.blog.count({
             where: {
-                isActive: isActive,
-                AND: filters,
+                isActive: true,
             },
         })
 
         for (let i = 0; i <= blogs.length - 1; i++) {
             const {
-                id,
                 title,
                 slug,
                 desc,
@@ -568,14 +573,10 @@ const get = async (req) => {
                 createdAt,
             } = blogs[i]
             blogs[i] = {
-                id: id,
                 title: title,
-                author: user,
                 slug: slug,
-                category: {
-                    id: category.id,
-                    name: category.name,
-                },
+                author: user,
+                category: category.name,
                 desc: desc,
                 isActive: isActive,
                 content: content,

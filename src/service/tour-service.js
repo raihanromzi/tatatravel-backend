@@ -464,20 +464,18 @@ const getById = async (req) => {
 }
 
 const get = async (req) => {
-    const { page, size, sortBy, orderBy, name, place, country, isActive } = validate(
-        getTourValidationSchema,
-        req.query
-    )
+    const { page, size, sortBy, orderBy } = validate(getTourValidationSchema, req.query)
+    const { sl, pl, c, s } = req.query
     const skip = (page - 1) * size
     const filters = []
 
     if (sortBy) {
         if (
-            sortBy !== 'id' &&
-            sortBy !== 'name' &&
-            sortBy !== 'price' &&
-            sortBy !== 'dateStart' &&
-            sortBy !== 'dateEnd'
+            sortBy !== 'sl' &&
+            sortBy !== 'st' &&
+            sortBy !== 'pl' &&
+            sortBy !== 'c' &&
+            sortBy !== 'createdAt'
         ) {
             throw new ResponseError(
                 errors.HTTP.CODE.BAD_REQUEST,
@@ -487,44 +485,60 @@ const get = async (req) => {
         }
     }
 
-    if (name) {
+    if (sl) {
         filters.push({
-            name: name,
+            slug: sl,
         })
     }
 
-    if (place) {
+    if (pl) {
         filters.push({
             Place: {
                 some: {
                     name: {
-                        contains: place,
+                        contains: pl,
                     },
                 },
             },
         })
     }
 
-    if (country) {
+    if (c) {
         filters.push({
             TourCountry: {
                 some: {
                     country: {
-                        name: country,
+                        name: c,
                     },
                 },
             },
+        })
+    }
+
+    if (s) {
+        filters.push({
+            OR: [
+                {
+                    name: {
+                        contains: s,
+                    },
+                },
+                {
+                    desc: {
+                        contains: s,
+                    },
+                },
+            ],
         })
     }
 
     return prismaClient.$transaction(async (prisma) => {
         const tours = await prisma.tour.findMany({
             where: {
-                isActive: isActive,
+                isActive: true,
                 AND: filters,
             },
             select: {
-                id: true,
                 name: true,
                 price: true,
                 dateStart: true,
@@ -536,7 +550,6 @@ const get = async (req) => {
                 imgHead: true,
                 imgDetail: {
                     select: {
-                        id: true,
                         image: true,
                     },
                 },
@@ -565,7 +578,7 @@ const get = async (req) => {
 
         const totalItems = await prisma.tour.count({
             where: {
-                isActive: isActive,
+                isActive: true,
                 AND: filters,
             },
         })
@@ -573,7 +586,6 @@ const get = async (req) => {
         return {
             data: tours.map((tour) => {
                 const {
-                    id: resultId,
                     name: resultName,
                     price: resultPrice,
                     dateStart: resultDateStart,
@@ -590,7 +602,6 @@ const get = async (req) => {
                 } = tour
 
                 return {
-                    id: resultId,
                     name: resultName,
                     price: resultPrice,
                     dateStart: resultDateStart,
@@ -600,7 +611,7 @@ const get = async (req) => {
                     slug: resultSlug,
                     isActive: resultIsActive,
                     imgHead: resultImgHead,
-                    imgDetail: resultImgDetail,
+                    imgDetail: resultImgDetail.map((image) => image.image),
                     place: resultPlace.map((place) => place.name),
                     country: resultTourCountry.map((country) => country.country.name),
                     createdAt: resultCreatedAt,
