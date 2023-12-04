@@ -470,17 +470,11 @@ const get = async (req) => {
     const filters = []
 
     if (sortBy) {
-        if (
-            sortBy !== 'sl' &&
-            sortBy !== 'st' &&
-            sortBy !== 'pl' &&
-            sortBy !== 'c' &&
-            sortBy !== 'createdAt'
-        ) {
+        if (sortBy !== 'createdAt') {
             throw new ResponseError(
                 errors.HTTP.CODE.BAD_REQUEST,
                 errors.HTTP.STATUS.BAD_REQUEST,
-                errors.SORT_BY.MUST_VALID
+                errors.SORT_BY.MUST_BE_VALID
             )
         }
     }
