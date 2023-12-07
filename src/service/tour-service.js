@@ -23,6 +23,7 @@ const add = async (req) => {
         countryId: countryIdTourExist,
         imgHead: imgHeadTourExist,
         imgDetail: imgDetailTourExist,
+        slug: slugTourExist,
     } = req.body
 
     if (
@@ -32,7 +33,8 @@ const add = async (req) => {
             !dateEndTourExist ||
             !descriptionTourExist ||
             !placeTourExist ||
-            !countryIdTourExist) &&
+            !countryIdTourExist ||
+            !slugTourExist) &&
         req.files
     ) {
         throw new MulterError(
@@ -61,7 +63,7 @@ const add = async (req) => {
         }
     }
 
-    const { name, price, dateStart, dateEnd, desc, place, countryId } = validate(
+    const { name, price, dateStart, dateEnd, desc, place, countryId, slug } = validate(
         addTourValidationSchema,
         req.body
     )
@@ -139,6 +141,21 @@ const add = async (req) => {
             )
         }
 
+        const findSlug = await prisma.tour.findUnique({
+            where: {
+                slug: slug,
+            },
+        })
+
+        if (findSlug) {
+            throw new MulterErrorMultipleImages(
+                errors.HTTP.CODE.BAD_REQUEST,
+                errors.HTTP.STATUS.BAD_REQUEST,
+                errors.TOUR.SLUG.ALREADY_EXISTS,
+                [imgDetail, imgHead]
+            )
+        }
+
         let newTour = null
         try {
             newTour = await prisma.tour.create({
@@ -164,6 +181,7 @@ const add = async (req) => {
                         },
                     },
                     imgHead: imgHead[0].path,
+                    slug: slug,
                     imgDetail: {
                         createMany: {
                             data: imgDetail.map((image) => {
@@ -293,6 +311,7 @@ const add = async (req) => {
                 dateEnd: true,
                 duration: true,
                 desc: true,
+                slug: true,
                 imgHead: true,
                 imgDetail: {
                     select: {
@@ -325,6 +344,7 @@ const add = async (req) => {
             dateEnd: resultDateEnd,
             duration: resultDuration,
             desc: resultDescription,
+            slug: resultSlug,
             imgHead: resultImgHead,
             imgDetail: resultImgDetail,
             Place: resultPlace,
@@ -339,6 +359,7 @@ const add = async (req) => {
             dateEnd: resultDateEnd,
             duration: resultDuration,
             desc: resultDescription,
+            slug: resultSlug,
             imgHead: resultImgHead,
             imgDetail: resultImgDetail,
             place: resultPlace.map((place) => place.name),
@@ -371,6 +392,7 @@ const getById = async (req) => {
                 dateEnd: true,
                 duration: true,
                 desc: true,
+                slug: true,
                 isActive: true,
                 imgHead: true,
                 imgDetail: {
@@ -413,6 +435,7 @@ const getById = async (req) => {
             dateEnd: resultDateEnd,
             duration: resultDuration,
             desc: resultDescription,
+            slug: resultSlug,
             isActive: resultIsActive,
             imgHead: resultImgHead,
             imgDetail: resultImgDetail,
@@ -429,6 +452,7 @@ const getById = async (req) => {
             dateEnd: resultDateEnd,
             duration: resultDuration,
             desc: resultDescription,
+            slug: resultSlug,
             isActive: resultIsActive,
             imgHead: resultImgHead,
             imgDetail: resultImgDetail,
@@ -440,78 +464,86 @@ const getById = async (req) => {
 }
 
 const get = async (req) => {
-    const { page, size, sortBy, orderBy, name, place, country, isActive } = validate(
-        getTourValidationSchema,
-        req.query
-    )
+    const { page, size, sortBy, orderBy } = validate(getTourValidationSchema, req.query)
+    const { sl, pl, c, s } = req.query
     const skip = (page - 1) * size
     const filters = []
 
     if (sortBy) {
-        if (
-            sortBy !== 'id' &&
-            sortBy !== 'name' &&
-            sortBy !== 'price' &&
-            sortBy !== 'dateStart' &&
-            sortBy !== 'dateEnd'
-        ) {
+        if (sortBy !== 'createdAt') {
             throw new ResponseError(
                 errors.HTTP.CODE.BAD_REQUEST,
                 errors.HTTP.STATUS.BAD_REQUEST,
-                errors.SORT_BY.MUST_VALID
+                errors.SORT_BY.MUST_BE_VALID
             )
         }
     }
 
-    if (name) {
+    if (sl) {
         filters.push({
-            name: name,
+            slug: sl,
         })
     }
 
-    if (place) {
+    if (pl) {
         filters.push({
             Place: {
                 some: {
                     name: {
-                        contains: place,
+                        contains: pl,
                     },
                 },
             },
         })
     }
 
-    if (country) {
+    if (c) {
         filters.push({
             TourCountry: {
                 some: {
                     country: {
-                        name: country,
+                        name: c,
                     },
                 },
             },
+        })
+    }
+
+    if (s) {
+        filters.push({
+            OR: [
+                {
+                    name: {
+                        contains: s,
+                    },
+                },
+                {
+                    desc: {
+                        contains: s,
+                    },
+                },
+            ],
         })
     }
 
     return prismaClient.$transaction(async (prisma) => {
         const tours = await prisma.tour.findMany({
             where: {
-                isActive: isActive,
+                isActive: true,
                 AND: filters,
             },
             select: {
-                id: true,
                 name: true,
                 price: true,
                 dateStart: true,
                 dateEnd: true,
                 duration: true,
                 desc: true,
+                slug: true,
                 isActive: true,
                 imgHead: true,
                 imgDetail: {
                     select: {
-                        id: true,
                         image: true,
                     },
                 },
@@ -540,7 +572,7 @@ const get = async (req) => {
 
         const totalItems = await prisma.tour.count({
             where: {
-                isActive: isActive,
+                isActive: true,
                 AND: filters,
             },
         })
@@ -548,13 +580,13 @@ const get = async (req) => {
         return {
             data: tours.map((tour) => {
                 const {
-                    id: resultId,
                     name: resultName,
                     price: resultPrice,
                     dateStart: resultDateStart,
                     dateEnd: resultDateEnd,
                     duration: resultDuration,
                     desc: resultDescription,
+                    slug: resultSlug,
                     isActive: resultIsActive,
                     imgHead: resultImgHead,
                     imgDetail: resultImgDetail,
@@ -564,16 +596,16 @@ const get = async (req) => {
                 } = tour
 
                 return {
-                    id: resultId,
                     name: resultName,
                     price: resultPrice,
                     dateStart: resultDateStart,
                     dateEnd: resultDateEnd,
                     duration: resultDuration,
                     desc: resultDescription,
+                    slug: resultSlug,
                     isActive: resultIsActive,
                     imgHead: resultImgHead,
-                    imgDetail: resultImgDetail,
+                    imgDetail: resultImgDetail.map((image) => image.image),
                     place: resultPlace.map((place) => place.name),
                     country: resultTourCountry.map((country) => country.country.name),
                     createdAt: resultCreatedAt,
@@ -591,27 +623,11 @@ const get = async (req) => {
 
 const update = async (req) => {
     const { id: tourId } = validate(idTourValidationSchema, req.params)
-    const { name, price, dateStart, dateEnd, desc, place, countryId, isActive } = validate(
+    const { name, price, dateStart, dateEnd, desc, place, countryId, isActive, slug } = validate(
         updateTourValidationSchema,
         req.body
     )
     const images = validate(imagesValidationSchema, req.files)
-
-    if (!parseInt(tourId)) {
-        throw new ResponseError(
-            errors.HTTP.CODE.BAD_REQUEST,
-            errors.HTTP.STATUS.BAD_REQUEST,
-            errors.TOUR.ID.MUST_BE_VALID
-        )
-    }
-
-    if (!parseInt(countryId)) {
-        throw new ResponseError(
-            errors.HTTP.CODE.BAD_REQUEST,
-            errors.HTTP.STATUS.BAD_REQUEST,
-            errors.COUNTRY.ID.MUST_BE_VALID
-        )
-    }
 
     if (
         !images.every((image) => image.fieldname === 'imgDetail' || image.fieldname === 'imgHead')
@@ -684,15 +700,6 @@ const update = async (req) => {
             )
         }
 
-        if (findTour.isActive === false) {
-            throw new MulterErrorMultipleImages(
-                errors.HTTP.CODE.BAD_REQUEST,
-                errors.HTTP.STATUS.BAD_REQUEST,
-                errors.TOUR.IS_NOT_ACTIVE,
-                [imgDetail, imgHead]
-            )
-        }
-
         if (countryId) {
             const findCountry = await prisma.country.findUnique({
                 where: {
@@ -705,6 +712,26 @@ const update = async (req) => {
                     errors.HTTP.CODE.NOT_FOUND,
                     errors.HTTP.STATUS.NOT_FOUND,
                     errors.COUNTRY.NOT_FOUND,
+                    [imgDetail, imgHead]
+                )
+            }
+        }
+
+        if (slug) {
+            const findSlug = await prisma.tour.findUnique({
+                where: {
+                    NOT: {
+                        id: parseInt(tourId),
+                    },
+                    slug: slug,
+                },
+            })
+
+            if (findSlug) {
+                throw new MulterErrorMultipleImages(
+                    errors.HTTP.CODE.BAD_REQUEST,
+                    errors.HTTP.STATUS.BAD_REQUEST,
+                    errors.TOUR.SLUG.ALREADY_EXISTS,
                     [imgDetail, imgHead]
                 )
             }
@@ -747,6 +774,7 @@ const update = async (req) => {
                     dateEnd: dateEnd,
                     duration: dateEnd - dateStart,
                     desc: desc,
+                    slug: slug,
                     Place: {
                         createMany: {
                             data: place.map((place) => {
@@ -889,6 +917,7 @@ const update = async (req) => {
                 dateEnd: true,
                 duration: true,
                 desc: true,
+                slug: true,
                 isActive: true,
                 imgHead: true,
                 imgDetail: {
@@ -923,6 +952,7 @@ const update = async (req) => {
             dateEnd: resultDateEnd,
             duration: resultDuration,
             desc: resultDescription,
+            slug: resultSlug,
             isActive: resultIsActive,
             imgHead: resultImgHead,
             imgDetail: resultImgDetail,
@@ -939,6 +969,7 @@ const update = async (req) => {
             dateEnd: resultDateEnd,
             duration: resultDuration,
             desc: resultDescription,
+            slug: resultSlug,
             isActive: resultIsActive,
             imgHead: resultImgHead,
             imgDetail: resultImgDetail,

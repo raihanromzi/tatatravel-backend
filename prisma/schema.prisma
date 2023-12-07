@@ -105,6 +105,7 @@ model Tour {
   duration    Int           @db.Int
   desc        String?       @db.VarChar(255)
   isActive    Boolean       @default(true)
+  slug        String        @unique @db.VarChar(100)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @default(now()) @updatedAt
   TourCountry TourCountry[]
