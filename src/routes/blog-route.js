@@ -8,5 +8,6 @@ blogRouter.patch('/v1/blogs/:id', blogController.update)
 blogRouter.get('/v1/blogs/:id', blogController.getById)
 blogRouter.get('/v1/blogs', blogController.get)
 blogRouter.delete('/v1/blogs/:id', blogController.remove)
+blogRouter.delete('/v1/blogImg/:id', blogController.removeImg)
 
 export { blogRouter }

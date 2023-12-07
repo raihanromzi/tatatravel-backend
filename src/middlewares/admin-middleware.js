@@ -42,7 +42,7 @@ const adminMiddleware = async (req, res, next) => {
 
     const { name, isActive: roleIsActive } = role
 
-    if (name.toLowerCase() !== 'super admin') {
+    if (name !== 'superAdmin') {
         res.status(errors.HTTP.CODE.UNAUTHORIZED)
             .send(
                 response.responseError(
