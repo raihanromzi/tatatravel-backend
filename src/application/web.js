@@ -14,7 +14,7 @@ import { blogRouter } from '../routes/blog-route.js'
 import { tourRouter } from '../routes/tour-route.js'
 import {
     accessTokenVerifyMiddleware,
-    refreshTokenVerifyMiddleware,
+    // refreshTokenVerifyMiddleware,
 } from '../middlewares/token-middleware.js'
 import { adminMiddleware } from '../middlewares/admin-middleware.js'
 import { errors } from '../utils/message-error.js'
@@ -31,11 +31,16 @@ web.use(cookieParser())
 web.use(checkDbMiddleware)
 web.use(multerMiddleware)
 
-web.use(cors())
+web.use(
+    cors({
+        credentials: true,
+        origin: 'http://localhost:8080',
+    })
+)
 
 web.use(publicRouter)
 
-web.use(refreshTokenVerifyMiddleware)
+// web.use(refreshTokenVerifyMiddleware)
 web.use(tokenRouter)
 
 web.use(accessTokenVerifyMiddleware)

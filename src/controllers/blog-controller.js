@@ -41,9 +41,9 @@ const get = async (req, res, next) => {
 
 const update = async (req, res, next) => {
     try {
-        const result = await blogService.update(req)
+        await blogService.update(req)
         res.status(success.HTTP.CODE.OK).send(
-            responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK, result)
+            responses.responseSuccess(success.HTTP.CODE.OK, success.HTTP.STATUS.OK)
         )
     } catch (e) {
         next(e)
@@ -64,5 +64,19 @@ const remove = async (req, res, next) => {
         next(e)
     }
 }
+const removeImg = async (req, res, next) => {
+    try {
+        await blogService.removeImg(req)
+        res.status(success.HTTP.CODE.OK).send(
+            responses.responseSuccess(
+                success.HTTP.CODE.OK,
+                success.HTTP.STATUS.OK,
+                success.BLOG.DELETE
+            )
+        )
+    } catch (e) {
+        next(e)
+    }
+}
 
-export default { add, getById, get, remove, update }
+export default { add, getById, get, remove, update, removeImg }
